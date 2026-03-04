@@ -45,8 +45,8 @@ const HeroSection = () => {
                     </h1>
 
                     <p className="text-sm sm:text-base text-slate-600 font-jakarta leading-relaxed mb-4 lg:mb-5 max-w-xl">
-                        Track sales, monitor staff shifts, manage cash reconciliation, control credit customers,
-                        and generate reports — all from one powerful platform built for petrol pump owners.
+                        PetroFi is petrol pump management software that tracks sales, staff shifts, cash reconciliation,
+                        and credit—all in one platform. The petrol pump software trusted by 500+ owners in India.
                     </p>
 
                     {/* CTA Buttons */}

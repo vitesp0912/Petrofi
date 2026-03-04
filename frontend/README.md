@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+# PetroFi – Frontend
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+**SEO:** Technical and on-page SEO (meta, Open Graph, Twitter Card, JSON-LD, sitemap, llms.txt, headings, landmarks) are implemented. See [docs/SEO.md](docs/SEO.md) for details and maintenance.
 
 ## Available Scripts
 

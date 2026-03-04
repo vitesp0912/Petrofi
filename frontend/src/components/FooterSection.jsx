@@ -26,7 +26,7 @@ const FooterSection = () => {
                             <span className="text-xl font-bold text-white font-outfit">PetroFi</span>
                         </div>
                         <p className="text-slate-400 font-jakarta text-sm leading-relaxed max-w-xs mb-6">
-                            The complete operations platform built specifically for petrol pump owners and managers in India.
+                            Petrol pump management software and operations platform for petrol pump owners and managers in India.
                         </p>
                         <a
                             href="mailto:petrofibusiness@gmail.com"

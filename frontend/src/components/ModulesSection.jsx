@@ -81,16 +81,16 @@ const ModulesSection = ({ id }) => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section id={id || 'features'} data-testid="modules-section" className="py-24 bg-slate-50">
+        <section id={id || 'features'} aria-labelledby="features-heading" data-testid="modules-section" className="py-24 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''}`}>
                     <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Core Modules</p>
                     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
-                        <h2 className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy max-w-lg leading-tight">
-                            Built for Every Part of Pump Operations
+                        <h2 id="features-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy max-w-lg leading-tight">
+                            Petrol Pump Management Software for Every Workflow
                         </h2>
                         <p className="text-slate-500 font-jakarta text-sm max-w-xs">
-                            Six powerful modules that cover every workflow a petrol pump needs.
+                            Six modules that cover sales, cash, credit, shifts, expenses and reports—the complete petrol pump management system.
                         </p>
                     </div>
 

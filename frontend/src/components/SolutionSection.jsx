@@ -27,8 +27,8 @@ const SolutionSection = () => {
                             <span className="gradient-text">Digitally Controlled</span> Operation
                         </h2>
                         <p className="text-slate-500 font-jakarta text-base leading-relaxed mb-8">
-                            PetroFi replaces registers, spreadsheets and guesswork with a centralized system
-                            where every sale, shift, expense and reconciliation is tracked in real time —
+                            PetroFi is a petrol pump management system that replaces registers and spreadsheets.
+                            Every sale, shift, expense and reconciliation is tracked in real time —
                             accessible from your phone, anywhere.
                         </p>
                         <ul className="space-y-3 mb-8">

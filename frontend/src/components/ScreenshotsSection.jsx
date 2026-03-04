@@ -35,16 +35,16 @@ const ScreenshotsSection = ({ id }) => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section id={id || 'screenshots'} data-testid="screenshots-section" className="py-24 bg-white overflow-hidden">
+        <section id={id || 'screenshots'} aria-labelledby="screenshots-heading" data-testid="screenshots-section" className="py-24 bg-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''}`}>
                     <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">App Preview</p>
                     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
-                        <h2 className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight max-w-md">
+                        <h2 id="screenshots-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight max-w-md">
                             Inside the PetroFi App
                         </h2>
                         <p className="text-sm text-slate-500 font-jakarta max-w-xs">
-                            Every screen designed for pump owners and managers — fast, simple, and accurate.
+                            See what the petrol pump software looks like in action—every screen built for pump owners and managers.
                         </p>
                     </div>
                 </div>

@@ -20,7 +20,7 @@ function App() {
     return (
         <div className="font-jakarta">
             <Navbar />
-            <main>
+            <main id="main-content" aria-label="Main content">
                 <HeroSection />
                 <ProblemSection />
                 <SolutionSection />

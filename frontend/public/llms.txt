@@ -1,8 +1,8 @@
 # PetroFi
 
-> Smart petrol pump management software for India. Track sales, reconcile cash, manage shifts and credit—all in one app. Trusted by 500+ pump owners and built specifically for petrol pump owners and managers in India.
+> PetroFi is petrol pump management software for India. Track sales, reconcile cash, manage shifts and credit—all in one app. Petrol pump software free download on iOS and Android. Trusted by 500+ pump owners.
 
-PetroFi is the complete operations platform for petrol pump owners and managers. It offers dashboard overview, meter reading, expenses, credit ledger, shift management, reports, and cash reconciliation. Mobile apps are available on iOS and Android.
+PetroFi is a petrol pump management system and operations platform for petrol pump owners and managers. It offers dashboard overview, meter reading, expenses, credit ledger, shift management, reports, and cash reconciliation. Petrol pump software free download on App Store and Google Play.
 
 ## Contact
 

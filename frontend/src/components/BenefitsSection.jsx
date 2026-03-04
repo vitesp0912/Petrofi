@@ -15,13 +15,13 @@ const BenefitsSection = ({ id }) => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section id={id || 'benefits'} data-testid="benefits-section" className="py-24 bg-white">
+        <section id={id || 'benefits'} aria-labelledby="benefits-heading" data-testid="benefits-section" className="py-24 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''} grid grid-cols-1 lg:grid-cols-2 gap-16 items-center`}>
                     {/* Left */}
                     <div>
                         <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Why PetroFi</p>
-                        <h2 className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight mb-5">
+                        <h2 id="benefits-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight mb-5">
                             What PetroFi Changes for Petrol Pump Owners
                         </h2>
                         <p className="text-slate-500 font-jakarta text-base leading-relaxed mb-8">

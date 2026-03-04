@@ -33,15 +33,15 @@ const ProblemSection = () => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section id="problem" data-testid="problem-section" className="py-24 bg-slate-50">
+        <section id="problem" aria-labelledby="problem-heading" data-testid="problem-section" className="py-24 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''}`}>
                     <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">The Problem</p>
-                    <h2 className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy max-w-2xl leading-tight mb-4">
+                    <h2 id="problem-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy max-w-2xl leading-tight mb-4">
                         Petrol Pump Operations Shouldn't Depend on Registers and Guesswork
                     </h2>
                     <p className="text-slate-500 font-jakarta text-base max-w-xl mb-14">
-                        Every day, pump owners lose money and time to preventable inefficiencies. PetroFi was built to fix exactly these problems.
+                        Every day, pump owners lose money and time to preventable inefficiencies. The right petrol pump management software was built to fix exactly these problems—that’s PetroFi.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
