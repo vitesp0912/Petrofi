@@ -40,8 +40,8 @@ const HeroSection = () => {
                     </div>
 
                     <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-bold font-outfit text-pf-navy leading-[1.15] mb-3 lg:mb-4">
-                        Know Exactly What's Happening at Your{' '}
-                        <span className="gradient-text">Petrol Pump</span> — Anytime.
+                        Best Petrol Pump Software in India —{' '}
+                        <span className="gradient-text">One App, Full Control.</span>
                     </h1>
 
                     <p className="text-sm sm:text-base text-slate-600 font-jakarta leading-relaxed mb-4 lg:mb-5 max-w-xl">
