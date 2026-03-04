@@ -39,14 +39,16 @@ const SolutionSection = () => {
                                 </li>
                             ))}
                         </ul>
-                        <button
-                            onClick={scrollToDemo}
-                            data-testid="solution-cta-btn"
-                            className="inline-flex items-center gap-2 bg-pf-sky text-white px-6 py-3 rounded-lg font-semibold font-jakarta text-sm hover:bg-[#2aa5f0]"
-                            style={{ transition: 'background-color 0.2s ease' }}
-                        >
-                            See PetroFi in Action <ArrowRight size={16} />
-                        </button>
+                        <div className="flex justify-center lg:justify-start">
+                            <button
+                                onClick={scrollToDemo}
+                                data-testid="solution-cta-btn"
+                                className="inline-flex items-center gap-2 bg-pf-sky text-white px-6 py-3 rounded-lg font-semibold font-jakarta text-sm hover:bg-[#2aa5f0]"
+                                style={{ transition: 'background-color 0.2s ease' }}
+                            >
+                                See PetroFi in Action <ArrowRight size={16} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Right: Visual */}

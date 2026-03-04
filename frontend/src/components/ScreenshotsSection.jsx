@@ -14,7 +14,7 @@ const SCREENS = [
 ];
 
 const PhoneFrame = ({ title, image, delay, isVisible }) => (
-    <div className={`flex-shrink-0 w-28 sm:w-32 md:w-36 fade-up ${isVisible ? 'visible' : ''} ${delay}`}>
+    <div className={`flex-shrink-0 w-36 sm:w-40 md:w-44 fade-up ${isVisible ? 'visible' : ''} ${delay}`}>
         <div className="w-full aspect-[9/19.5] bg-slate-900 rounded-[20px] border-[3px] border-slate-200 shadow-xl overflow-hidden relative flex items-center justify-center">
             <img
                 src={image}
