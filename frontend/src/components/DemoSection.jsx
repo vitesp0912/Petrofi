@@ -52,10 +52,10 @@ const DemoSection = ({ id }) => {
                     <div>
                         <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Request Demo</p>
                         <h2 id="demo-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-white leading-tight mb-5">
-                            See PetroFi Running on a Real Petrol Pump
+                            See PetroFI Running on a Real Petrol Pump
                         </h2>
                         <p className="text-slate-400 font-jakarta text-base leading-relaxed mb-8">
-                            Book a personalized demo with our team. We'll show you exactly how PetroFi works
+                            Book a personalized demo with our team. We'll show you exactly how PetroFI works
                             for a pump like yours — live, not a recording.
                         </p>
                         <div className="space-y-3 mb-8">

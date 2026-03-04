@@ -25,9 +25,9 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const subject = `New PetroFi demo request from ${name || 'Prospect'}`;
+    const subject = `New PetroFI demo request from ${name || 'Prospect'}`;
     const text = [
-        'New demo request for PetroFi:',
+        'New demo request for PetroFI:',
         '',
         `Name: ${name || '-'}`,
         `Pump Name: ${pump_name || '-'}`,

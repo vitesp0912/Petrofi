@@ -20,17 +20,17 @@ const BenefitsSection = ({ id }) => {
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''} grid grid-cols-1 lg:grid-cols-2 gap-16 items-center`}>
                     {/* Left */}
                     <div>
-                        <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Why PetroFi</p>
+                        <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Why PetroFI</p>
                         <h2 id="benefits-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight mb-5">
-                            What PetroFi Changes for Petrol Pump Owners
+                            What PetroFI Changes for Petrol Pump Owners
                         </h2>
                         <p className="text-slate-500 font-jakarta text-base leading-relaxed mb-8">
-                            From day one, PetroFi gives you a level of operational control you never had before.
+                            From day one, PetroFI gives you a level of operational control you never had before.
                             These are the outcomes pump owners consistently report after switching.
                         </p>
                         <div className="bg-pf-navy/5 rounded-2xl p-5 border border-pf-navy/10">
                             <p className="text-pf-navy font-outfit font-bold text-lg mb-1">500+</p>
-                            <p className="text-slate-500 font-jakarta text-sm">Petrol pumps managed on PetroFi across India</p>
+                            <p className="text-slate-500 font-jakarta text-sm">Petrol pumps managed on PetroFI across India</p>
                         </div>
                     </div>
 

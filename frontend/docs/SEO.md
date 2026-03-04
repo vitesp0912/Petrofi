@@ -1,6 +1,6 @@
-# SEO Implementation (PetroFi)
+# SEO Implementation (PetroFI)
 
-This document describes the technical and on-page SEO setup for the PetroFi marketing site.
+This document describes the technical and on-page SEO setup for the PetroFI marketing site.
 
 ## Technical SEO
 
@@ -56,8 +56,8 @@ Section IDs used for in-page links: `#features`, `#how-it-works`, `#screenshots`
 ### Images
 
 - **Hero**: Decorative logo watermark uses `alt=""` and `aria-hidden="true"`.
-- **Content images**: Descriptive `alt` (e.g. “PetroFi mobile app”, screenshot titles in carousel).
-- **Logos**: Navbar and footer logo use `alt="PetroFi Logo"` / `alt="PetroFi"`.
+- **Content images**: Descriptive `alt` (e.g. “PetroFI mobile app”, screenshot titles in carousel).
+- **Logos**: Navbar and footer logo use `alt="PetroFI Logo"` / `alt="PetroFI"`.
 
 ---
 

@@ -34,10 +34,10 @@ const Navbar = () => {
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                     <img
                         src="https://customer-assets.emergentagent.com/job_shift-clarity/artifacts/zbnh3pqn_app_icon.png"
-                        alt="PetroFi Logo"
+                        alt="PetroFI Logo"
                         className="w-9 h-9 object-contain"
                     />
-                    <span className="text-xl font-bold text-pf-navy font-outfit">PetroFi</span>
+                    <span className="text-xl font-bold text-pf-navy font-outfit">PetroFI</span>
                 </div>
 
                 {/* Desktop Nav */}

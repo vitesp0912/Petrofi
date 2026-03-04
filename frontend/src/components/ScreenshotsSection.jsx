@@ -41,7 +41,7 @@ const ScreenshotsSection = ({ id }) => {
                     <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">App Preview</p>
                     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
                         <h2 id="screenshots-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight max-w-md">
-                            Inside the PetroFi App
+                            Inside the PetroFI App
                         </h2>
                         <p className="text-sm text-slate-500 font-jakarta max-w-xs">
                             See what the petrol pump software looks like in action. Every screen built for pump owners and managers.

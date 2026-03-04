@@ -45,7 +45,7 @@ const HeroSection = () => {
                     </h1>
 
                     <p className="text-sm sm:text-base text-slate-600 font-jakarta leading-relaxed mb-4 lg:mb-5 max-w-xl">
-                        PetroFi is petrol pump management software that tracks sales, staff shifts, cash reconciliation,
+                        PetroFI is petrol pump management software that tracks sales, staff shifts, cash reconciliation,
                         and credit, all in one platform. The petrol pump software trusted by 500+ owners in India.
                     </p>
 
@@ -86,7 +86,7 @@ const HeroSection = () => {
                     <div className="phone-slide-in w-full max-w-[240px] lg:max-w-[260px] flex justify-center">
                         <img
                             src="/mobile.png"
-                            alt="PetroFi mobile app"
+                            alt="PetroFI mobile app"
                             className="w-full animate-float object-contain"
                         />
                     </div>

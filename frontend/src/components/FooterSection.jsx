@@ -3,7 +3,7 @@ import { Mail, ExternalLink } from 'lucide-react';
 
 const LINKS = {
     Product: ['Features', 'Dashboard', 'Reports', 'Mobile App'],
-    Company: ['About PetroFi', 'Contact', 'Blog', 'Careers'],
+    Company: ['About PetroFI', 'Contact', 'Blog', 'Careers'],
     Support: ['Help Center', 'Book Demo', 'WhatsApp Support', 'Training'],
     Legal: ['Privacy Policy', 'Terms of Service', 'Refund Policy', 'Security'],
 };
@@ -20,10 +20,10 @@ const FooterSection = () => {
                         <div className="flex items-center gap-2 mb-4">
                             <img
                                 src="https://customer-assets.emergentagent.com/job_shift-clarity/artifacts/zbnh3pqn_app_icon.png"
-                                alt="PetroFi"
+                                alt="PetroFI"
                                 className="w-9 h-9 object-contain"
                             />
-                            <span className="text-xl font-bold text-white font-outfit">PetroFi</span>
+                            <span className="text-xl font-bold text-white font-outfit">PetroFI</span>
                         </div>
                         <p className="text-slate-400 font-jakarta text-sm leading-relaxed max-w-xs mb-6">
                             Petrol pump management software and operations platform for petrol pump owners and managers in India.
@@ -62,7 +62,7 @@ const FooterSection = () => {
 
                 <div className="border-t border-white/10 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-slate-500 text-xs font-jakarta">
-                        © {new Date().getFullYear()} PetroFi. All rights reserved. Built for Indian Petrol Pump Owners.
+                        © {new Date().getFullYear()} PetroFI. All rights reserved. Built for Indian Petrol Pump Owners.
                     </p>
                     <div className="flex items-center gap-4">
                         <a

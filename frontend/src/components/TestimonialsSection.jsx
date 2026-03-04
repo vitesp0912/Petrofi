@@ -5,7 +5,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 
 const TESTIMONIALS = [
     {
-        quote: 'PetroFi made it extremely easy for us to track daily sales and reconcile cash without confusion. Our operations are far more organized now. I can check everything from my phone even when I\'m not at the pump.',
+        quote: 'PetroFI made it extremely easy for us to track daily sales and reconcile cash without confusion. Our operations are far more organized now. I can check everything from my phone even when I\'m not at the pump.',
         name: 'Rajesh Sharma',
         pump: 'Sharma Fuel Station',
         city: 'Jaipur, Rajasthan',
@@ -21,7 +21,7 @@ const TESTIMONIALS = [
         color: '#38B6FF',
     },
     {
-        quote: 'Managing three operators was a constant headache before PetroFi. Now each shift is logged digitally and I get complete accountability. My manager says it saved at least 2 hours every day.',
+        quote: 'Managing three operators was a constant headache before PetroFI. Now each shift is logged digitally and I get complete accountability. My manager says it saved at least 2 hours every day.',
         name: 'Mohan Kumar',
         pump: 'Kumar Petroleum',
         city: 'Pune, Maharashtra',

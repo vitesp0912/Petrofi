@@ -1,6 +1,6 @@
-# Website Keywords – PetroFi
+# Website Keywords – PetroFI
 
-Single reference for primary and secondary keywords used across the PetroFi marketing site for on-page SEO and content consistency.
+Single reference for primary and secondary keywords used across the PetroFI marketing site for on-page SEO and content consistency.
 
 ---
 

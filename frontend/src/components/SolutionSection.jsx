@@ -23,11 +23,11 @@ const SolutionSection = () => {
                     <div>
                         <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">The Solution</p>
                         <h2 className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight mb-5">
-                            PetroFi Turns Your Petrol Pump Into a{' '}
+                            PetroFI Turns Your Petrol Pump Into a{' '}
                             <span className="gradient-text">Digitally Controlled</span> Operation
                         </h2>
                         <p className="text-slate-500 font-jakarta text-base leading-relaxed mb-8">
-                            PetroFi is a petrol pump management system that replaces registers and spreadsheets.
+                            PetroFI is a petrol pump management system that replaces registers and spreadsheets.
                             Every sale, shift, expense and reconciliation is tracked in real time —
                             accessible from your phone, anywhere.
                         </p>
@@ -46,19 +46,19 @@ const SolutionSection = () => {
                                 className="inline-flex items-center gap-2 bg-pf-sky text-white px-6 py-3 rounded-lg font-semibold font-jakarta text-sm hover:bg-[#2aa5f0]"
                                 style={{ transition: 'background-color 0.2s ease' }}
                             >
-                                See PetroFi in Action <ArrowRight size={16} />
+                                See PetroFI in Action <ArrowRight size={16} />
                             </button>
                         </div>
                     </div>
 
                     {/* Right: Visual */}
                     <div className="relative">
-                        {/* Mobile app image — above PetroFi Platform card on mobile only; slides in from right */}
+                        {/* Mobile app image — above PetroFI Platform card on mobile only; slides in from right */}
                         <div className="flex lg:hidden justify-center mb-6 phone-slide-in-wrap">
                             <div className="phone-slide-in w-full max-w-[260px] flex justify-center">
                                 <img
                                     src="/mobile.png"
-                                    alt="PetroFi mobile app"
+                                    alt="PetroFI mobile app"
                                     className="w-full animate-float object-contain"
                                 />
                             </div>
@@ -67,7 +67,7 @@ const SolutionSection = () => {
                             {/* Central label */}
                             <div className="text-center mb-6">
                                 <div className="inline-block bg-pf-navy rounded-2xl px-6 py-3 text-white font-outfit font-bold text-lg shadow-lg">
-                                    PetroFi Platform
+                                    PetroFI Platform
                                 </div>
                             </div>
                             {/* Flow lines */}
