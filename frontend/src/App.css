@@ -1,0 +1,65 @@
+/* PetroFi - Scroll & Entrance Animations */
+
+.fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.fade-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.fade-right {
+    opacity: 0;
+    transform: translateX(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+.delay-500 { transition-delay: 500ms; }
+.delay-600 { transition-delay: 600ms; }
+
+/* Module card hover */
+.module-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(13, 27, 62, 0.10);
+}
+
+/* Gradient text */
+.gradient-text {
+    background: linear-gradient(135deg, #0D1B3E 0%, #38B6FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Hero dot pattern */
+.dot-pattern {
+    background-image: radial-gradient(circle, #0D1B3E15 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+/* Phone frame scrollbar */
+.screenshots-scroll::-webkit-scrollbar { display: none; }
+.screenshots-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Smooth section scroll */
+html { scroll-behavior: smooth; }
