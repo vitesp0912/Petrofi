@@ -31,16 +31,15 @@ const FinalCTASection = () => {
                         >
                             Book Demo <ArrowRight size={18} />
                         </button>
-                        <a
-                            href="https://apps.apple.com/in/app/petrofi/id6758732447"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <button
+                            type="button"
+                            onClick={() => document.getElementById('download')?.scrollIntoView({ behavior: 'smooth' })}
                             data-testid="final-cta-download-btn"
                             className="flex items-center justify-center gap-2 border-2 border-white/30 text-white px-8 py-4 rounded-xl font-bold font-jakarta text-base hover:border-white hover:bg-white/5"
                             style={{ transition: 'border-color 0.2s ease, background-color 0.2s ease' }}
                         >
                             <Download size={18} /> Download App
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>

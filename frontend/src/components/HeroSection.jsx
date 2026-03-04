@@ -59,16 +59,15 @@ const HeroSection = () => {
                         >
                             Book Live Demo <ArrowRight size={16} />
                         </button>
-                        <a
-                            href="https://apps.apple.com/in/app/petrofi/id6758732447"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <button
+                            type="button"
+                            onClick={() => document.getElementById('download')?.scrollIntoView({ behavior: 'smooth' })}
                             data-testid="hero-download-btn"
                             className="flex items-center gap-2 border border-slate-200 text-pf-navy px-6 py-3 rounded-lg font-semibold font-jakarta text-sm hover:border-pf-sky hover:text-pf-sky bg-white"
                             style={{ transition: 'border-color 0.2s ease, color 0.2s ease' }}
                         >
                             <Download size={16} /> Download App
-                        </a>
+                        </button>
                     </div>
 
                     {/* Trust badges */}

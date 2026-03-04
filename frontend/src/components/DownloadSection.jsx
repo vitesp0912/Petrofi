@@ -6,7 +6,7 @@ const DownloadSection = () => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section data-testid="download-section" className="py-20 bg-white">
+        <section id="download" data-testid="download-section" className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''} flex flex-col items-center text-center`}>
                     <div className="w-14 h-14 bg-pf-sky/10 rounded-2xl flex items-center justify-center mb-6">

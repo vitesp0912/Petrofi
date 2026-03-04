@@ -1,4 +1,5 @@
 import React from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import './App.css';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
@@ -34,6 +35,7 @@ function App() {
                 <DemoSection id="demo" />
             </main>
             <FooterSection />
+            <Analytics />
         </div>
     );
 }
