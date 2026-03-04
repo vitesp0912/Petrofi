@@ -51,13 +51,15 @@ const SolutionSection = () => {
 
                     {/* Right: Visual */}
                     <div className="relative">
-                        {/* Mobile app image — above PetroFi Platform card on mobile only */}
-                        <div className="flex lg:hidden justify-center mb-6">
-                            <img
-                                src="/mobile.png"
-                                alt="PetroFi mobile app"
-                                className="w-full max-w-[260px] animate-float object-contain"
-                            />
+                        {/* Mobile app image — above PetroFi Platform card on mobile only; slides in from right */}
+                        <div className="flex lg:hidden justify-center mb-6 phone-slide-in-wrap">
+                            <div className="phone-slide-in w-full max-w-[260px] flex justify-center">
+                                <img
+                                    src="/mobile.png"
+                                    alt="PetroFi mobile app"
+                                    className="w-full animate-float object-contain"
+                                />
+                            </div>
                         </div>
                         <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100">
                             {/* Central label */}

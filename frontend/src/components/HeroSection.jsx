@@ -83,12 +83,14 @@ const HeroSection = () => {
                 </div>
 
                 {/* Right: Mobile app image — desktop only; on mobile it appears in next section */}
-                <div className="hidden lg:flex justify-center pl-4 lg:pl-6 pr-4 lg:pr-6">
-                    <img
-                        src="/mobile.png"
-                        alt="PetroFi mobile app"
-                        className="w-full max-w-[240px] lg:max-w-[260px] animate-float object-contain"
-                    />
+                <div className="hidden lg:flex justify-center pl-4 lg:pl-6 pr-4 lg:pr-6 phone-slide-in-wrap">
+                    <div className="phone-slide-in w-full max-w-[240px] lg:max-w-[260px] flex justify-center">
+                        <img
+                            src="/mobile.png"
+                            alt="PetroFi mobile app"
+                            className="w-full animate-float object-contain"
+                        />
+                    </div>
                 </div>
             </div>
         </section>
