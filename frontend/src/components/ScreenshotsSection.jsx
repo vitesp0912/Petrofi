@@ -44,7 +44,7 @@ const ScreenshotsSection = ({ id }) => {
                             Inside the PetroFi App
                         </h2>
                         <p className="text-sm text-slate-500 font-jakarta max-w-xs">
-                            See what the petrol pump software looks like in action—every screen built for pump owners and managers.
+                            See what the petrol pump software looks like in action. Every screen built for pump owners and managers.
                         </p>
                     </div>
                 </div>

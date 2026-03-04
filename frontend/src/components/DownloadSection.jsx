@@ -14,10 +14,10 @@ const DownloadSection = () => {
                     </div>
                     <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Download Now</p>
                     <h2 id="download-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight mb-4">
-                        Petrol Pump Software Free Download – iOS &amp; Android
+                        Petrol Pump Software Free Download. iOS and Android
                     </h2>
                     <p className="text-slate-500 font-jakarta text-base max-w-md mb-10">
-                        Get the petrol pump management software on App Store or Google Play. Free download—start managing your pump in minutes.
+                        Get the petrol pump management software on App Store or Google Play. Free download. Start managing your pump in minutes.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4">

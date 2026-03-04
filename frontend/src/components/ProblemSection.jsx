@@ -41,7 +41,7 @@ const ProblemSection = () => {
                         Petrol Pump Operations Shouldn't Depend on Registers and Guesswork
                     </h2>
                     <p className="text-slate-500 font-jakarta text-base max-w-xl mb-14">
-                        Every day, pump owners lose money and time to preventable inefficiencies. The right petrol pump management software was built to fix exactly these problems—that’s PetroFi.
+                        Every day, pump owners lose money and time to preventable inefficiencies. The right petrol pump management software was built to fix exactly these problems. That’s PetroFi.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

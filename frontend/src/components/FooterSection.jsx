@@ -87,6 +87,18 @@ const FooterSection = () => {
                         </a>
                     </div>
                 </div>
+                <p className="text-center text-slate-500 text-xs font-jakarta mt-4">
+                    Powered by{' '}
+                    <a
+                        href="https://vitespace.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-pf-sky hover:text-white font-semibold"
+                        style={{ transition: 'color 0.2s ease' }}
+                    >
+                        Vitespace
+                    </a>
+                </p>
             </div>
         </footer>
     );

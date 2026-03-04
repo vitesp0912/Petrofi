@@ -90,7 +90,7 @@ const ModulesSection = ({ id }) => {
                             Petrol Pump Management Software for Every Workflow
                         </h2>
                         <p className="text-slate-500 font-jakarta text-sm max-w-xs">
-                            Six modules that cover sales, cash, credit, shifts, expenses and reports—the complete petrol pump management system.
+                            Six modules that cover sales, cash, credit, shifts, expenses and reports, the complete petrol pump management system.
                         </p>
                     </div>
 
