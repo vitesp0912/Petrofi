@@ -64,6 +64,23 @@
 /* Smooth section scroll */
 html { scroll-behavior: smooth; }
 
+/* Legal page TOC chips: hide scrollbar, keep swipe */
+.legal-toc-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.legal-toc-scroll::-webkit-scrollbar { display: none; }
+
+@media print {
+    header[data-testid="navbar"],
+    footer[data-testid="footer-section"],
+    .legal-toc-scroll,
+    button[aria-label="Back to top"] {
+        display: none !important;
+    }
+    main { padding: 0 !important; }
+}
+
 /* Phone slide-in from right — 3D-style entrance */
 @keyframes phoneSlideInFromRight {
     0% {
