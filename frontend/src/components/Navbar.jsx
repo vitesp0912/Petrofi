@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, Phone, X } from 'lucide-react';
+import { CreditCard, LogOut, Menu, Phone, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { getAuthDisplayName, getAuthInitials } from '../lib/auth';
+import LoginDialog from './LoginDialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 const NAV_LINKS = [
     { label: 'Features', id: 'tracks' },
@@ -17,10 +28,19 @@ const PHONES = [
 const Navbar = ({ forceSolid = false }) => {
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [loginOpen, setLoginOpen] = useState(false);
+    const { user, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const isHome = location.pathname === '/';
     const solid = forceSolid || !isHome || scrolled;
+    const accountLabel = getAuthDisplayName(user);
+    const accountInitials = getAuthInitials(user);
+
+    const openLogin = () => {
+        setMobileOpen(false);
+        setLoginOpen(true);
+    };
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 24);
@@ -39,6 +59,14 @@ const Navbar = ({ forceSolid = false }) => {
             document.body.style.overflow = '';
         };
     }, [mobileOpen]);
+
+    const handleSignOut = async () => {
+        setMobileOpen(false);
+        await signOut();
+        if (location.pathname.startsWith('/subscription')) {
+            navigate('/');
+        }
+    };
 
     const goToSection = (id) => {
         setMobileOpen(false);
@@ -85,11 +113,11 @@ const Navbar = ({ forceSolid = false }) => {
                     ))}
                 </div>
 
-                <div className="justify-self-end flex items-center gap-3">
+                <div className="justify-self-end flex items-center gap-2 sm:gap-3">
                     <button
                         onClick={() => goToSection('demo')}
                         data-testid="nav-book-demo-btn"
-                        className="hidden md:inline-flex text-sm font-medium text-slate-600 hover:text-pf-navy font-jakarta"
+                        className="hidden lg:inline-flex text-sm font-medium text-slate-600 hover:text-pf-navy font-jakarta"
                         style={{ transition: 'color 0.2s ease' }}
                     >
                         Book a Demo
@@ -102,6 +130,56 @@ const Navbar = ({ forceSolid = false }) => {
                     >
                         Start Free Trial
                     </button>
+                    {user ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    type="button"
+                                    data-testid="nav-account-btn"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-pf-navy/15 bg-white/80 pl-1 pr-2 sm:pr-3 py-1 text-sm font-semibold text-pf-navy font-jakarta hover:bg-white"
+                                    style={{ transition: 'background-color 0.2s ease' }}
+                                >
+                                    <span className="w-8 h-8 rounded-full bg-pf-navy text-white text-[11px] font-bold flex items-center justify-center">
+                                        {accountInitials}
+                                    </span>
+                                    <span className="hidden sm:inline max-w-[8.5rem] truncate">{accountLabel}</span>
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="z-[70] w-56 rounded-xl border-slate-100 bg-white text-pf-navy">
+                                <DropdownMenuLabel className="font-jakarta text-xs text-slate-500 font-medium">
+                                    Signed in
+                                </DropdownMenuLabel>
+                                <p className="px-2 pb-2 text-sm font-semibold font-jakarta truncate">{accountLabel}</p>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    className="font-jakarta cursor-pointer"
+                                    onSelect={() => navigate('/subscription')}
+                                    data-testid="nav-subscription"
+                                >
+                                    <CreditCard size={14} />
+                                    Subscription
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="font-jakarta cursor-pointer text-red-600 focus:text-red-600"
+                                    onSelect={() => handleSignOut()}
+                                    data-testid="nav-sign-out"
+                                >
+                                    <LogOut size={14} />
+                                    Sign out
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={openLogin}
+                            data-testid="nav-login-btn"
+                            className="inline-flex items-center border border-pf-navy bg-white/90 text-pf-navy px-3.5 sm:px-4 py-2 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy hover:text-white"
+                            style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
+                        >
+                            Login
+                        </button>
+                    )}
                     <button
                         className="md:hidden text-pf-navy relative z-[60]"
                         onClick={() => setMobileOpen(!mobileOpen)}
@@ -173,7 +251,39 @@ const Navbar = ({ forceSolid = false }) => {
                         </a>
                     ))}
                 </div>
-                <div className="p-5 border-t border-slate-100">
+                <div className="p-5 border-t border-slate-100 space-y-2.5">
+                    {user ? (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setMobileOpen(false);
+                                    navigate('/subscription');
+                                }}
+                                className="w-full border border-slate-200 text-pf-navy py-3 rounded-lg text-sm font-semibold font-jakarta"
+                                data-testid="mobile-subscription-btn"
+                            >
+                                Subscription
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleSignOut}
+                                className="w-full border border-slate-200 text-pf-navy py-3 rounded-lg text-sm font-semibold font-jakarta"
+                                data-testid="mobile-sign-out-btn"
+                            >
+                                Sign out
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={openLogin}
+                            className="w-full border border-pf-navy text-pf-navy py-3 rounded-lg text-sm font-semibold font-jakarta"
+                            data-testid="mobile-login-btn"
+                        >
+                            Login
+                        </button>
+                    )}
                     <button
                         onClick={() => goToSection('pricing')}
                         className="w-full bg-pf-navy text-white py-3 rounded-lg text-sm font-semibold font-jakarta"
@@ -183,6 +293,7 @@ const Navbar = ({ forceSolid = false }) => {
                     </button>
                 </div>
             </div>
+            <LoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
         </header>
     );
 };

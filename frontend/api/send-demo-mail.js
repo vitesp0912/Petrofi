@@ -11,7 +11,15 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const { name, pump_name, city, phone, email, address, source } = req.body || {};
+    const clip = (value, max) => String(value ?? '').trim().slice(0, max);
+    const name = clip(req.body?.name, 80);
+    const pump_name = clip(req.body?.pump_name, 80);
+    const city = clip(req.body?.city, 80);
+    const phone = clip(req.body?.phone, 20);
+    const email = clip(req.body?.email, 254);
+    const address = clip(req.body?.address, 200);
+    const source = req.body?.source === 'screenshots' ? 'screenshots' : 'demo';
+    const replyTo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : undefined;
     const to = process.env.DEMO_MAIL_TO || process.env.SMTP_MAIL_USER;
     const host = process.env.SMTP_MAIL_HOST;
     const user = process.env.SMTP_MAIL_USER;
@@ -19,9 +27,7 @@ module.exports = async (req, res) => {
     const port = parseInt(process.env.SMTP_MAIL_PORT || '587', 10);
 
     if (!host || !user || !pass || !to) {
-        res.status(500).json({
-            error: 'Server mail config missing. Set SMTP_MAIL_HOST, SMTP_MAIL_USER, SMTP_MAIL_APP_PASSWORD, DEMO_MAIL_TO in Vercel.',
-        });
+        res.status(500).json({ error: 'Mail is not configured.' });
         return;
     }
 
@@ -53,11 +59,11 @@ module.exports = async (req, res) => {
             to,
             subject,
             text,
-            replyTo: email || undefined,
+            replyTo,
         });
         res.status(200).json({ ok: true });
     } catch (err) {
         console.error('Send mail error:', err.message);
-        res.status(500).json({ error: 'Failed to send email', message: err.message });
+        res.status(500).json({ error: 'Failed to send email' });
     }
 };

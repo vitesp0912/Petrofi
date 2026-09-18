@@ -1,6 +1,13 @@
 // craco.config.js
 const path = require("path");
-require("dotenv").config();
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
+require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
+
+// CRA only inlines REACT_APP_* into the browser. Keep .env names as SUPABASE_*.
+process.env.REACT_APP_SUPABASE_URL =
+    process.env.SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL || "";
+process.env.REACT_APP_SUPABASE_ANON_KEY =
+    process.env.SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY || "";
 
 // Check if we're in development/preview mode (not production build)
 // Craco sets NODE_ENV=development for start, NODE_ENV=production for build
@@ -61,19 +68,14 @@ let webpackConfig = {
 };
 
 webpackConfig.devServer = (devServerConfig) => {
-  // Add health check endpoints if enabled
-  if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
-    const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+  const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
 
+  if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
     devServerConfig.setupMiddlewares = (middlewares, devServer) => {
-      // Call original setup if exists
       if (originalSetupMiddlewares) {
         middlewares = originalSetupMiddlewares(middlewares, devServer);
       }
-
-      // Setup health endpoints
       setupHealthEndpoints(devServer, healthPluginInstance);
-
       return middlewares;
     };
   }
@@ -95,6 +97,28 @@ if (isDevServer) {
       throw err;
     }
   }
+
+  const previousDevServer = webpackConfig.devServer;
+  webpackConfig.devServer = (devServerConfig) => {
+    const resolved = typeof previousDevServer === "function"
+      ? previousDevServer(devServerConfig)
+      : { ...devServerConfig, ...(previousDevServer || {}) };
+    const originalSetupMiddlewares = resolved.setupMiddlewares;
+    const { localApiMiddleware } = require("./api/dev-middleware");
+
+    resolved.setupMiddlewares = (middlewares, devServer) => {
+      if (originalSetupMiddlewares) {
+        middlewares = originalSetupMiddlewares(middlewares, devServer);
+      }
+      middlewares.unshift({
+        name: "petrofi-api",
+        middleware: localApiMiddleware,
+      });
+      return middlewares;
+    };
+
+    return resolved;
+  };
 }
 
 module.exports = webpackConfig;
