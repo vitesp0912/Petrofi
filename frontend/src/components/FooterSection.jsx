@@ -4,9 +4,9 @@ import { Mail, ExternalLink } from 'lucide-react';
 
 const LINKS = {
     Product: [
-        { label: 'Features', hash: 'features' },
-        { label: 'Dashboard', hash: 'features' },
-        { label: 'Reports', hash: 'features' },
+        { label: 'What We Track', hash: 'tracks' },
+        { label: 'Reports', hash: 'reports' },
+        { label: 'Pricing', hash: 'pricing' },
         { label: 'Mobile App', hash: 'download' },
     ],
     Company: [
@@ -56,7 +56,7 @@ const FooterSection = () => {
                             <span className="text-xl font-bold text-white font-outfit">PetroFI</span>
                         </Link>
                         <p className="text-slate-400 font-jakarta text-sm leading-relaxed max-w-xs mb-6">
-                            Petrol pump management software and operations platform for petrol pump owners and managers in India.
+                            Petrol pump management software that tracks every rupee. Sales, credit, expenses, inventory, tanks, cash and bank.
                         </p>
                         <a
                             href="mailto:petrofibusiness@gmail.com"

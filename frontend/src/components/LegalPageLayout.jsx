@@ -65,7 +65,7 @@ const LegalPageLayout = ({
     const activeSection = toc.find((item) => item.id === activeId) || toc[0];
 
     return (
-        <div className="font-jakarta bg-white min-h-screen">
+        <div className="font-jakarta bg-pf-deep text-white min-h-screen">
             <Navbar forceSolid />
             <main id="main-content" aria-label={title}>
                 <header className="relative bg-pf-navy pt-24 pb-12 sm:pt-28 sm:pb-16 overflow-hidden">
@@ -107,7 +107,7 @@ const LegalPageLayout = ({
                     </div>
                 </header>
 
-                <div className="lg:hidden sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200">
+                <div className="lg:hidden sticky top-16 z-30 bg-pf-deep/95 backdrop-blur-md border-b border-white/10">
                     <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
                         <button
                             type="button"
@@ -120,13 +120,13 @@ const LegalPageLayout = ({
                                 <span className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 font-jakarta">
                                     On this page
                                 </span>
-                                <span className="block text-sm font-semibold font-outfit text-pf-navy truncate">
+                                <span className="block text-sm font-semibold font-outfit text-white truncate">
                                     {activeSection?.number}. {activeSection?.title}
                                 </span>
                             </span>
                             <ChevronDown
                                 size={18}
-                                className={`text-pf-navy shrink-0 ${tocOpen ? 'rotate-180' : ''}`}
+                                className={`text-white shrink-0 ${tocOpen ? 'rotate-180' : ''}`}
                                 style={{ transition: 'transform 0.2s ease' }}
                             />
                         </button>
@@ -134,7 +134,7 @@ const LegalPageLayout = ({
                             <nav
                                 id="mobile-legal-toc"
                                 aria-label="On this page"
-                                className="absolute left-0 right-0 top-full bg-white border-b border-slate-200 shadow-lg max-h-[min(60vh,420px)] overflow-y-auto"
+                                className="absolute left-0 right-0 top-full bg-pf-navy border-b border-white/10 shadow-lg max-h-[min(60vh,420px)] overflow-y-auto"
                             >
                                 <ol className="py-2 px-4 sm:px-6">
                                     {toc.map((item) => (
@@ -144,8 +144,8 @@ const LegalPageLayout = ({
                                                 onClick={() => scrollToSection(item.id)}
                                                 className={`w-full text-left flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-sm font-jakarta ${
                                                     activeId === item.id
-                                                        ? 'bg-pf-sky/10 text-pf-navy font-semibold'
-                                                        : 'text-slate-600'
+                                                        ? 'bg-pf-sky/10 text-white font-semibold'
+                                                        : 'text-slate-400'
                                                 }`}
                                                 style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                                             >
@@ -162,11 +162,11 @@ const LegalPageLayout = ({
                     </div>
                 </div>
 
-                <div className="bg-slate-50">
+                <div className="bg-pf-deep">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
                         <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)] gap-10 xl:gap-14 items-start">
                             <aside className="hidden lg:block sticky top-24 self-start">
-                                <div className="bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5">
+                                <div className="bg-pf-card rounded-2xl border border-white/10 p-5">
                                     <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 font-jakarta mb-4">
                                         On this page
                                     </p>
@@ -179,8 +179,8 @@ const LegalPageLayout = ({
                                                         onClick={() => scrollToSection(item.id)}
                                                         className={`w-full text-left flex gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-jakarta leading-snug ${
                                                             activeId === item.id
-                                                                ? 'bg-pf-sky/10 text-pf-navy font-semibold'
-                                                                : 'text-slate-500 hover:text-pf-navy hover:bg-slate-50'
+                                                                ? 'bg-pf-sky/10 text-white font-semibold'
+                                                                : 'text-slate-400 hover:text-white hover:bg-white/5'
                                                         }`}
                                                         style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                                                     >
@@ -197,7 +197,7 @@ const LegalPageLayout = ({
                             </aside>
 
                             <div className="min-w-0">
-                                <article className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 sm:p-8 lg:p-12">
+                                <article className="bg-pf-card rounded-2xl sm:rounded-3xl border border-white/10 p-5 sm:p-8 lg:p-12 text-slate-200">
                                     {children}
                                 </article>
 
@@ -272,7 +272,7 @@ export const LegalSection = ({ id, number, title, children }) => (
             <span className="shrink-0 mt-0.5 w-8 h-8 rounded-lg bg-pf-sky/10 text-pf-sky text-xs font-bold font-outfit flex items-center justify-center">
                 {number}
             </span>
-            <h2 className="text-xl sm:text-2xl font-bold font-outfit text-pf-navy leading-snug">{title}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold font-outfit text-white leading-snug">{title}</h2>
         </div>
         <div className="lg:pl-11 space-y-4">{children}</div>
     </section>
@@ -283,7 +283,7 @@ export const LegalP = ({ children }) => (
 );
 
 export const LegalH3 = ({ children }) => (
-    <h3 className="text-base sm:text-lg font-bold font-outfit text-pf-navy pt-2">{children}</h3>
+    <h3 className="text-base sm:text-lg font-bold font-outfit text-white pt-2">{children}</h3>
 );
 
 export const LegalList = ({ items }) => (

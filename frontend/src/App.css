@@ -34,6 +34,29 @@
 .delay-500 { transition-delay: 500ms; }
 .delay-600 { transition-delay: 600ms; }
 
+/* Feature cards — scroll-in reveal */
+.track-reveal {
+    opacity: 0;
+    transform: translateY(36px) scale(0.96);
+}
+.track-reveal.is-in {
+    animation: track-card-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes track-card-in {
+    0% {
+        opacity: 0;
+        transform: translateY(36px) scale(0.96);
+    }
+    62% {
+        opacity: 1;
+        transform: translateY(-5px) scale(1.015);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 /* Module card hover */
 .module-card {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -98,4 +121,128 @@ html { scroll-behavior: smooth; }
 .phone-slide-in {
     animation: phoneSlideInFromRight 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     transform-style: preserve-3d;
+}
+
+/* Reports screenshot — scroll-driven 3D */
+.report-3d-stage {
+    perspective: 1400px;
+    perspective-origin: 50% 45%;
+}
+.report-3d-shot {
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    transform: translate3d(78vw, 0, 0) rotateY(38deg) scale(0.82);
+}
+
+/* App screens — always scrolling, hover or not */
+.screenshot-marquee-mask {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+@keyframes screenshot-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+.screenshot-marquee {
+    animation: screenshot-marquee 45s linear infinite;
+}
+.screenshot-marquee.is-paused {
+    animation: none;
+}
+.screenshot-blurred {
+    filter: blur(14px);
+    transform: scale(1.03);
+}
+
+/* Money-flow arrows */
+.money-flow-arrow {
+    width: 28px;
+    height: 2px;
+    background: #38B6FF;
+    position: relative;
+    overflow: hidden;
+}
+.money-flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #38B6FF;
+    border-top: 2px solid #38B6FF;
+    transform: translateY(-50%) rotate(45deg);
+}
+.money-flow-arrow::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #38B6FF;
+    animation: flow-dot 1.8s ease-in-out infinite;
+}
+.money-flow-arrow-down {
+    width: 2px;
+    height: 22px;
+    background: #38B6FF;
+    position: relative;
+}
+.money-flow-arrow-down::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #38B6FF;
+    border-bottom: 2px solid #38B6FF;
+    transform: translateX(-50%) rotate(45deg);
+}
+
+@keyframes flow-dot {
+    0% { transform: translateX(0); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translateX(36px); opacity: 0; }
+}
+
+/* Rupee orbit */
+@keyframes rupee-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.rupee-orbit {
+    animation: rupee-spin 36s linear infinite;
+    will-change: transform;
+}
+.rupee-orbit .rupee-orbit-card {
+    animation: rupee-spin 36s linear infinite reverse;
+    will-change: transform;
+}
+.rupee-pulse {
+    animation: rupee-pulse 3.2s ease-in-out infinite;
+}
+@keyframes rupee-pulse {
+    0%, 100% { box-shadow: 0 12px 36px rgba(56, 182, 255, 0.45); }
+    50% { box-shadow: 0 16px 48px rgba(56, 182, 255, 0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fade-up, .fade-left, .fade-right, .phone-slide-in, .track-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+    .rupee-orbit,
+    .rupee-orbit .rupee-orbit-card,
+    .rupee-pulse,
+    .money-flow-arrow::before,
+    .animate-float,
+    .screenshot-marquee {
+        animation: none !important;
+    }
 }

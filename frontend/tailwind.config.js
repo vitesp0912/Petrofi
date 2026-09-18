@@ -13,6 +13,8 @@ module.exports = {
             },
             colors: {
                 'pf-navy': '#0D1B3E',
+                'pf-deep': '#08101F',
+                'pf-card': '#152A4F',
                 'pf-sky': '#38B6FF',
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',

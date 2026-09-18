@@ -38,11 +38,19 @@ Supporting and long-tail terms. Use naturally in body copy, subheadings, and fea
 - udhar / udhar customers  
 - sales tracking  
 - expense tracking  
+- inventory management  
+- tank stock  
+- cash management  
+- bank balances  
 - meter reading  
 - shift reports  
 - staff accountability  
 - dashboard  
-- reports and data exports  
+- reports  
+- inventory sales report  
+- customer credit report  
+- tank report  
+- cash & bank book 
 
 ### Actions / outcomes
 

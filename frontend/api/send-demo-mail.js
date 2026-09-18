@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const { name, pump_name, city, phone, email } = req.body || {};
+    const { name, pump_name, city, phone, email, address, source } = req.body || {};
     const to = process.env.DEMO_MAIL_TO || process.env.SMTP_MAIL_USER;
     const host = process.env.SMTP_MAIL_HOST;
     const user = process.env.SMTP_MAIL_USER;
@@ -25,15 +25,20 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const subject = `New PetroFI demo request from ${name || 'Prospect'}`;
+    const isRegister = source === 'screenshots';
+    const subject = isRegister
+        ? `New PetroFI pump registration from ${name || 'Prospect'}`
+        : `New PetroFI demo request from ${name || 'Prospect'}`;
     const text = [
-        'New demo request for PetroFI:',
+        isRegister ? 'New pump registration for PetroFI:' : 'New demo request for PetroFI:',
         '',
         `Name: ${name || '-'}`,
         `Pump Name: ${pump_name || '-'}`,
-        `City: ${city || '-'}`,
         `Phone: ${phone || '-'}`,
+        `Address: ${address || '-'}`,
+        `City: ${city || '-'}`,
         `Email: ${email || '-'}`,
+        `Source: ${source || 'demo'}`,
     ].join('\n');
 
     try {

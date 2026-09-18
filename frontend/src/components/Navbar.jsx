@@ -3,10 +3,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
-    { label: 'Features', id: 'features' },
-    { label: 'How It Works', id: 'how-it-works' },
-    { label: 'Screenshots', id: 'screenshots' },
-    { label: 'Request Demo', id: 'demo' },
+    { label: 'Features', id: 'tracks' },
+    { label: 'How it Works', id: 'how-it-works' },
+    { label: 'Pricing', id: 'pricing' },
+    { label: 'Download', id: 'download' },
 ];
 
 const Navbar = ({ forceSolid = false }) => {
@@ -43,10 +43,10 @@ const Navbar = ({ forceSolid = false }) => {
             className={`fixed top-0 left-0 right-0 z-50 ${solid ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100' : 'bg-transparent'}`}
             style={{ transition: 'background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease' }}
         >
-            <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 grid grid-cols-[1fr_auto] md:grid-cols-3 items-center gap-4">
                 <Link
                     to="/"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 justify-self-start"
                     onClick={() => {
                         if (isHome) window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
@@ -59,7 +59,7 @@ const Navbar = ({ forceSolid = false }) => {
                     <span className="text-xl font-bold text-pf-navy font-outfit">PetroFI</span>
                 </Link>
 
-                <div className="hidden md:flex items-center gap-7">
+                <div className="hidden md:flex items-center justify-center gap-7">
                     {NAV_LINKS.map((link) => (
                         <button
                             key={link.id}
@@ -73,26 +73,33 @@ const Navbar = ({ forceSolid = false }) => {
                     ))}
                 </div>
 
-                <div className="hidden md:block">
+                <div className="justify-self-end flex items-center gap-3">
                     <button
                         onClick={() => goToSection('demo')}
                         data-testid="nav-book-demo-btn"
-                        className="bg-pf-sky text-white px-5 py-2 rounded-lg text-sm font-semibold font-jakarta hover:bg-[#2aa5f0] shadow-sm"
+                        className="hidden md:inline-flex text-sm font-medium text-slate-600 hover:text-pf-navy font-jakarta"
+                        style={{ transition: 'color 0.2s ease' }}
+                    >
+                        Book a Demo
+                    </button>
+                    <button
+                        onClick={() => goToSection('pricing')}
+                        data-testid="nav-start-free-btn"
+                        className="hidden md:inline-flex bg-pf-navy text-white px-5 py-2 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy/90 shadow-sm"
                         style={{ transition: 'background-color 0.2s ease, box-shadow 0.2s ease' }}
                     >
-                        Book Demo
+                        Start Free Trial
+                    </button>
+                    <button
+                        className="md:hidden text-pf-navy"
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                        data-testid="mobile-menu-toggle"
+                        aria-expanded={mobileOpen}
+                        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                    >
+                        {mobileOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
-
-                <button
-                    className="md:hidden text-pf-navy"
-                    onClick={() => setMobileOpen(!mobileOpen)}
-                    data-testid="mobile-menu-toggle"
-                    aria-expanded={mobileOpen}
-                    aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-                >
-                    {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
             </nav>
 
             {mobileOpen && (
@@ -109,10 +116,17 @@ const Navbar = ({ forceSolid = false }) => {
                     ))}
                     <button
                         onClick={() => goToSection('demo')}
-                        className="w-full bg-pf-sky text-white py-2.5 rounded-lg text-sm font-semibold font-jakarta mt-2"
-                        data-testid="mobile-book-demo-btn"
+                        className="block w-full text-left text-sm font-medium text-slate-700 hover:text-pf-navy font-jakarta py-3 border-b border-slate-50"
+                        data-testid="mobile-nav-demo"
                     >
-                        Book Demo
+                        Book a Demo
+                    </button>
+                    <button
+                        onClick={() => goToSection('pricing')}
+                        className="w-full bg-pf-navy text-white py-2.5 rounded-lg text-sm font-semibold font-jakarta mt-2"
+                        data-testid="mobile-start-free-btn"
+                    >
+                        Start Free Trial
                     </button>
                 </div>
             )}

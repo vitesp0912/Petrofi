@@ -6,7 +6,7 @@ const DownloadSection = () => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section id="download" aria-labelledby="download-heading" data-testid="download-section" className="py-20 bg-white">
+        <section id="download" aria-labelledby="download-heading" data-testid="download-section" className="py-20 bg-white scroll-mt-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''} flex flex-col items-center text-center`}>
                     <div className="w-14 h-14 bg-pf-sky/10 rounded-2xl flex items-center justify-center mb-6">
@@ -14,10 +14,10 @@ const DownloadSection = () => {
                     </div>
                     <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Download Now</p>
                     <h2 id="download-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight mb-4">
-                        Petrol Pump Software Free Download. iOS and Android
+                        Petrol Pump Software Free Download
                     </h2>
                     <p className="text-slate-500 font-jakarta text-base max-w-md mb-10">
-                        Get the petrol pump management software on App Store or Google Play. Free download. Start managing your pump in minutes.
+                        Get PetroFI on App Store or Google Play. Try it free for 30 days on your pump.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4">
@@ -59,7 +59,7 @@ const DownloadSection = () => {
                     </div>
 
                     <p className="text-xs text-slate-400 font-jakarta mt-6">
-                        Petrol pump software free download · Trusted by 500+ pump owners
+                        Petrol pump software free download · 30-day trial · iOS and Android
                     </p>
                 </div>
             </div>

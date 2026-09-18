@@ -10,7 +10,7 @@ import TermsOfServicePage from './pages/TermsOfServicePage';
 function App() {
     return (
         <BrowserRouter>
-            <div className="font-jakarta">
+            <div className="font-jakarta bg-pf-deep text-white min-h-screen">
                 <ScrollToTop />
                 <Routes>
                     <Route path="/" element={<HomePage />} />

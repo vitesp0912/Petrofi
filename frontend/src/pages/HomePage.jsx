@@ -4,15 +4,16 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import ProblemSection from '../components/ProblemSection';
-import SolutionSection from '../components/SolutionSection';
-import ModulesSection from '../components/ModulesSection';
-import BenefitsSection from '../components/BenefitsSection';
-import OwnerManagerSection from '../components/OwnerManagerSection';
+import TracksSection from '../components/TracksSection';
 import ScreenshotsSection from '../components/ScreenshotsSection';
-import TestimonialsSection from '../components/TestimonialsSection';
-import DemoSection from '../components/DemoSection';
+import ReportsSection from '../components/ReportsSection';
+// import MoneyControlSection from '../components/MoneyControlSection';
+import BuiltForPumpsSection from '../components/BuiltForPumpsSection';
+import SimpleSection from '../components/SimpleSection';
+import PricingSection from '../components/PricingSection';
 import DownloadSection from '../components/DownloadSection';
 import FinalCTASection from '../components/FinalCTASection';
+import DemoSection from '../components/DemoSection';
 import FooterSection from '../components/FooterSection';
 
 function HomePage() {
@@ -21,7 +22,7 @@ function HomePage() {
     usePageMeta({
         title: 'Best Petrol Pump Software in India. Free Download | PetroFI',
         description:
-            'Petrol pump management software for India. Free download on iOS & Android. Track sales, cash reconciliation, shifts and credit. One petrol pump software trusted by 500+ owners.',
+            'Petrol pump management software for India. Track fuel sales, credit customers, expenses, inventory, tanks, cash and bank. Get the reports you need. Free 30-day trial on iOS and Android.',
         canonical: 'https://www.petrofi.in/',
     });
 
@@ -41,14 +42,19 @@ function HomePage() {
             <Navbar />
             <main id="main-content" aria-label="Main content">
                 <HeroSection />
+                <div className="bg-pf-navy text-white text-center py-3.5 px-4">
+                    <p className="text-xs sm:text-sm font-semibold font-outfit tracking-[0.12em]">
+                        EVERY SINGLE RUPEE IS TRACKED AT YOUR PETROL PUMP
+                    </p>
+                </div>
+                <TracksSection />
                 <ProblemSection />
-                <SolutionSection />
+                <SimpleSection id="how-it-works" />
                 <ScreenshotsSection id="screenshots" />
-                <ModulesSection id="features" />
+                <ReportsSection />
+                <BuiltForPumpsSection />
+                <PricingSection />
                 <DownloadSection />
-                <BenefitsSection id="how-it-works" />
-                <OwnerManagerSection />
-                <TestimonialsSection />
                 <FinalCTASection />
                 <DemoSection id="demo" />
             </main>

@@ -1,109 +1,128 @@
 import React from 'react';
-import { TrendingUp, DollarSign, Users, BarChart2, Wallet, FileText } from 'lucide-react';
+import {
+    CreditCard,
+    Droplets,
+    FileText,
+    Fuel,
+    Landmark,
+    Package,
+    Receipt,
+    Repeat,
+    Timer,
+    UserCog,
+    Users,
+    Wallet,
+} from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
-const MODULES = [
+const GROUPS = [
     {
-        icon: TrendingUp,
-        title: 'Sales Tracking',
-        desc: 'Record and monitor sales across all payment methods — cash, UPI, and card — with complete nozzle-level visibility.',
-        points: ['Nozzle-level sales tracking', 'Digital vs cash segregation', 'Shift-wise sales visibility'],
-        accent: '#38B6FF',
-        size: 'lg',
+        icon: Fuel,
+        title: 'Sales',
+        items: ['Fuel sales', 'Nozzle-level', 'Shift-wise', 'Cash', 'UPI', 'Card'],
     },
     {
-        icon: DollarSign,
-        title: 'Cash Reconciliation',
-        desc: 'Eliminate confusion between expected and actual cash at every shift closing.',
-        points: ['Compare sales vs collected cash', 'Shift level cash submissions', 'Identify discrepancies instantly'],
-        accent: '#0D1B3E',
-        size: 'sm',
+        icon: Timer,
+        title: 'Shift Management',
+        items: ['Open / close shift', 'Operator tracking', 'Mismatch alerts', 'Cash collect'],
     },
     {
         icon: Wallet,
-        title: 'Credit Customer Ledger',
-        desc: 'Manage all udhar customers in one centralized place with outstanding tracking.',
-        points: ['Customer-wise credit history', 'Outstanding balance tracking', 'Easy record keeping'],
-        accent: '#38B6FF',
-        size: 'sm',
+        title: 'Cash',
+        items: ['Cash in hand', 'Shift collection', 'Reconciliation'],
+    },
+    {
+        icon: Landmark,
+        title: 'Bank',
+        items: ['Company account', 'Current account', 'Balances'],
     },
     {
         icon: Users,
-        title: 'Staff & Shift Management',
-        desc: 'Track who is operating which pump, and when. Full accountability across every shift.',
-        points: ['Operator shift tracking', 'Manager-level oversight', 'Accountability across shifts'],
-        accent: '#0D1B3E',
-        size: 'lg',
+        title: 'Credit',
+        items: ['Customer ledger', 'Outstanding', 'Payment history', 'Udhar'],
     },
     {
-        icon: BarChart2,
-        title: 'Expense Tracking',
-        desc: 'Understand real profitability by tracking all operational expenses against revenue.',
-        points: ['Record pump expenses', 'Monitor operational spending', 'Accurate profit visibility'],
-        accent: '#38B6FF',
-        size: 'sm',
+        icon: Receipt,
+        title: 'Expenses',
+        items: ['Daily expenses', 'Operational costs'],
+    },
+    {
+        icon: Package,
+        title: 'Inventory',
+        items: ['Lubricants', 'Engine oils', 'Stock movement', 'Inventory sales'],
+    },
+    {
+        icon: Droplets,
+        title: 'Tanks',
+        items: ['Tank stock', 'Fuel types', 'Tank reports'],
     },
     {
         icon: FileText,
-        title: 'Reports & Data Exports',
-        desc: 'Generate reports for any time period in seconds. Export to PDF or Excel for easy sharing.',
-        points: ['Daily, weekly, monthly reports', 'PDF / Excel export', 'Share with accountants or partners'],
-        accent: '#0D1B3E',
-        size: 'sm',
+        title: 'Reports',
+        items: ['Combined', 'Credit', 'Inventory sales', 'Tank', 'Cash & Bank', 'Sales'],
+    },
+    {
+        icon: UserCog,
+        title: 'Staff',
+        items: ['Operators', 'Shifts', 'Accountability'],
+    },
+    {
+        icon: CreditCard,
+        title: 'Payments',
+        items: ['Cash', 'UPI', 'Cards', 'Bank'],
+    },
+    {
+        icon: Repeat,
+        title: 'Other Transactions',
+        items: ['Charges', 'Interest', 'Transport', 'Other money movement'],
     },
 ];
-
-const ModuleCard = ({ icon: Icon, title, desc, points, accent, delay, isVisible }) => (
-    <div
-        data-testid={`module-card-${title.replace(/\s+/g, '-').toLowerCase()}`}
-        className={`module-card bg-white rounded-2xl p-6 border border-slate-100 shadow-sm fade-up ${isVisible ? 'visible' : ''} ${delay}`}
-    >
-        <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
-            style={{ backgroundColor: `${accent}15` }}
-        >
-            <Icon size={20} style={{ color: accent }} />
-        </div>
-        <h3 className="text-base font-bold font-outfit text-pf-navy mb-2">{title}</h3>
-        <p className="text-sm text-slate-500 font-jakarta leading-relaxed mb-4">{desc}</p>
-        <ul className="space-y-1.5">
-            {points.map((p) => (
-                <li key={p} className="flex items-center gap-2 text-xs text-slate-600 font-jakarta">
-                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accent }} />
-                    {p}
-                </li>
-            ))}
-        </ul>
-    </div>
-);
 
 const ModulesSection = ({ id }) => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section id={id || 'features'} aria-labelledby="features-heading" data-testid="modules-section" className="py-24 bg-slate-50">
+        <section
+            id={id || 'features'}
+            aria-labelledby="features-heading"
+            data-testid="modules-section"
+            className="py-20 md:py-24 bg-slate-50 scroll-mt-20"
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''}`}>
-                    <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Core Modules</p>
-                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
-                        <h2 id="features-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy max-w-lg leading-tight">
-                            Petrol Pump Management Software for Every Workflow
-                        </h2>
-                        <p className="text-slate-500 font-jakarta text-sm max-w-xs">
-                            Six modules that cover sales, cash, credit, shifts, expenses and reports, the complete petrol pump management system.
-                        </p>
-                    </div>
+                <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''} mb-10`}>
+                    <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">
+                        Inside PetroFI
+                    </p>
+                    <h2 id="features-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight max-w-2xl">
+                        A complete petrol pump system. Not just sales.
+                    </h2>
+                </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {MODULES.map((mod, i) => (
-                            <ModuleCard
-                                key={mod.title}
-                                {...mod}
-                                delay={`delay-${(i % 3 + 1) * 100}`}
-                                isVisible={isVisible}
-                            />
-                        ))}
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 border border-slate-200 rounded-2xl overflow-hidden">
+                    {GROUPS.map((group, i) => {
+                        const Icon = group.icon;
+                        return (
+                            <div
+                                key={group.title}
+                                className={`bg-white p-6 fade-up ${isVisible ? 'visible' : ''} delay-${(i % 3 + 1) * 100}`}
+                            >
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-9 h-9 rounded-lg bg-pf-sky/10 flex items-center justify-center flex-shrink-0">
+                                        <Icon size={16} className="text-pf-sky" strokeWidth={1.5} />
+                                    </div>
+                                    <h3 className="text-base font-bold font-outfit text-pf-navy">{group.title}</h3>
+                                </div>
+                                <ul className="space-y-2">
+                                    {group.items.map((item) => (
+                                        <li key={item} className="flex items-start gap-2 text-sm text-slate-600 font-jakarta">
+                                            <span className="mt-2 w-1 h-1 rounded-full bg-pf-sky flex-shrink-0" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </section>

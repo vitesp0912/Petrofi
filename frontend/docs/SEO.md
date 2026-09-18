@@ -45,13 +45,18 @@ Key sections have `aria-labelledby` pointing to their main heading for clarity a
 | Section            | Heading id             | Section `aria-labelledby` |
 |--------------------|------------------------|---------------------------|
 | Problem            | `problem-heading`      | `problem-heading`         |
-| Features / Modules  | `features-heading`     | `features-heading`        |
+| What we track      | `tracks-heading`       | `tracks-heading`          |
 | Screenshots        | `screenshots-heading`  | `screenshots-heading`     |
+| Reports            | `reports-heading`      | `reports-heading`         |
+| Money control      | `money-heading`        | `money-heading`           |
+| Built for pumps    | `built-for-heading`    | `built-for-heading`       |
+| How it works       | `simple-heading`       | `simple-heading`          |
+| Features / Modules | `features-heading`     | `features-heading`        |
+| Pricing            | `pricing-heading`      | `pricing-heading`         |
 | Download           | `download-heading`     | `download-heading`        |
-| Benefits           | `benefits-heading`     | `benefits-heading`        |
 | Demo               | `demo-heading`         | `demo-heading`            |
 
-Section IDs used for in-page links: `#features`, `#how-it-works`, `#screenshots`, `#download`, `#demo`, `#problem`, `#hero`.
+Section IDs used for in-page links: `#hero`, `#problem`, `#tracks`, `#screenshots`, `#reports`, `#money`, `#built-for`, `#how-it-works`, `#features`, `#pricing`, `#download`, `#demo`.
 
 ### Images
 

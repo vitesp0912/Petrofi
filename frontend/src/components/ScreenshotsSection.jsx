@@ -1,97 +1,125 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { ArrowRight, Lock } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from './ui/carousel';
+import RegisterPumpDialog from './RegisterPumpDialog';
 
-// Screenshot source: 5.78" device → frame uses aspect ratio 9:19.5 to match.
-// All images from frontend/public — order: Dashboard → Meter Reading → Expenses → Credit Ledger → Shift → Report → Cash.
+const UNLOCK_KEY = 'petrofi_pump_registered';
+
 const SCREENS = [
-    { title: 'Dashboard', image: '/screen-dashboard.PNG' },
-    { title: 'Meter Reading', image: '/Meter_Reading%20screen.PNG' },
-    { title: 'Expenses', image: '/Expenses.PNG' },
-    { title: 'Credit Ledger', image: '/Credit_ledger.PNG' },
-    { title: 'Shift Management', image: '/Shift%20Management.PNG' },
-    { title: 'Reports', image: '/screen-reports.PNG' },
-    { title: 'Cash Reconciliation', image: '/Cash_reconciliation.jpeg' },
+    {
+        title: 'Dashboard',
+        image: '/dashboard.webp',
+        caption: 'See today’s sales at a glance.',
+        alt: 'PetroFI dashboard showing total fuel sales for a petrol pump',
+    },
+    {
+        title: 'Meter Readings',
+        image: '/entriesmeterreadings.webp',
+        caption: 'Enter nozzle readings, shift by shift.',
+        alt: 'PetroFI meter reading screen for nozzle-level fuel sales',
+    },
+    {
+        title: 'Expenses',
+        image: '/expenses.webp',
+        caption: 'Log every rupee that goes out.',
+        alt: 'PetroFI expenses screen for petrol pump operational costs',
+    },
+    {
+        title: 'Udhar Ledger',
+        image: '/udharledger.webp',
+        caption: 'Udhar customers and outstanding, in one list.',
+        alt: 'PetroFI udhar customer ledger with outstanding amounts',
+    },
 ];
-
-const PHONE_WIDTH_MOBILE = '250px';   // single phone width on mobile
-const PHONE_WIDTH_DESKTOP = 'w-52 md:w-56 lg:w-60';
-
-const PhoneFrame = ({ title, image, isMobile }) => (
-    <div className={`mx-auto flex-shrink-0 ${isMobile ? 'w-[250px]' : PHONE_WIDTH_DESKTOP}`}>
-        <div className="w-full aspect-[9/19.5] bg-slate-900 rounded-[20px] border-[3px] border-slate-200 shadow-xl overflow-hidden relative flex items-center justify-center">
-            <img
-                src={image}
-                alt={title}
-                className="w-full h-full object-contain"
-                loading="lazy"
-            />
-        </div>
-        <p className="text-center text-xs text-slate-500 font-jakarta mt-2">{title}</p>
-    </div>
-);
 
 const ScreenshotsSection = ({ id }) => {
     const { ref, isVisible } = useScrollAnimation();
+    const looped = [...SCREENS, ...SCREENS];
+    const [unlocked, setUnlocked] = useState(false);
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        try {
+            if (sessionStorage.getItem(UNLOCK_KEY) === '1') setUnlocked(true);
+        } catch {
+            /* ignore */
+        }
+    }, []);
+
+    const handleSuccess = () => {
+        setUnlocked(true);
+        try {
+            sessionStorage.setItem(UNLOCK_KEY, '1');
+        } catch {
+            /* ignore */
+        }
+    };
 
     return (
-        <section id={id || 'screenshots'} aria-labelledby="screenshots-heading" data-testid="screenshots-section" className="py-24 bg-white overflow-hidden">
+        <section
+            id={id || 'screenshots'}
+            aria-labelledby="screenshots-heading"
+            data-testid="screenshots-section"
+            className="py-20 md:py-24 bg-slate-50 overflow-hidden scroll-mt-20"
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''}`}>
-                    <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">App Preview</p>
-                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
-                        <h2 id="screenshots-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-pf-navy leading-tight max-w-md">
-                            Inside the PetroFI App
-                        </h2>
-                        <p className="text-sm text-slate-500 font-jakarta max-w-xs">
-                            See what the petrol pump software looks like in action. Every screen built for pump owners and managers.
-                        </p>
-                    </div>
+                <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''} mb-10`}>
+                    <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">
+                        Inside the app
+                    </p>
+                    <h2 id="screenshots-heading" className="text-3xl sm:text-4xl lg:text-5xl font-bold font-outfit text-pf-navy leading-tight max-w-2xl">
+                        YOUR ENTIRE PUMP. IN ONE APP.
+                    </h2>
                 </div>
 
-                {/* Desktop: centered carousel with absolute arrows */}
-                <div className="relative hidden sm:flex items-center justify-center gap-2 px-4 max-w-2xl sm:max-w-[650px] mx-auto">
-                    <Carousel
-                        opts={{ align: 'center', loop: true }}
-                        className="w-full flex-1 min-w-0"
-                    >
-                        <CarouselContent className="-ml-0">
-                            {SCREENS.map((screen) => (
-                                <CarouselItem key={screen.title} className="pl-0 basis-full">
-                                    <PhoneFrame title={screen.title} image={screen.image} isMobile={false} />
-                                </CarouselItem>
+                <div className="relative rounded-3xl overflow-hidden bg-white border border-slate-200/80 shadow-[0_8px_40px_rgba(13,27,62,0.06)]">
+                    <div className={`screenshot-marquee-mask py-6 ${unlocked ? '' : 'screenshot-blurred'}`}>
+                        <div className={`screenshot-marquee flex w-max items-end gap-5 px-4 ${unlocked ? '' : 'is-paused'}`}>
+                            {looped.map((screen, i) => (
+                                <figure key={`${screen.title}-${i}`} className="flex-shrink-0 m-0">
+                                    <img
+                                        src={screen.image}
+                                        alt={screen.alt}
+                                        className="h-[280px] sm:h-[360px] lg:h-[420px] w-auto max-w-none block"
+                                        loading="lazy"
+                                    />
+                                    <figcaption className="text-center mt-3">
+                                        <p className="text-sm font-semibold font-outfit text-pf-navy">{screen.title}</p>
+                                        <p className="text-xs text-slate-500 font-jakarta mt-1">{screen.caption}</p>
+                                    </figcaption>
+                                </figure>
                             ))}
-                        </CarouselContent>
-                        <CarouselPrevious className="absolute left-0 lg:-left-1 h-12 w-12 rounded-full bg-white border-2 border-slate-200 shadow-md hover:bg-slate-50" />
-                        <CarouselNext className="absolute right-0 lg:-right-1 h-12 w-12 rounded-full bg-white border-2 border-slate-200 shadow-md hover:bg-slate-50" />
-                    </Carousel>
-                </div>
-
-                {/* Mobile: structured row [Arrow | Carousel viewport | Arrow], centered */}
-                <div className="sm:hidden flex flex-col items-center">
-                    <div className="flex items-center justify-center gap-3">
-                        <Carousel
-                            opts={{ align: 'center', loop: true }}
-                            className="flex items-center gap-3"
-                        >
-                            <CarouselPrevious className="static h-11 w-11 shrink-0 rounded-full bg-white border-2 border-slate-200 shadow-md hover:bg-slate-50" />
-                            <div className="w-[250px] shrink-0 overflow-hidden">
-                                <CarouselContent className="-ml-0">
-                                    {SCREENS.map((screen) => (
-                                        <CarouselItem key={screen.title} className="pl-0 basis-full min-w-0">
-                                            <PhoneFrame title={screen.title} image={screen.image} isMobile />
-                                        </CarouselItem>
-                                    ))}
-                                </CarouselContent>
-                            </div>
-                            <CarouselNext className="static h-11 w-11 shrink-0 rounded-full bg-white border-2 border-slate-200 shadow-md hover:bg-slate-50" />
-                        </Carousel>
+                        </div>
                     </div>
-                    <p className="text-center text-xs text-slate-400 font-jakarta mt-7">Swipe or use arrows</p>
-                </div>
 
-                <p className="hidden sm:block text-center text-xs text-slate-400 font-jakarta mt-8">Use arrows or swipe to see more screens</p>
+                    {!unlocked && (
+                        <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-8 bg-pf-navy/45">
+                            <button
+                                type="button"
+                                onClick={() => setOpen(true)}
+                                data-testid="register-pump-cta"
+                                className="group max-w-sm w-full bg-white border border-slate-100 shadow-[0_20px_60px_rgba(13,27,62,0.16)] rounded-2xl px-6 py-7 sm:px-8 sm:py-8 text-center hover:shadow-[0_24px_70px_rgba(13,27,62,0.2)]"
+                                style={{ transition: 'box-shadow 0.2s ease' }}
+                            >
+                                <span className="w-11 h-11 mx-auto mb-4 rounded-full bg-pf-sky/10 flex items-center justify-center">
+                                    <Lock size={18} className="text-pf-sky" strokeWidth={1.8} />
+                                </span>
+                                <span className="block text-xl sm:text-2xl font-bold font-outfit text-pf-navy leading-snug">
+                                    Register your pump for{' '}
+                                    <span className="text-pf-sky">free</span>
+                                    {' '}to see the details
+                                </span>
+                                <span className="mt-5 inline-flex items-center justify-center gap-2 bg-pf-navy text-white px-5 py-3 rounded-xl text-sm font-semibold font-jakarta group-hover:bg-pf-navy/90">
+                                    Register your pump
+                                    <ArrowRight size={16} />
+                                </span>
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
+
+            <RegisterPumpDialog open={open} onOpenChange={setOpen} onSuccess={handleSuccess} />
         </section>
     );
 };

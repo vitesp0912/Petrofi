@@ -42,7 +42,7 @@ const DemoSection = ({ id }) => {
 
     return (
         <section id={id || 'demo'} aria-labelledby="demo-heading"
-            data-testid="demo-section" className="py-24 bg-pf-navy relative overflow-hidden">
+            data-testid="demo-section" className="py-24 bg-pf-navy relative overflow-hidden scroll-mt-20">
             {/* Background accent */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-pf-sky/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -52,11 +52,10 @@ const DemoSection = ({ id }) => {
                     <div>
                         <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Request Demo</p>
                         <h2 id="demo-heading" className="text-3xl sm:text-4xl font-bold font-outfit text-white leading-tight mb-5">
-                            See PetroFI Running on a Real Petrol Pump
+                            See how every rupee is tracked
                         </h2>
                         <p className="text-slate-400 font-jakarta text-base leading-relaxed mb-8">
-                            Book a personalized demo with our team. We'll show you exactly how PetroFI works
-                            for a pump like yours — live, not a recording.
+                            Book a live demo. We will show sales, credit, expenses, inventory, tanks, cash and reports on a pump like yours.
                         </p>
                         <div className="space-y-3 mb-8">
                             {FEATURES.map((f) => (
