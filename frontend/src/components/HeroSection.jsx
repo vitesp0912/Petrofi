@@ -12,7 +12,7 @@ const HeroSection = () => {
             <img
                 src="/PETROFIHERO.webp"
                 alt="PetroFI on phone and laptop at a petrol pump, showing sales, cash, expenses and tank stock"
-                className="absolute inset-0 w-full h-full object-cover object-[72%_center]"
+                className="absolute inset-0 w-full h-full object-cover object-[18%_center] lg:object-[72%_center]"
             />
             <div
                 className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-white/25 lg:via-white/80 lg:to-transparent pointer-events-none"
@@ -24,7 +24,7 @@ const HeroSection = () => {
             />
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div className="max-w-xl">
+                <div className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
                     <div className="inline-flex items-center gap-2 bg-pf-sky/10 text-pf-sky text-xs font-semibold px-4 py-2 rounded-full font-jakarta mb-3 lg:mb-4 border border-pf-sky/20">
                         <span className="w-1.5 h-1.5 bg-pf-sky rounded-full animate-pulse-dot" />
                         Trusted by 500+ Petrol Pump Owners
@@ -40,23 +40,23 @@ const HeroSection = () => {
                         and credit, all in one platform. The petrol pump software trusted by 500+ owners in India.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+                    <div className="inline-flex flex-col sm:flex-row gap-3 items-stretch mx-auto lg:mx-0">
                         <button
                             onClick={() => scrollToId('pricing')}
                             data-testid="hero-trial-btn"
-                            className="flex items-center justify-center gap-2 bg-pf-navy text-white px-6 py-3 rounded-lg font-semibold font-jakarta text-sm hover:bg-pf-navy/90 shadow-lg w-full sm:w-auto"
+                            className="flex items-center justify-center gap-1.5 bg-pf-navy text-white px-5 py-2.5 rounded-lg font-semibold font-jakarta text-sm hover:bg-pf-navy/90 shadow-lg whitespace-nowrap"
                             style={{ transition: 'background-color 0.2s ease, box-shadow 0.2s ease' }}
                         >
-                            Start Your Free 30-Day Trial <ArrowRight size={16} />
+                            Start Your Free 30-Day Trial <ArrowRight size={15} />
                         </button>
                         <button
                             type="button"
                             onClick={() => scrollToId('download')}
                             data-testid="hero-download-btn"
-                            className="flex items-center justify-center gap-2 border border-slate-200 text-pf-navy px-6 py-3 rounded-lg font-semibold font-jakarta text-sm hover:border-pf-sky hover:text-pf-sky bg-white w-full sm:w-auto"
+                            className="flex items-center justify-center gap-1.5 border border-slate-200 text-pf-navy px-5 py-2.5 rounded-lg font-semibold font-jakarta text-sm hover:border-pf-sky hover:text-pf-sky bg-white whitespace-nowrap"
                             style={{ transition: 'border-color 0.2s ease, color 0.2s ease' }}
                         >
-                            <Download size={16} /> Download App
+                            <Download size={15} /> Download App
                         </button>
                     </div>
                 </div>

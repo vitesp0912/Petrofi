@@ -10,14 +10,24 @@ const ReportsSection = () => {
         if (!section || !shot) return undefined;
 
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (reduced) {
+        const mobile = window.matchMedia('(max-width: 767px)');
+
+        const pinShot = () => {
             shot.style.transform = 'none';
             shot.style.opacity = '1';
+        };
+
+        if (reduced) {
+            pinShot();
             return undefined;
         }
 
         let frame = 0;
         const update = () => {
+            if (mobile.matches) {
+                pinShot();
+                return;
+            }
             const rect = section.getBoundingClientRect();
             const span = window.innerHeight + rect.height;
             const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / span));

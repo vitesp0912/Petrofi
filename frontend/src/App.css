@@ -133,6 +133,16 @@ html { scroll-behavior: smooth; }
     will-change: transform, opacity;
     transform: translate3d(78vw, 0, 0) rotateY(38deg) scale(0.82);
 }
+@media (max-width: 767px) {
+    .report-3d-stage {
+        perspective: none;
+    }
+    .report-3d-shot {
+        transform: none;
+        opacity: 1;
+        will-change: auto;
+    }
+}
 
 /* App screens — always scrolling, hover or not */
 .screenshot-marquee-mask {

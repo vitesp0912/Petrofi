@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, Phone, X } from 'lucide-react';
 
 const NAV_LINKS = [
     { label: 'Features', id: 'tracks' },
     { label: 'How it Works', id: 'how-it-works' },
     { label: 'Pricing', id: 'pricing' },
     { label: 'Download', id: 'download' },
+];
+
+const PHONES = [
+    { label: '+91 73986 21812', href: 'tel:+917398621812' },
+    { label: '+91 87001 17495', href: 'tel:+918700117495' },
 ];
 
 const Navbar = ({ forceSolid = false }) => {
@@ -27,6 +32,13 @@ const Navbar = ({ forceSolid = false }) => {
     useEffect(() => {
         setMobileOpen(false);
     }, [location.pathname]);
+
+    useEffect(() => {
+        document.body.style.overflow = mobileOpen ? 'hidden' : '';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [mobileOpen]);
 
     const goToSection = (id) => {
         setMobileOpen(false);
@@ -91,7 +103,7 @@ const Navbar = ({ forceSolid = false }) => {
                         Start Free Trial
                     </button>
                     <button
-                        className="md:hidden text-pf-navy"
+                        className="md:hidden text-pf-navy relative z-[60]"
                         onClick={() => setMobileOpen(!mobileOpen)}
                         data-testid="mobile-menu-toggle"
                         aria-expanded={mobileOpen}
@@ -102,13 +114,36 @@ const Navbar = ({ forceSolid = false }) => {
                 </div>
             </nav>
 
-            {mobileOpen && (
-                <div className="md:hidden bg-white border-t border-slate-100 px-4 py-4 space-y-1 shadow-lg">
+            <div
+                className={`md:hidden fixed inset-0 z-40 bg-pf-navy/40 ${mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                style={{ transition: 'opacity 0.25s ease' }}
+                onClick={() => setMobileOpen(false)}
+                aria-hidden={!mobileOpen}
+            />
+            <div
+                className={`md:hidden fixed top-0 right-0 z-50 h-[100dvh] w-[min(20rem,86vw)] bg-white shadow-2xl flex flex-col ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                style={{ transition: 'transform 0.3s ease' }}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Menu"
+            >
+                <div className="h-16 px-5 flex items-center justify-between border-b border-slate-100">
+                    <span className="text-base font-bold font-outfit text-pf-navy">Menu</span>
+                    <button
+                        type="button"
+                        onClick={() => setMobileOpen(false)}
+                        className="text-pf-navy"
+                        aria-label="Close menu"
+                    >
+                        <X size={22} />
+                    </button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-5 py-4">
                     {NAV_LINKS.map((link) => (
                         <button
                             key={link.id}
                             onClick={() => goToSection(link.id)}
-                            className="block w-full text-left text-sm font-medium text-slate-700 hover:text-pf-navy font-jakarta py-3 border-b border-slate-50"
+                            className="block w-full text-left text-sm font-medium text-slate-700 hover:text-pf-navy font-jakarta py-3.5 border-b border-slate-100"
                             data-testid={`mobile-nav-${link.id}`}
                         >
                             {link.label}
@@ -116,20 +151,38 @@ const Navbar = ({ forceSolid = false }) => {
                     ))}
                     <button
                         onClick={() => goToSection('demo')}
-                        className="block w-full text-left text-sm font-medium text-slate-700 hover:text-pf-navy font-jakarta py-3 border-b border-slate-50"
+                        className="block w-full text-left text-sm font-medium text-slate-700 hover:text-pf-navy font-jakarta py-3.5 border-b border-slate-100"
                         data-testid="mobile-nav-demo"
                     >
                         Book a Demo
                     </button>
+
+                    <p className="text-[11px] font-semibold font-jakarta uppercase tracking-widest text-pf-sky mt-6 mb-3">
+                        Call us
+                    </p>
+                    {PHONES.map((phone) => (
+                        <a
+                            key={phone.href}
+                            href={phone.href}
+                            className="flex items-center gap-3 text-sm font-medium text-pf-navy font-jakarta py-2.5"
+                        >
+                            <span className="w-8 h-8 rounded-full bg-pf-sky/10 flex items-center justify-center shrink-0">
+                                <Phone size={14} className="text-pf-sky" />
+                            </span>
+                            {phone.label}
+                        </a>
+                    ))}
+                </div>
+                <div className="p-5 border-t border-slate-100">
                     <button
                         onClick={() => goToSection('pricing')}
-                        className="w-full bg-pf-navy text-white py-2.5 rounded-lg text-sm font-semibold font-jakarta mt-2"
+                        className="w-full bg-pf-navy text-white py-3 rounded-lg text-sm font-semibold font-jakarta"
                         data-testid="mobile-start-free-btn"
                     >
                         Start Free Trial
                     </button>
                 </div>
-            )}
+            </div>
         </header>
     );
 };
