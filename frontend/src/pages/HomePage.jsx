@@ -12,6 +12,7 @@ import BuiltForPumpsSection from '../components/BuiltForPumpsSection';
 import SimpleSection from '../components/SimpleSection';
 import PricingSection from '../components/PricingSection';
 import DownloadSection from '../components/DownloadSection';
+import TestimonialsSection from '../components/TestimonialsSection';
 import FinalCTASection from '../components/FinalCTASection';
 import DemoSection from '../components/DemoSection';
 import FooterSection from '../components/FooterSection';
@@ -55,6 +56,7 @@ function HomePage() {
                 <BuiltForPumpsSection />
                 <PricingSection />
                 <DownloadSection />
+                <TestimonialsSection />
                 <FinalCTASection />
                 <DemoSection id="demo" />
             </main>

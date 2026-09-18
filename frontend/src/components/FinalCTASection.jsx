@@ -14,7 +14,8 @@ const FinalCTASection = () => {
             <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''}`}>
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-outfit text-white leading-tight mb-4">
-                        KNOW WHERE EVERY RUPEE STANDS.
+                        Stop Managing Your Petrol Pump With Registers.
+                        <span className="block">Start Running It With Real Data.</span>
                     </h2>
                     <p className="text-slate-400 font-jakarta text-base mb-10 max-w-xl mx-auto">
                         Run your petrol pump with numbers you can actually see.

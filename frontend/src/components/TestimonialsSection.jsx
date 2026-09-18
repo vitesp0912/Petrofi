@@ -5,7 +5,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 
 const TESTIMONIALS = [
     {
-        quote: 'PetroFI made it extremely easy for us to track daily sales and reconcile cash without confusion. Our operations are far more organized now. I can check everything from my phone even when I\'m not at the pump.',
+        quote: 'We used to write everything in the register. At night the cash never matched. Now I open the app and I can see today’s sale on my phone.',
         name: 'Rajesh Sharma',
         pump: 'Sharma Fuel Station',
         city: 'Jaipur, Rajasthan',
@@ -13,7 +13,7 @@ const TESTIMONIALS = [
         color: '#0D1B3E',
     },
     {
-        quote: 'Earlier we used registers and often found mismatches at shift end. Now everything is digital. We know exactly where every rupee is. The credit customer ledger alone saved us lakhs in forgotten payments.',
+        quote: 'Udhar customers used to get missed. Someone paid, someone didn’t, and we forgot. Now I can see who still has to pay.',
         name: 'Suresh Patel',
         pump: 'Patel Service Station',
         city: 'Ahmedabad, Gujarat',
@@ -21,7 +21,7 @@ const TESTIMONIALS = [
         color: '#38B6FF',
     },
     {
-        quote: 'Managing three operators was a constant headache before PetroFI. Now each shift is logged digitally and I get complete accountability. My manager says it saved at least 2 hours every day.',
+        quote: 'I have three operators. Earlier I never knew who sold what. Now every shift is in the app. I check from home also.',
         name: 'Mohan Kumar',
         pump: 'Kumar Petroleum',
         city: 'Pune, Maharashtra',
@@ -44,7 +44,7 @@ const TestimonialCard = ({ quote, name, pump, city, avatar, color, index, isVisi
         className={`module-card bg-white rounded-2xl p-6 border border-slate-100 shadow-sm fade-up ${isVisible ? 'visible' : ''} delay-${(index + 1) * 100}`}
     >
         <Stars />
-        <p className="text-sm text-slate-600 font-jakarta leading-relaxed mb-6 italic">
+        <p className="text-sm text-slate-600 font-jakarta leading-relaxed mb-6">
             "{quote}"
         </p>
         <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
@@ -68,7 +68,7 @@ const TestimonialsSection = () => {
     const { ref, isVisible } = useScrollAnimation();
 
     return (
-        <section data-testid="testimonials-section" className="py-24 bg-slate-50">
+        <section data-testid="testimonials-section" className="py-20 md:py-24 bg-slate-50 scroll-mt-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div ref={ref} className={`fade-up ${isVisible ? 'visible' : ''}`}>
                     <p className="text-pf-sky text-sm font-semibold font-jakarta uppercase tracking-widest mb-3">Testimonials</p>
