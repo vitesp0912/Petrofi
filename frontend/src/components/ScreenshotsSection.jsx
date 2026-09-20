@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Lock } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import RegisterPumpDialog from './RegisterPumpDialog';
 
-const UNLOCK_KEY = 'petrofi_pump_registered';
+const UNLOCK_KEY = 'petrofi_pump_registered_until';
+const VIEW_MS = 4 * 60 * 1000;
 
 const SCREENS = [
     {
@@ -37,22 +38,66 @@ const ScreenshotsSection = ({ id }) => {
     const looped = [...SCREENS, ...SCREENS];
     const [unlocked, setUnlocked] = useState(false);
     const [open, setOpen] = useState(false);
+    const lockTimer = useRef(null);
+
+    const clearLockTimer = () => {
+        if (lockTimer.current) {
+            window.clearTimeout(lockTimer.current);
+            lockTimer.current = null;
+        }
+    };
+
+    const lockGallery = () => {
+        clearLockTimer();
+        setUnlocked(false);
+        setOpen(false);
+        try {
+            sessionStorage.removeItem(UNLOCK_KEY);
+        } catch {
+            /* ignore */
+        }
+    };
+
+    const unlockGallery = (until) => {
+        const remaining = until - Date.now();
+        if (remaining <= 0) {
+            lockGallery();
+            return;
+        }
+        setUnlocked(true);
+        try {
+            sessionStorage.setItem(UNLOCK_KEY, String(until));
+        } catch {
+            /* ignore */
+        }
+        clearLockTimer();
+        lockTimer.current = window.setTimeout(lockGallery, remaining);
+    };
 
     useEffect(() => {
         try {
-            if (sessionStorage.getItem(UNLOCK_KEY) === '1') setUnlocked(true);
+            const until = Number(sessionStorage.getItem(UNLOCK_KEY) || 0);
+            if (until > Date.now()) unlockGallery(until);
         } catch {
             /* ignore */
         }
+
+        const onLeave = () => lockGallery();
+        const onVisibility = () => {
+            if (document.hidden) lockGallery();
+        };
+
+        document.addEventListener('visibilitychange', onVisibility);
+        window.addEventListener('pagehide', onLeave);
+        return () => {
+            clearLockTimer();
+            document.removeEventListener('visibilitychange', onVisibility);
+            window.removeEventListener('pagehide', onLeave);
+        };
     }, []);
 
     const handleSuccess = () => {
-        setUnlocked(true);
-        try {
-            sessionStorage.setItem(UNLOCK_KEY, '1');
-        } catch {
-            /* ignore */
-        }
+        unlockGallery(Date.now() + VIEW_MS);
     };
 
     return (

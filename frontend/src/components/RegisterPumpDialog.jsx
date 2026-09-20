@@ -66,7 +66,7 @@ const RegisterPumpDialog = ({ open, onOpenChange, onSuccess }) => {
                         </div>
                         <h3 className="text-xl font-bold font-outfit text-pf-navy mb-2">You are in</h3>
                         <p className="text-slate-500 font-jakarta text-sm leading-relaxed mb-6">
-                            We have your pump details. The screens below are open now.
+                            We have your pump details. The screens below stay open for four minutes.
                         </p>
                         <button
                             type="button"
