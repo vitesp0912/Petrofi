@@ -115,14 +115,6 @@ const Navbar = ({ forceSolid = false }) => {
 
                 <div className="justify-self-end flex items-center gap-2 sm:gap-3">
                     <button
-                        onClick={() => goToSection('demo')}
-                        data-testid="nav-book-demo-btn"
-                        className="hidden lg:inline-flex text-sm font-medium text-slate-600 hover:text-pf-navy font-jakarta"
-                        style={{ transition: 'color 0.2s ease' }}
-                    >
-                        Book a Demo
-                    </button>
-                    <button
                         onClick={() => goToSection('pricing')}
                         data-testid="nav-start-free-btn"
                         className="hidden md:inline-flex bg-pf-navy text-white px-5 py-2 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy/90 shadow-sm"
@@ -227,13 +219,6 @@ const Navbar = ({ forceSolid = false }) => {
                             {link.label}
                         </button>
                     ))}
-                    <button
-                        onClick={() => goToSection('demo')}
-                        className="block w-full text-left text-sm font-medium text-slate-700 hover:text-pf-navy font-jakarta py-3.5 border-b border-slate-100"
-                        data-testid="mobile-nav-demo"
-                    >
-                        Book a Demo
-                    </button>
 
                     <p className="text-[11px] font-semibold font-jakarta uppercase tracking-widest text-pf-sky mt-6 mb-3">
                         Call us
