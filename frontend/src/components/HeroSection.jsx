@@ -12,7 +12,7 @@ const HeroSection = () => {
             <img
                 src="/PETROFIHERO.webp"
                 alt="PetroFI on phone and laptop at a petrol pump, showing sales, cash, expenses and tank stock"
-                className="absolute inset-0 w-full h-full object-cover object-[18%_center] lg:object-[72%_center]"
+                className="absolute inset-0 w-full h-full object-cover object-center lg:object-[72%_center]"
             />
             <div
                 className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-white/25 lg:via-white/80 lg:to-transparent pointer-events-none"
@@ -44,7 +44,7 @@ const HeroSection = () => {
                         <button
                             onClick={() => scrollToId('pricing')}
                             data-testid="hero-trial-btn"
-                            className="flex items-center justify-center gap-1.5 bg-pf-navy text-white px-5 py-2.5 rounded-lg font-semibold font-jakarta text-sm hover:bg-pf-navy/90 shadow-lg whitespace-nowrap"
+                            className="flex items-center justify-center gap-1.5 bg-pf-navy text-white px-5 py-2.5 rounded-full font-semibold font-jakarta text-sm hover:bg-pf-navy/90 shadow-lg whitespace-nowrap"
                             style={{ transition: 'background-color 0.2s ease, box-shadow 0.2s ease' }}
                         >
                             Start Your Free 30-Day Trial <ArrowRight size={15} />
@@ -53,7 +53,7 @@ const HeroSection = () => {
                             type="button"
                             onClick={() => scrollToId('download')}
                             data-testid="hero-download-btn"
-                            className="flex items-center justify-center gap-1.5 border border-slate-200 text-pf-navy px-5 py-2.5 rounded-lg font-semibold font-jakarta text-sm hover:border-pf-sky hover:text-pf-sky bg-white whitespace-nowrap"
+                            className="flex items-center justify-center gap-1.5 border border-slate-200 text-pf-navy px-5 py-2.5 rounded-full font-semibold font-jakarta text-sm hover:border-pf-sky hover:text-pf-sky bg-white whitespace-nowrap"
                             style={{ transition: 'border-color 0.2s ease, color 0.2s ease' }}
                         >
                             <Download size={15} /> Download App

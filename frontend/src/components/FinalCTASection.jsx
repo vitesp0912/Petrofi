@@ -24,7 +24,7 @@ const FinalCTASection = () => {
                         <button
                             onClick={() => scrollToId('download')}
                             data-testid="final-cta-trial-btn"
-                            className="flex items-center justify-center gap-1.5 bg-pf-sky text-white px-5 py-2.5 rounded-lg font-semibold font-jakarta text-sm hover:bg-[#2aa5f0] shadow-lg whitespace-nowrap"
+                            className="flex items-center justify-center gap-1.5 bg-pf-sky text-white px-5 py-2.5 rounded-full font-semibold font-jakarta text-sm hover:bg-[#2aa5f0] shadow-lg whitespace-nowrap"
                             style={{ transition: 'background-color 0.2s ease' }}
                         >
                             START YOUR FREE 30-DAY TRIAL <ArrowRight size={15} />
@@ -33,7 +33,7 @@ const FinalCTASection = () => {
                             type="button"
                             onClick={() => scrollToId('demo')}
                             data-testid="final-cta-demo-btn"
-                            className="flex items-center justify-center gap-1.5 border-2 border-white/30 text-white px-5 py-2.5 rounded-lg font-semibold font-jakarta text-sm hover:border-white hover:bg-white/5 whitespace-nowrap"
+                            className="flex items-center justify-center gap-1.5 border-2 border-white/30 text-white px-5 py-2.5 rounded-full font-semibold font-jakarta text-sm hover:border-white hover:bg-white/5 whitespace-nowrap"
                             style={{ transition: 'border-color 0.2s ease, background-color 0.2s ease' }}
                         >
                             BOOK A DEMO

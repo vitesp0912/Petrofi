@@ -70,7 +70,7 @@ const PricingSection = () => {
                                 type="button"
                                 onClick={() => scrollToId('download')}
                                 data-testid="pricing-start-free-btn"
-                                className="inline-flex items-center justify-center gap-2 bg-pf-navy text-white px-7 py-3 rounded-lg font-semibold font-jakarta text-sm hover:bg-pf-navy/90 shadow-lg"
+                                className="inline-flex items-center justify-center gap-2 bg-pf-navy text-white px-7 py-3 rounded-full font-semibold font-jakarta text-sm hover:bg-pf-navy/90 shadow-lg"
                                 style={{ transition: 'background-color 0.2s ease' }}
                             >
                                 START FREE <Download size={16} />
@@ -79,7 +79,7 @@ const PricingSection = () => {
                                 type="button"
                                 onClick={() => scrollToId('demo')}
                                 data-testid="pricing-demo-btn"
-                                className="inline-flex items-center justify-center gap-2 border border-slate-200 bg-white text-pf-navy px-7 py-3 rounded-lg font-semibold font-jakarta text-sm hover:border-pf-sky hover:text-pf-sky"
+                                className="inline-flex items-center justify-center gap-2 border border-slate-200 bg-white text-pf-navy px-7 py-3 rounded-full font-semibold font-jakarta text-sm hover:border-pf-sky hover:text-pf-sky"
                                 style={{ transition: 'border-color 0.2s ease, color 0.2s ease' }}
                             >
                                 BOOK A DEMO <ArrowRight size={16} />

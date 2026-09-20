@@ -117,8 +117,8 @@ const Navbar = ({ forceSolid = false }) => {
                     <button
                         onClick={() => goToSection('pricing')}
                         data-testid="nav-start-free-btn"
-                        className="hidden md:inline-flex items-center h-10 bg-pf-navy text-white px-5 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy/90 shadow-sm"
-                        style={{ transition: 'background-color 0.2s ease, box-shadow 0.2s ease' }}
+                        className="hidden md:inline-flex items-center h-10 bg-pf-navy text-white px-5 rounded-full text-sm font-semibold font-jakarta hover:bg-pf-navy/90"
+                        style={{ transition: 'background-color 0.2s ease' }}
                     >
                         Start Free Trial
                     </button>
@@ -164,7 +164,7 @@ const Navbar = ({ forceSolid = false }) => {
                             type="button"
                             onClick={openLogin}
                             data-testid="nav-login-btn"
-                            className="inline-flex items-center h-10 border border-pf-navy bg-white/90 text-pf-navy px-3.5 sm:px-4 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy hover:text-white"
+                            className="inline-flex items-center h-10 border border-slate-200 bg-white text-pf-navy px-4 rounded-full text-sm font-semibold font-jakarta hover:border-pf-navy"
                             style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                         >
                             Login
@@ -243,7 +243,7 @@ const Navbar = ({ forceSolid = false }) => {
                                     setMobileOpen(false);
                                     navigate('/subscription');
                                 }}
-                                className="w-full border border-slate-200 text-pf-navy py-3 rounded-lg text-sm font-semibold font-jakarta"
+                                className="w-full border border-slate-200 text-pf-navy py-3 rounded-full text-sm font-semibold font-jakarta"
                                 data-testid="mobile-subscription-btn"
                             >
                                 Subscription
@@ -251,7 +251,7 @@ const Navbar = ({ forceSolid = false }) => {
                             <button
                                 type="button"
                                 onClick={handleSignOut}
-                                className="w-full border border-slate-200 text-pf-navy py-3 rounded-lg text-sm font-semibold font-jakarta"
+                                className="w-full border border-slate-200 text-pf-navy py-3 rounded-full text-sm font-semibold font-jakarta"
                                 data-testid="mobile-sign-out-btn"
                             >
                                 Sign out
@@ -261,7 +261,7 @@ const Navbar = ({ forceSolid = false }) => {
                         <button
                             type="button"
                             onClick={openLogin}
-                            className="w-full border border-pf-navy text-pf-navy py-3 rounded-lg text-sm font-semibold font-jakarta"
+                            className="w-full border border-slate-200 text-pf-navy py-3 rounded-full text-sm font-semibold font-jakarta"
                             data-testid="mobile-login-btn"
                         >
                             Login
@@ -269,7 +269,7 @@ const Navbar = ({ forceSolid = false }) => {
                     )}
                     <button
                         onClick={() => goToSection('pricing')}
-                        className="w-full bg-pf-navy text-white py-3 rounded-lg text-sm font-semibold font-jakarta"
+                        className="w-full bg-pf-navy text-white py-3 rounded-full text-sm font-semibold font-jakarta"
                         data-testid="mobile-start-free-btn"
                     >
                         Start Free Trial

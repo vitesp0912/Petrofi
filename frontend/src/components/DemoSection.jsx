@@ -133,7 +133,7 @@ const DemoSection = ({ id }) => {
                                     type="submit"
                                     disabled={status === 'loading'}
                                     data-testid="demo-submit-btn"
-                                    className="w-full bg-pf-navy text-white py-3 rounded-lg text-sm font-bold font-jakarta flex items-center justify-center gap-2 hover:bg-pf-navy/90 disabled:opacity-60 mt-2 shadow-sm"
+                                    className="w-full bg-pf-navy text-white py-3 rounded-full text-sm font-bold font-jakarta flex items-center justify-center gap-2 hover:bg-pf-navy/90 disabled:opacity-60 mt-2 shadow-sm"
                                     style={{ transition: 'background-color 0.2s ease' }}
                                 >
                                     {status === 'loading' ? 'Submitting...' : <>Request Demo <ArrowRight size={16} /></>}

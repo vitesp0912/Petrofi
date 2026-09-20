@@ -43,7 +43,7 @@ const SolutionSection = () => {
                             <button
                                 onClick={scrollToDemo}
                                 data-testid="solution-cta-btn"
-                                className="inline-flex items-center gap-2 bg-pf-sky text-white px-6 py-3 rounded-lg font-semibold font-jakarta text-sm hover:bg-[#2aa5f0]"
+                                className="inline-flex items-center gap-2 bg-pf-sky text-white px-6 py-3 rounded-full font-semibold font-jakarta text-sm hover:bg-[#2aa5f0]"
                                 style={{ transition: 'background-color 0.2s ease' }}
                             >
                                 See PetroFI in Action <ArrowRight size={16} />

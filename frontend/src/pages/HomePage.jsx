@@ -50,11 +50,11 @@ function HomePage() {
                 </div>
                 <TracksSection />
                 <ProblemSection />
+                <PricingSection />
                 <SimpleSection id="how-it-works" />
                 <ScreenshotsSection id="screenshots" />
                 <ReportsSection />
                 <BuiltForPumpsSection />
-                <PricingSection />
                 <DownloadSection />
                 <TestimonialsSection />
                 <FinalCTASection />

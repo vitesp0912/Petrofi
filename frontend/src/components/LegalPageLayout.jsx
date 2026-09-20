@@ -214,7 +214,7 @@ const LegalPageLayout = ({
                                             </div>
                                             <Link
                                                 to={related.to}
-                                                className="inline-flex items-center justify-center gap-2 bg-pf-sky text-white px-5 py-2.5 rounded-lg text-sm font-semibold font-jakarta hover:bg-[#2aa5f0] shrink-0"
+                                                className="inline-flex items-center justify-center gap-2 bg-pf-sky text-white px-5 py-2.5 rounded-full text-sm font-semibold font-jakarta hover:bg-[#2aa5f0] shrink-0"
                                                 style={{ transition: 'background-color 0.2s ease' }}
                                             >
                                                 {related.cta} <ChevronRight size={16} />

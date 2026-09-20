@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
     const to = process.env.DEMO_MAIL_TO || process.env.SMTP_MAIL_USER;
     const host = process.env.SMTP_MAIL_HOST;
     const user = process.env.SMTP_MAIL_USER;
-    const pass = process.env.SMTP_MAIL_APP_PASSWORD;
+    const pass = (process.env.SMTP_MAIL_APP_PASSWORD || '').replace(/\s/g, '');
     const port = parseInt(process.env.SMTP_MAIL_PORT || '587', 10);
 
     if (!host || !user || !pass || !to) {

@@ -36,7 +36,7 @@ const OwnerManagerSection = () => {
                         <button
                             onClick={() => setActive('owner')}
                             data-testid="owner-tab-btn"
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold font-jakarta ${active === 'owner' ? 'bg-pf-navy text-white shadow-sm' : 'text-slate-500 hover:text-pf-navy'}`}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold font-jakarta ${active === 'owner' ? 'bg-pf-navy text-white shadow-sm' : 'text-slate-500 hover:text-pf-navy'}`}
                             style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                         >
                             <Building2 size={15} /> For Owners
@@ -44,7 +44,7 @@ const OwnerManagerSection = () => {
                         <button
                             onClick={() => setActive('manager')}
                             data-testid="manager-tab-btn"
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold font-jakarta ${active === 'manager' ? 'bg-pf-navy text-white shadow-sm' : 'text-slate-500 hover:text-pf-navy'}`}
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold font-jakarta ${active === 'manager' ? 'bg-pf-navy text-white shadow-sm' : 'text-slate-500 hover:text-pf-navy'}`}
                             style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                         >
                             <UserCog size={15} /> For Managers

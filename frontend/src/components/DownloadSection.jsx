@@ -27,7 +27,7 @@ const DownloadSection = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-testid="appstore-btn"
-                            className="flex items-center gap-3 bg-pf-navy text-white px-6 py-4 rounded-xl hover:bg-pf-navy/90 shadow-lg group"
+                            className="flex items-center gap-3 bg-pf-navy text-white px-6 py-4 rounded-full hover:bg-pf-navy/90 shadow-lg group"
                             style={{ transition: 'background-color 0.2s ease, box-shadow 0.2s ease' }}
                         >
                             <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white flex-shrink-0">
@@ -45,7 +45,7 @@ const DownloadSection = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-testid="playstore-btn"
-                            className="flex items-center gap-3 border-2 border-pf-navy text-pf-navy px-6 py-4 rounded-xl hover:bg-pf-navy hover:text-white shadow-sm group"
+                            className="flex items-center gap-3 border-2 border-pf-navy text-pf-navy px-6 py-4 rounded-full hover:bg-pf-navy hover:text-white shadow-sm group"
                             style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                         >
                             <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0 fill-current">

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, Lock } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import RegisterPumpDialog from './RegisterPumpDialog';
@@ -40,14 +40,14 @@ const ScreenshotsSection = ({ id }) => {
     const [open, setOpen] = useState(false);
     const lockTimer = useRef(null);
 
-    const clearLockTimer = () => {
+    const clearLockTimer = useCallback(() => {
         if (lockTimer.current) {
             window.clearTimeout(lockTimer.current);
             lockTimer.current = null;
         }
-    };
+    }, []);
 
-    const lockGallery = () => {
+    const lockGallery = useCallback(() => {
         clearLockTimer();
         setUnlocked(false);
         setOpen(false);
@@ -56,9 +56,9 @@ const ScreenshotsSection = ({ id }) => {
         } catch {
             /* ignore */
         }
-    };
+    }, [clearLockTimer]);
 
-    const unlockGallery = (until) => {
+    const unlockGallery = useCallback((until) => {
         const remaining = until - Date.now();
         if (remaining <= 0) {
             lockGallery();
@@ -72,7 +72,7 @@ const ScreenshotsSection = ({ id }) => {
         }
         clearLockTimer();
         lockTimer.current = window.setTimeout(lockGallery, remaining);
-    };
+    }, [clearLockTimer, lockGallery]);
 
     useEffect(() => {
         try {
@@ -94,7 +94,7 @@ const ScreenshotsSection = ({ id }) => {
             document.removeEventListener('visibilitychange', onVisibility);
             window.removeEventListener('pagehide', onLeave);
         };
-    }, []);
+    }, [clearLockTimer, lockGallery, unlockGallery]);
 
     const handleSuccess = () => {
         unlockGallery(Date.now() + VIEW_MS);
@@ -154,7 +154,7 @@ const ScreenshotsSection = ({ id }) => {
                                     <span className="text-pf-sky">free</span>
                                     {' '}to see the details
                                 </span>
-                                <span className="mt-5 inline-flex items-center justify-center gap-2 bg-pf-navy text-white px-5 py-3 rounded-xl text-sm font-semibold font-jakarta group-hover:bg-pf-navy/90">
+                                <span className="mt-5 inline-flex items-center justify-center gap-2 bg-pf-navy text-white px-5 py-3 rounded-full text-sm font-semibold font-jakarta group-hover:bg-pf-navy/90">
                                     Register your pump
                                     <ArrowRight size={16} />
                                 </span>
