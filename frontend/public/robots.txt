@@ -2,5 +2,11 @@
 User-agent: *
 Allow: /
 Disallow: /subscription
+Disallow: /subscription/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /subscription
+Disallow: /subscription/
 
 Sitemap: https://petrofi.in/sitemap.xml

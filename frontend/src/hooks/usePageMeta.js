@@ -12,8 +12,11 @@ const setMeta = (attr, key, value) => {
 };
 
 const setCanonical = (href) => {
-    if (!href) return;
     let el = document.querySelector('link[rel="canonical"]');
+    if (!href) {
+        if (el) el.remove();
+        return;
+    }
     if (!el) {
         el = document.createElement('link');
         el.setAttribute('rel', 'canonical');
@@ -25,15 +28,21 @@ const setCanonical = (href) => {
 export function usePageMeta({ title, description, canonical, robots = 'index, follow' }) {
     useEffect(() => {
         const previousTitle = document.title;
+        const indexable = !/noindex/i.test(robots || '');
         document.title = title;
-        setMeta('name', 'description', description);
+        if (description) setMeta('name', 'description', description);
         setMeta('name', 'robots', robots);
+        setMeta('name', 'googlebot', robots);
         setMeta('property', 'og:title', title);
-        setMeta('property', 'og:description', description);
-        setMeta('property', 'og:url', canonical);
+        if (description) setMeta('property', 'og:description', description);
         setMeta('name', 'twitter:title', title);
-        setMeta('name', 'twitter:description', description);
-        setCanonical(canonical);
+        if (description) setMeta('name', 'twitter:description', description);
+        if (indexable && canonical) {
+            setMeta('property', 'og:url', canonical);
+            setCanonical(canonical);
+        } else {
+            setCanonical(null);
+        }
 
         return () => {
             document.title = previousTitle;

@@ -10,6 +10,15 @@
         <meta name="description" content="Petrol pump management software for India. Track fuel sales, credit customers, expenses, inventory, tanks, cash and bank. Get the reports you need. Free 30-day trial on iOS and Android." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://petrofi.in/" />
+        <script>
+            (function () {
+                if (location.pathname.indexOf('/subscription') !== 0) return;
+                var robots = document.querySelector('meta[name="robots"]');
+                if (robots) robots.setAttribute('content', 'noindex, nofollow, noarchive, nosnippet');
+                var canonical = document.querySelector('link[rel="canonical"]');
+                if (canonical) canonical.parentNode.removeChild(canonical);
+            })();
+        </script>
 
         <!-- Open Graph -->
         <meta property="og:type" content="website" />
