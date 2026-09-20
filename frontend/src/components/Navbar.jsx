@@ -117,7 +117,7 @@ const Navbar = ({ forceSolid = false }) => {
                     <button
                         onClick={() => goToSection('pricing')}
                         data-testid="nav-start-free-btn"
-                        className="hidden md:inline-flex bg-pf-navy text-white px-5 py-2 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy/90 shadow-sm"
+                        className="hidden md:inline-flex items-center h-10 bg-pf-navy text-white px-5 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy/90 shadow-sm"
                         style={{ transition: 'background-color 0.2s ease, box-shadow 0.2s ease' }}
                     >
                         Start Free Trial
@@ -128,13 +128,11 @@ const Navbar = ({ forceSolid = false }) => {
                                 <button
                                     type="button"
                                     data-testid="nav-account-btn"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-pf-navy/15 bg-white/80 pl-1 pr-2 sm:pr-3 py-1 text-sm font-semibold text-pf-navy font-jakarta hover:bg-white"
+                                    aria-label={accountLabel}
+                                    className="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-pf-navy text-white text-[11px] font-bold font-outfit hover:bg-pf-navy/90"
                                     style={{ transition: 'background-color 0.2s ease' }}
                                 >
-                                    <span className="w-8 h-8 rounded-full bg-pf-navy text-white text-[11px] font-bold flex items-center justify-center">
-                                        {accountInitials}
-                                    </span>
-                                    <span className="hidden sm:inline max-w-[8.5rem] truncate">{accountLabel}</span>
+                                    {accountInitials}
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="z-[70] w-56 rounded-xl border-slate-100 bg-white text-pf-navy">
@@ -166,7 +164,7 @@ const Navbar = ({ forceSolid = false }) => {
                             type="button"
                             onClick={openLogin}
                             data-testid="nav-login-btn"
-                            className="inline-flex items-center border border-pf-navy bg-white/90 text-pf-navy px-3.5 sm:px-4 py-2 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy hover:text-white"
+                            className="inline-flex items-center h-10 border border-pf-navy bg-white/90 text-pf-navy px-3.5 sm:px-4 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy hover:text-white"
                             style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                         >
                             Login
