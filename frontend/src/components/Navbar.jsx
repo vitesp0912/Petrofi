@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CreditCard, LogOut, Menu, Phone, X } from 'lucide-react';
+import { CircleUser, CreditCard, LogOut, Menu, Phone, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getAuthDisplayName, getAuthInitials } from '../lib/auth';
+import { getAuthDisplayName } from '../lib/auth';
 import LoginDialog from './LoginDialog';
 import {
     DropdownMenu,
@@ -35,10 +35,13 @@ const Navbar = ({ forceSolid = false }) => {
     const isHome = location.pathname === '/';
     const solid = forceSolid || !isHome || scrolled;
     const accountLabel = getAuthDisplayName(user);
-    const accountInitials = getAuthInitials(user);
 
     const openLogin = () => {
         setMobileOpen(false);
+        if (!user && location.pathname.startsWith('/subscription')) {
+            document.getElementById('account-login')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
         setLoginOpen(true);
     };
 
@@ -129,10 +132,11 @@ const Navbar = ({ forceSolid = false }) => {
                                     type="button"
                                     data-testid="nav-account-btn"
                                     aria-label={accountLabel}
-                                    className="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-pf-navy text-white text-[11px] font-bold font-outfit hover:bg-pf-navy/90"
+                                    className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 text-pf-navy ring-1 ring-slate-200 hover:bg-slate-200"
                                     style={{ transition: 'background-color 0.2s ease' }}
+                                    title={accountLabel}
                                 >
-                                    {accountInitials}
+                                    <CircleUser size={22} strokeWidth={1.75} />
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="z-[70] w-56 rounded-xl border-slate-100 bg-white text-pf-navy">

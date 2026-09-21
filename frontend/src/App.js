@@ -6,6 +6,9 @@ import { AuthProvider } from './context/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import PaymentsPanel from './components/account/PaymentsPanel';
+import PlansPanel from './components/account/PlansPanel';
+import ProfilePanel from './components/account/ProfilePanel';
 import SubscriptionPage from './pages/SubscriptionPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 
@@ -17,7 +20,11 @@ function App() {
                     <ScrollToTop />
                     <Routes>
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/subscription" element={<SubscriptionPage />} />
+                        <Route path="/subscription" element={<SubscriptionPage />}>
+                            <Route index element={<ProfilePanel />} />
+                            <Route path="payments" element={<PaymentsPanel />} />
+                            <Route path="plans" element={<PlansPanel />} />
+                        </Route>
                         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                         <Route path="/terms-of-service" element={<TermsOfServicePage />} />
                     </Routes>

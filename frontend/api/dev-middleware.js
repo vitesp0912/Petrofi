@@ -1,8 +1,13 @@
+const fs = require('fs');
 const path = require('path');
 
 const HANDLERS = {
     '/api/subscription': path.join(__dirname, 'subscription.js'),
     '/api/send-demo-mail': path.join(__dirname, 'send-demo-mail.js'),
+    '/api/payment-catalog': path.join(__dirname, 'payment-catalog.js'),
+    '/api/payment-create-order': path.join(__dirname, 'payment-create-order.js'),
+    '/api/payment-status': path.join(__dirname, 'payment-status.js'),
+    '/api/payment-webhook': path.join(__dirname, 'payment-webhook.js'),
 };
 
 function pathnameOf(req) {
@@ -42,7 +47,7 @@ function readJsonBody(req) {
 
 function localApiMiddleware(req, res, next) {
     const file = HANDLERS[pathnameOf(req)];
-    if (!file) {
+    if (!file || !fs.existsSync(file)) {
         next();
         return;
     }
@@ -53,7 +58,8 @@ function localApiMiddleware(req, res, next) {
         return Promise.resolve(handler(req, res));
     };
 
-    const needsBody = req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH';
+    const isWebhook = pathnameOf(req) === '/api/payment-webhook';
+    const needsBody = !isWebhook && (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH');
     const task = needsBody ? readJsonBody(req).then(run) : run();
     task.catch(next);
 }

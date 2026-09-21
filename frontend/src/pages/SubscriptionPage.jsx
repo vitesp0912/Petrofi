@@ -1,31 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Building2, CalendarRange, CreditCard, MapPin, ShieldCheck } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { ArrowRight, Check } from 'lucide-react';
+import AccountSidebar, { AccountMobileNav } from '../components/account/AccountSidebar';
+import LoginForm from '../components/LoginForm';
 import Navbar from '../components/Navbar';
-import FooterSection from '../components/FooterSection';
-import LoginDialog from '../components/LoginDialog';
+import RegisterPumpDialog from '../components/RegisterPumpDialog';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
-import {
-    daysUntil,
-    fetchPumpSubscription,
-    formatDate,
-    formatMoney,
-    roleLabel,
-    statusTone,
-    titleCase,
-} from '../lib/subscription';
+import { fetchPumpSubscription } from '../lib/subscription';
+
+const TRIAL_POINTS = [
+    '30 days of full access on your pump',
+    'Our team completes the setup with you',
+    'No payment required to begin',
+];
 
 function SubscriptionPage() {
     const { user, loading: authLoading } = useAuth();
-    const [loginOpen, setLoginOpen] = useState(false);
+    const navigate = useNavigate();
+    const [registerOpen, setRegisterOpen] = useState(false);
+    const [registerPrefill, setRegisterPrefill] = useState(null);
     const [state, setState] = useState({ loading: true, reason: '', profile: null, pump: null, history: [] });
 
     usePageMeta({
-        title: 'Subscription | PetroFI',
-        description: 'View your PetroFI petrol pump subscription details.',
-        canonical: 'https://www.petrofi.in/subscription',
-        robots: 'noindex, nofollow',
+        title: 'Account | PetroFI',
+        robots: 'noindex, nofollow, noarchive, nosnippet',
     });
 
     useEffect(() => {
@@ -58,228 +57,121 @@ function SubscriptionPage() {
         };
     }, [authLoading, user]);
 
-    const pump = state.pump;
-    const remaining = daysUntil(pump?.endDate);
-    const location = [pump?.city, pump?.state].filter(Boolean).join(', ');
+    const outletContext = useMemo(() => ({
+        user,
+        loading: authLoading || state.loading,
+        reason: state.reason,
+        profile: state.profile,
+        pump: state.pump,
+        history: state.history,
+    }), [user, authLoading, state]);
+
+    if (authLoading) {
+        return (
+            <div className="h-dvh bg-[#F3F6FB] flex items-center justify-center">
+                <div className="h-9 w-9 rounded-full border-2 border-slate-200 border-t-pf-navy animate-spin" aria-label="Loading" />
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="h-dvh overflow-hidden bg-white text-pf-navy flex flex-col" data-testid="account-login-page">
+                <Navbar forceSolid />
+                <div className="flex-1 min-h-0 pt-16 flex flex-col lg:grid lg:grid-cols-2 overflow-y-auto lg:overflow-hidden">
+                    <aside className="relative bg-pf-navy text-white flex lg:h-full lg:overflow-y-auto">
+                        <div className="absolute -right-20 -top-24 w-72 h-72 rounded-full bg-pf-sky/20 blur-3xl pointer-events-none" />
+                        <div className="absolute -left-16 bottom-0 w-56 h-56 rounded-full bg-pf-sky/10 blur-3xl pointer-events-none" />
+                        <div className="relative m-auto w-full max-w-[440px] px-8 py-12 sm:px-12 lg:px-14">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pf-sky font-jakarta">
+                                30 days free
+                            </p>
+                            <h1 className="mt-4 text-3xl sm:text-4xl lg:text-[42px] font-bold font-outfit leading-[1.12]">
+                                Start your free trial
+                            </h1>
+                            <p className="mt-4 text-[15px] text-white/70 font-jakarta leading-relaxed">
+                                Start a 30-day trial. Share a few details and we complete the setup. No payment to begin.
+                            </p>
+                            <ul className="mt-8 space-y-3.5">
+                                {TRIAL_POINTS.map((point) => (
+                                    <li key={point} className="flex items-center gap-3 text-[15px] font-jakarta text-white">
+                                        <span className="h-6 w-6 rounded-full bg-pf-sky text-pf-navy flex items-center justify-center shrink-0">
+                                            <Check size={13} strokeWidth={2.75} />
+                                        </span>
+                                        {point}
+                                    </li>
+                                ))}
+                            </ul>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setRegisterPrefill(null);
+                                    setRegisterOpen(true);
+                                }}
+                                data-testid="account-register-pump"
+                                className="mt-10 inline-flex items-center justify-center gap-2 w-full bg-pf-sky text-pf-navy px-7 py-3 rounded-full text-sm font-bold font-jakarta hover:bg-pf-sky/90"
+                            >
+                                Start free trial <ArrowRight size={16} />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/', { state: { scrollTo: 'demo' } })}
+                                className="mt-4 block w-full text-center text-sm font-semibold text-white/70 hover:text-white font-jakarta"
+                            >
+                                Book a live demo
+                            </button>
+                        </div>
+                    </aside>
+                    <main className="bg-[#F3F6FB] flex flex-1 lg:h-full lg:overflow-y-auto">
+                        <div className="m-auto w-full max-w-[440px] px-6 py-12 sm:px-10">
+                            <div
+                                id="account-login"
+                                className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_18px_50px_rgba(13,27,62,0.08)] p-7 sm:p-9"
+                            >
+                                <LoginForm
+                                    hideTrialNote
+                                    onRegister={() => {
+                                        setRegisterPrefill(null);
+                                        setRegisterOpen(true);
+                                    }}
+                                    onUnregistered={(prefill) => {
+                                        setRegisterPrefill(prefill);
+                                        setRegisterOpen(true);
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </main>
+                </div>
+                <RegisterPumpDialog
+                    open={registerOpen}
+                    onOpenChange={(next) => {
+                        setRegisterOpen(next);
+                        if (!next) setRegisterPrefill(null);
+                    }}
+                    source="account-login"
+                    variant="account"
+                    prefill={registerPrefill}
+                />
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-[#F4F7FB] text-pf-navy">
-            <Navbar forceSolid />
-            <main id="main-content" aria-label="Subscription" className="pt-16">
-                <header className="relative bg-pf-navy overflow-hidden">
-                    <div className="absolute inset-0 dot-pattern opacity-20 pointer-events-none" />
-                    <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-pf-sky/10 rounded-full blur-3xl pointer-events-none" />
-                    <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-                        <p className="text-pf-sky text-xs font-semibold uppercase tracking-widest font-jakarta mb-3">
-                            Your pump
-                        </p>
-                        <h1 className="text-3xl sm:text-4xl font-bold font-outfit text-white leading-tight">
-                            Subscription
-                        </h1>
-                        <p className="mt-3 text-slate-300 font-jakarta text-sm sm:text-base max-w-2xl leading-relaxed">
-                            Plan, billing, and status for the petrol pump on this PetroFI account.
-                        </p>
+        <div className="h-dvh overflow-hidden bg-[#F3F6FB] text-pf-navy">
+            <div className="h-dvh flex">
+                <AccountSidebar profile={state.profile} />
+                <div className="flex-1 min-w-0 h-full overflow-y-auto">
+                    <div className="px-4 sm:px-6 lg:px-10 xl:px-12 py-5 sm:py-8">
+                        <AccountMobileNav />
+                        <main id="main-content" aria-label="Account" className="pt-5 lg:pt-0">
+                            <Outlet context={outletContext} />
+                        </main>
                     </div>
-                </header>
-
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-                    {authLoading || state.loading ? (
-                        <LoadingState />
-                    ) : !user || state.reason === 'signed_out' ? (
-                        <GateCard
-                            title="Log in to see your subscription"
-                            body="Use the phone number or email on your PetroFI account to view this pump’s plan and billing details."
-                            action="Log in"
-                            onAction={() => setLoginOpen(true)}
-                        />
-                    ) : state.reason === 'unavailable' ? (
-                        <GateCard
-                            title="Subscription details are not available right now"
-                            body="Please try again in a few minutes."
-                        />
-                    ) : state.reason === 'load_failed' ? (
-                        <GateCard
-                            title="We could not load this pump’s subscription"
-                            body="Please refresh the page. If this continues, contact PetroFI support."
-                        />
-                    ) : !pump ? (
-                        <GateCard
-                            title="No petrol pump is linked to this account yet"
-                            body="If you just registered, wait for PetroFI to approve your pump. You can also go back to the homepage or contact support."
-                            action="Back to homepage"
-                            to="/"
-                        />
-                    ) : (
-                        <div className="space-y-6">
-                            <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-7">
-                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                                    <div>
-                                        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 font-jakarta mb-1">
-                                            {pump.code || 'Pump'}
-                                        </p>
-                                        <h2 className="text-2xl font-bold font-outfit text-pf-navy">{pump.name}</h2>
-                                        {location ? (
-                                            <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-slate-500 font-jakarta">
-                                                <MapPin size={14} className="text-pf-sky" />
-                                                {location}
-                                            </p>
-                                        ) : null}
-                                    </div>
-                                    <StatusPill value={pump.subscriptionStatus} />
-                                </div>
-
-                                <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Detail label="Owner" value={pump.ownerName || state.profile?.name || 'Not set'} />
-                                    <Detail label="Your role" value={roleLabel(state.profile?.role)} />
-                                    <Detail label="Pump phone" value={pump.phone || 'Not set'} />
-                                    <Detail label="Pump email" value={pump.email || 'Not set'} />
-                                </dl>
-                            </section>
-
-                            <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <SummaryCard
-                                    icon={CreditCard}
-                                    label="Plan"
-                                    value={titleCase(pump.plan)}
-                                    hint={titleCase(pump.billingCycle)}
-                                />
-                                <SummaryCard
-                                    icon={CalendarRange}
-                                    label="Current period"
-                                    value={formatDate(pump.startDate)}
-                                    hint={pump.endDate ? `Renews or ends ${formatDate(pump.endDate)}` : 'No end date on file'}
-                                />
-                                <SummaryCard
-                                    icon={ShieldCheck}
-                                    label="Payment"
-                                    value={pump.paymentVerified ? 'Verified' : 'Not verified'}
-                                    hint={remaining == null ? 'No end date on file' : remaining >= 0 ? `${remaining} day${remaining === 1 ? '' : 's'} remaining` : `${Math.abs(remaining)} day${Math.abs(remaining) === 1 ? '' : 's'} overdue`}
-                                />
-                            </section>
-
-                            <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-7">
-                                <h3 className="text-lg font-bold font-outfit text-pf-navy mb-4">Plan details</h3>
-                                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Detail label="Subscription status" value={<StatusPill value={pump.subscriptionStatus} />} />
-                                    <Detail label="Registration" value={<StatusPill value={pump.registrationStatus} />} />
-                                    <Detail label="Pump access" value={pump.active ? 'Active' : 'Inactive'} />
-                                    <Detail label="Billing cycle" value={titleCase(pump.billingCycle)} />
-                                    <Detail label="Start date" value={formatDate(pump.startDate)} />
-                                    <Detail label="End date" value={formatDate(pump.endDate)} />
-                                </dl>
-                            </section>
-
-                            {state.history.length > 0 ? (
-                                <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-7">
-                                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-4">Billing history</h3>
-                                    <div className="overflow-x-auto -mx-1 sm:mx-0">
-                                        <table className="w-full min-w-[520px] text-left text-sm font-jakarta">
-                                            <thead>
-                                                <tr className="text-xs uppercase tracking-wide text-slate-400">
-                                                    <th className="pb-3 font-semibold">Plan</th>
-                                                    <th className="pb-3 font-semibold">Status</th>
-                                                    <th className="pb-3 font-semibold">Period</th>
-                                                    <th className="pb-3 font-semibold">Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {state.history.map((row, index) => (
-                                                    <tr key={`${row.plan}-${row.startDate}-${index}`} className="border-t border-slate-100">
-                                                        <td className="py-3 font-semibold text-pf-navy">{titleCase(row.plan)}</td>
-                                                        <td className="py-3">{titleCase(row.status)}</td>
-                                                        <td className="py-3 text-slate-600">
-                                                            {formatDate(row.startDate)} – {formatDate(row.endDate)}
-                                                        </td>
-                                                        <td className="py-3 text-slate-700">{formatMoney(row.amount)}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </section>
-                            ) : null}
-
-                            <p className="text-sm text-slate-500 font-jakarta">
-                                Need a change to this plan? Call{' '}
-                                <a href="tel:+917398621812" className="font-semibold text-pf-navy hover:text-pf-sky">
-                                    +91 73986 21812
-                                </a>
-                                {' '}or{' '}
-                                <Link to="/" className="font-semibold text-pf-navy hover:text-pf-sky">
-                                    go back to the homepage
-                                </Link>
-                                .
-                            </p>
-                        </div>
-                    )}
                 </div>
-            </main>
-            <FooterSection />
-            <LoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
+            </div>
         </div>
     );
 }
-
-const StatusPill = ({ value }) => (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold font-jakarta ${statusTone(value)}`}>
-        {titleCase(value)}
-    </span>
-);
-
-const Detail = ({ label, value }) => (
-    <div className="rounded-xl bg-slate-50 border border-slate-100 px-4 py-3">
-        <dt className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 font-jakarta mb-1">{label}</dt>
-        <dd className="text-sm font-semibold text-pf-navy font-jakarta">{value}</dd>
-    </div>
-);
-
-const SummaryCard = ({ icon: Icon, label, value, hint }) => (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-        <div className="w-9 h-9 rounded-xl bg-pf-sky/10 text-pf-sky flex items-center justify-center mb-3">
-            <Icon size={16} />
-        </div>
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 font-jakarta">{label}</p>
-        <p className="mt-1 text-lg font-bold font-outfit text-pf-navy">{value}</p>
-        <p className="mt-1 text-xs text-slate-500 font-jakarta">{hint}</p>
-    </div>
-);
-
-const GateCard = ({ title, body, action, onAction, to }) => (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 max-w-xl" data-testid="subscription-gate">
-        <div className="w-10 h-10 rounded-xl bg-pf-sky/10 text-pf-sky flex items-center justify-center mb-4">
-            <Building2 size={18} />
-        </div>
-        <h2 className="text-xl font-bold font-outfit text-pf-navy mb-2">{title}</h2>
-        <p className="text-sm text-slate-500 font-jakarta leading-relaxed">{body}</p>
-        {action && to ? (
-            <Link
-                to={to}
-                className="inline-flex mt-5 bg-pf-navy text-white px-4 py-2.5 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy/90"
-            >
-                {action}
-            </Link>
-        ) : null}
-        {action && onAction ? (
-            <button
-                type="button"
-                onClick={onAction}
-                className="inline-flex mt-5 bg-pf-navy text-white px-4 py-2.5 rounded-lg text-sm font-semibold font-jakarta hover:bg-pf-navy/90"
-            >
-                {action}
-            </button>
-        ) : null}
-    </div>
-);
-
-const LoadingState = () => (
-    <div className="space-y-4" data-testid="subscription-loading">
-        <div className="h-40 rounded-2xl bg-white border border-slate-200 animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="h-32 rounded-2xl bg-white border border-slate-200 animate-pulse" />
-            <div className="h-32 rounded-2xl bg-white border border-slate-200 animate-pulse" />
-            <div className="h-32 rounded-2xl bg-white border border-slate-200 animate-pulse" />
-        </div>
-    </div>
-);
 
 export default SubscriptionPage;

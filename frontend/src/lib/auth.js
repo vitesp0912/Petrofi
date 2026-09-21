@@ -155,8 +155,15 @@ export async function sendLoginOtp(parsed) {
             logAuthError('validate_phone_for_login', error, { kind: parsed.kind });
             return { ok: false, error: 'We could not check this account right now. Please try again.' };
         }
-        const blocked = accountCheckError('phone', readAccountCheck(data));
-        if (blocked) return { ok: false, error: blocked };
+        const check = readAccountCheck(data);
+        const blocked = accountCheckError('phone', check);
+        if (blocked) {
+            return {
+                ok: false,
+                error: blocked,
+                reason: check.exists ? 'inactive' : 'not_registered',
+            };
+        }
 
         const { error: otpError } = await supabase.auth.signInWithOtp({
             phone: parsed.phoneE164,
@@ -174,8 +181,15 @@ export async function sendLoginOtp(parsed) {
             logAuthError('validate_email_for_login', error, { kind: parsed.kind });
             return { ok: false, error: 'We could not check this account right now. Please try again.' };
         }
-        const blocked = accountCheckError('email', readAccountCheck(data));
-        if (blocked) return { ok: false, error: blocked };
+        const check = readAccountCheck(data);
+        const blocked = accountCheckError('email', check);
+        if (blocked) {
+            return {
+                ok: false,
+                error: blocked,
+                reason: check.exists ? 'inactive' : 'not_registered',
+            };
+        }
 
         const { error: otpError } = await supabase.auth.signInWithOtp({
             email: parsed.email,

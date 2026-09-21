@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Download } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { useCountUp } from '../hooks/useCountUp';
 import { scrollToId } from '../lib/utils';
+import RegisterPumpDialog from './RegisterPumpDialog';
 
 const POINTS = [
     'Download the app',
@@ -14,6 +15,7 @@ const PricingSection = () => {
     const { ref, isVisible } = useScrollAnimation();
     const countRef = useRef(null);
     const [inView, setInView] = useState(false);
+    const [trialOpen, setTrialOpen] = useState(false);
     const days = useCountUp(30, { duration: 1200, enabled: inView });
 
     useEffect(() => {
@@ -68,12 +70,12 @@ const PricingSection = () => {
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <button
                                 type="button"
-                                onClick={() => scrollToId('download')}
+                                onClick={() => setTrialOpen(true)}
                                 data-testid="pricing-start-free-btn"
                                 className="inline-flex items-center justify-center gap-2 bg-pf-navy text-white px-7 py-3 rounded-full font-semibold font-jakarta text-sm hover:bg-pf-navy/90 shadow-lg"
                                 style={{ transition: 'background-color 0.2s ease' }}
                             >
-                                START FREE <Download size={16} />
+                                START FREE <ArrowRight size={16} />
                             </button>
                             <button
                                 type="button"
@@ -88,6 +90,12 @@ const PricingSection = () => {
                     </div>
                 </div>
             </div>
+            <RegisterPumpDialog
+                open={trialOpen}
+                onOpenChange={setTrialOpen}
+                source="pricing"
+                variant="account"
+            />
         </section>
     );
 };
