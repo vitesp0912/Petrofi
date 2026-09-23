@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { Landmark, Phone, Smartphone, Wallet } from 'lucide-react';
-import { formatDate, formatMoney, GST_RATE, PETROFI_PLANS, planPrice, titleCase } from '../../lib/subscription';
+import { formatDate, formatMoney } from '../../lib/subscription';
 import {
     createPaymentOrder,
     fetchPaymentCatalog,
@@ -17,24 +17,6 @@ const METHODS = [
     { icon: Wallet, label: 'Cards', hint: 'Debit and credit cards' },
 ];
 
-function localQuotes() {
-    const gstPct = Math.round(GST_RATE * 100);
-    return PETROFI_PLANS.map((plan) => {
-        const price = planPrice(plan);
-        return {
-            id: plan.id,
-            name: plan.name,
-            months: plan.months,
-            billedAs: plan.billedAs,
-            featured: Boolean(plan.featured),
-            base: price.base,
-            gst: price.gst,
-            total: price.total,
-            gstPct,
-        };
-    });
-}
-
 const PaymentsPanel = () => {
     const { user, loading, reason, pump, profile, history } = useOutletContext();
     const [params] = useSearchParams();
@@ -43,7 +25,7 @@ const PaymentsPanel = () => {
 
     const [catalog, setCatalog] = useState(null);
     const [catalogError, setCatalogError] = useState('');
-    const [planId, setPlanId] = useState(requestedPlan || 'first-year');
+    const [planId, setPlanId] = useState(requestedPlan || '');
     const [gstin, setGstin] = useState('');
     const [phone, setPhone] = useState('');
     const [paying, setPaying] = useState(false);
@@ -85,10 +67,7 @@ const PaymentsPanel = () => {
         };
     }, [returnOrderId]);
 
-    const quotes = useMemo(
-        () => (catalog?.quotes?.length ? catalog.quotes : localQuotes()),
-        [catalog]
-    );
+    const quotes = catalog?.quotes || [];
     const quote = useMemo(
         () => quotes.find((item) => item.id === planId) || quotes[0] || null,
         [quotes, planId]
@@ -180,7 +159,9 @@ const PaymentsPanel = () => {
                                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 font-jakarta">
                                         {item.name}
                                     </p>
-                                    <p className="mt-2 text-xl font-bold font-outfit text-pf-navy">{formatMoney(item.base)}</p>
+                                    <p className="mt-2 text-xl font-bold font-outfit text-pf-navy">
+                                        {formatMoney(item.base, item.currency)}
+                                    </p>
                                     <p className="mt-1 text-xs text-slate-500 font-jakarta">+{item.gstPct}% GST</p>
                                 </button>
                             );
@@ -248,15 +229,15 @@ const PaymentsPanel = () => {
                             <dl className="mt-5 space-y-2 text-sm font-jakarta">
                                 <div className="flex justify-between gap-4">
                                     <dt className="text-white/55">Plan</dt>
-                                    <dd className="font-semibold">{formatMoney(quote.base)}</dd>
+                                    <dd className="font-semibold">{formatMoney(quote.base, quote.currency)}</dd>
                                 </div>
                                 <div className="flex justify-between gap-4">
                                     <dt className="text-white/55">+{quote.gstPct}% GST</dt>
-                                    <dd className="font-semibold">{formatMoney(quote.gst)}</dd>
+                                    <dd className="font-semibold">{formatMoney(quote.gst, quote.currency)}</dd>
                                 </div>
                                 <div className="flex justify-between gap-4 pt-2 border-t border-white/10">
                                     <dt className="font-semibold">Total</dt>
-                                    <dd className="text-xl font-bold font-outfit">{formatMoney(quote.total)}</dd>
+                                    <dd className="text-xl font-bold font-outfit">{formatMoney(quote.total, quote.currency)}</dd>
                                 </div>
                             </dl>
                         ) : null}
@@ -313,18 +294,18 @@ const PaymentsPanel = () => {
                                     <th className="pb-3 font-semibold">Plan</th>
                                     <th className="pb-3 font-semibold">Status</th>
                                     <th className="pb-3 font-semibold">Period</th>
-                                    <th className="pb-3 font-semibold">Amount</th>
+                                    <th className="pb-3 font-semibold">Time left</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {history.map((row, index) => (
-                                    <tr key={`${row.plan}-${row.startDate}-${index}`} className="border-t border-slate-100">
-                                        <td className="py-3.5 font-semibold text-pf-navy">{titleCase(row.plan)}</td>
+                                    <tr key={`${row.planName}-${row.startDate}-${index}`} className="border-t border-slate-100">
+                                        <td className="py-3.5 font-semibold text-pf-navy">{row.planName || 'Not set'}</td>
                                         <td className="py-3.5"><StatusPill value={row.status} /></td>
                                         <td className="py-3.5 text-slate-600">
                                             {formatDate(row.startDate)} to {formatDate(row.endDate)}
                                         </td>
-                                        <td className="py-3.5 font-semibold text-pf-navy">{formatMoney(row.amount)}</td>
+                                        <td className="py-3.5 font-semibold text-pf-navy">{row.timeLeft || 'Not set'}</td>
                                     </tr>
                                 ))}
                             </tbody>

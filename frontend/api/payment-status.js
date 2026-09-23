@@ -42,8 +42,18 @@ module.exports = async (req, res) => {
             return;
         }
 
+        const quotes = await listQuotes().catch(() => []);
+
         if (row.status === 'paid') {
-            send(res, 200, { ok: true, status: 'paid', orderId, quotes: listQuotes() });
+            const healed = await fulfillPaidOrder(admin, row, {
+                cfOrderId: row.cf_order_id,
+                paidAt: row.paid_at || new Date().toISOString(),
+            });
+            if (!healed.ok) {
+                send(res, 500, { ok: false, reason: 'fulfill_failed' });
+                return;
+            }
+            send(res, 200, { ok: true, status: 'paid', orderId, quotes });
             return;
         }
 
@@ -51,13 +61,13 @@ module.exports = async (req, res) => {
         try {
             cfOrder = await getCashfreeOrder(orderId);
         } catch (err) {
-            send(res, 200, { ok: true, status: row.status || 'pending', orderId, quotes: listQuotes() });
+            send(res, 200, { ok: true, status: row.status || 'pending', orderId, quotes });
             return;
         }
 
         if (!orderIsPaid(cfOrder) || !amountsMatch(row.amount_total, cfOrder.order_amount)) {
             const mapped = String(cfOrder?.order_status || row.status || 'pending').toLowerCase();
-            send(res, 200, { ok: true, status: mapped === 'paid' ? 'pending' : mapped, orderId, quotes: listQuotes() });
+            send(res, 200, { ok: true, status: mapped === 'paid' ? 'pending' : mapped, orderId, quotes });
             return;
         }
 
@@ -71,7 +81,7 @@ module.exports = async (req, res) => {
             return;
         }
 
-        send(res, 200, { ok: true, status: 'paid', orderId, quotes: listQuotes() });
+        send(res, 200, { ok: true, status: 'paid', orderId, quotes });
     } catch (err) {
         console.error('[payments] status', err.message);
         send(res, 500, { ok: false, reason: 'load_failed' });

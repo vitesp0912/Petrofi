@@ -4,6 +4,33 @@ This is the checklist to take real money on the subscription Payments page.
 
 The website does **not** trust the browser for price, plan, or “I paid”. Cashfree and the PetroFI server decide. If Cashfree is down, the rest of the website still loads. Pay Now simply fails with a clear message.
 
+## Who does what
+
+Checkout code is already in the repo. The browser never writes `payment_orders`. Pay Now calls `/api/payment-*`. Those routes talk to Cashfree and write the database with the service role key.
+
+**Already in the repo (no extra coding needed for the money path)**
+
+- Payments page: `frontend/src/components/account/PaymentsPanel.jsx`
+- Create order / status / webhook: `frontend/api/payment-*.js`
+- SQL: `docs/sql/cashfree_payments.sql`
+
+**You do these (I cannot do them from this chat)**
+
+1. Run the SQL once in Supabase → SQL Editor.
+2. Paste `SUPABASE_SERVICE_ROLE_KEY` into repo-root `.env` and into Vercel (server env only).
+3. Confirm sandbox Cashfree App ID + Secret are on Vercel (they are already in local `.env`).
+4. In Cashfree → Webhooks, add `https://www.petrofi.in/api/payment-webhook` (success + failed, API `2025-01-01`).
+5. Redeploy Vercel after env vars. Sign in and make one sandbox payment.
+6. After that works: live Cashfree keys + `CASHFREE_ENV=production`.
+
+**Do not paste into this chat**
+
+- Service role key
+- Live Cashfree secret
+- MCP `sbp_` token
+
+The attached Supabase MCP is **read-only**. It cannot create tables. Run the SQL yourself in the dashboard.
+
 ---
 
 ## What you will see on the page

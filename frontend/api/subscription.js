@@ -1,40 +1,15 @@
-const { createClient } = require('@supabase/supabase-js');
+const { send, requireUser, isUuid, adminClient } = require('./lib/http');
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const PUMP_COLUMNS = 'id, pump_code, name, city, state, owner_name, phone, email, registration_status, subscription_status, is_active, payment_verified, subscription_plan, subscription_start_date, subscription_end_date, billing_cycle';
-
-function send(res, status, body) {
-    const payload = JSON.stringify(body);
-    if (typeof res.setHeader === 'function') {
-        res.setHeader('Cache-Control', 'no-store');
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('X-Content-Type-Options', 'nosniff');
-    }
-    if (typeof res.status === 'function' && typeof res.json === 'function') {
-        res.status(status).json(body);
-        return;
-    }
-    res.statusCode = status;
-    res.end(payload);
-}
-
-function bearerToken(req) {
-    const header = String(req.headers.authorization || '');
-    const match = /^Bearer\s+(\S+)/i.exec(header);
-    return match ? match[1] : null;
-}
-
-function isUuid(value) {
-    return typeof value === 'string' && UUID_RE.test(value);
-}
+const PUMP_COLUMNS =
+    'id, pump_code, name, city, state, owner_name, phone, email, registration_status, is_active';
+const SUB_COLUMNS = 'id, plan_id, status, start_date, end_date, created_at';
 
 function emptyPayload(profile) {
     return {
         ok: true,
-        profile: profile
-            ? { name: profile.name || null, role: profile.role || null }
-            : null,
+        profile: profile ? { name: profile.name || null, role: profile.role || null } : null,
         pump: null,
+        subscription: null,
         history: [],
     };
 }
@@ -49,24 +24,62 @@ function mapPump(row) {
         phone: row.phone || null,
         email: row.email || null,
         registrationStatus: row.registration_status || null,
-        subscriptionStatus: row.subscription_status || null,
         active: row.is_active === true,
-        paymentVerified: row.payment_verified === true,
-        plan: row.subscription_plan || null,
-        startDate: row.subscription_start_date || null,
-        endDate: row.subscription_end_date || null,
-        billingCycle: row.billing_cycle || null,
     };
 }
 
-function mapHistory(row) {
+function daysUntil(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return Math.ceil((date.getTime() - Date.now()) / 86400000);
+}
+
+function remainingLabel(remaining) {
+    if (remaining == null) return 'Not set';
+    if (remaining > 1) return `${remaining} days left`;
+    if (remaining === 1) return '1 day left';
+    if (remaining === 0) return 'Ends today';
+    if (remaining === -1) return '1 day overdue';
+    return `${Math.abs(remaining)} days overdue`;
+}
+
+function mapSubscription(row, plan) {
+    if (!row) return null;
+    const remainingDays = daysUntil(row.end_date);
     return {
-        plan: row.plan || null,
         status: row.status || null,
+        planName: plan?.name || null,
         startDate: row.start_date || null,
         endDate: row.end_date || null,
-        amount: row.amount ?? null,
+        remainingDays,
+        timeLeft: remainingLabel(remainingDays),
     };
+}
+
+function pickCurrent(rows) {
+    if (!rows?.length) return null;
+    return [...rows].sort((a, b) => {
+        const aActive = String(a.status || '').toLowerCase() === 'active' ? 1 : 0;
+        const bActive = String(b.status || '').toLowerCase() === 'active' ? 1 : 0;
+        if (bActive !== aActive) return bActive - aActive;
+        const end = new Date(b.end_date || 0).getTime() - new Date(a.end_date || 0).getTime();
+        if (end) return end;
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+    })[0];
+}
+
+async function planNameMap(planIds) {
+    const ids = [...new Set((planIds || []).filter((id) => isUuid(id)))];
+    if (!ids.length) return {};
+    const admin = adminClient();
+    if (!admin) return {};
+    const { data, error } = await admin.from('plans').select('id, name').in('id', ids);
+    if (error) {
+        console.error('[api/subscription] plans lookup failed', error.code, error.message);
+        return {};
+    }
+    return Object.fromEntries((data || []).map((row) => [row.id, { name: row.name }]));
 }
 
 module.exports = async (req, res) => {
@@ -75,41 +88,14 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const url = process.env.SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL;
-    const anonKey = process.env.SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
-    if (!url || !anonKey) {
-        send(res, 503, { ok: false, reason: 'unavailable' });
-        return;
-    }
-
-    const token = bearerToken(req);
-    if (!token) {
-        send(res, 401, { ok: false, reason: 'signed_out' });
-        return;
-    }
-
-    const supabase = createClient(url, anonKey, {
-        auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false,
-        },
-        global: {
-            headers: { Authorization: `Bearer ${token}` },
-        },
-    });
-
     try {
-        const { data: authData, error: authError } = await supabase.auth.getUser(token);
-        if (authError || !authData?.user) {
-            send(res, 401, { ok: false, reason: 'signed_out' });
-            return;
-        }
+        const auth = await requireUser(req, res);
+        if (!auth) return;
 
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile, error: profileError } = await auth.supabase
             .from('users')
             .select('name, role, pump_id')
-            .eq('id', authData.user.id)
+            .eq('id', auth.user.id)
             .maybeSingle();
 
         if (profileError) {
@@ -124,18 +110,14 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const [{ data: pumpRow, error: pumpError }, { data: history, error: historyError }] = await Promise.all([
-            supabase
-                .from('pumps')
-                .select(PUMP_COLUMNS)
-                .eq('id', pumpId)
-                .maybeSingle(),
-            supabase
+        const [{ data: pumpRow, error: pumpError }, { data: subRows, error: subError }] = await Promise.all([
+            auth.supabase.from('pumps').select(PUMP_COLUMNS).eq('id', pumpId).maybeSingle(),
+            auth.supabase
                 .from('subscriptions')
-                .select('plan, status, start_date, end_date, amount')
+                .select(SUB_COLUMNS)
                 .eq('pump_id', pumpId)
-                .order('start_date', { ascending: false })
-                .limit(6),
+                .order('created_at', { ascending: false })
+                .limit(8),
         ]);
 
         if (pumpError) {
@@ -144,19 +126,24 @@ module.exports = async (req, res) => {
             return;
         }
 
-        if (historyError) {
-            console.error('[api/subscription] history skipped');
+        if (subError) {
+            console.error('[api/subscription] subscriptions failed', subError.code, subError.message);
+            send(res, 500, { ok: false, reason: 'load_failed' });
+            return;
         }
 
         const pump = pumpRow && pumpRow.id === pumpId ? mapPump(pumpRow) : null;
+        const rows = pump ? subRows || [] : [];
+        const names = await planNameMap(rows.map((row) => row.plan_id));
+        const current = pickCurrent(rows);
+        const history = rows.map((row) => mapSubscription(row, names[row.plan_id]));
 
         send(res, 200, {
             ok: true,
-            profile: profile
-                ? { name: profile.name || null, role: profile.role || null }
-                : null,
+            profile: profile ? { name: profile.name || null, role: profile.role || null } : null,
             pump,
-            history: pump && !historyError ? (history || []).map(mapHistory) : [],
+            subscription: current ? mapSubscription(current, names[current.plan_id]) : null,
+            history,
         });
     } catch (err) {
         console.error('[api/subscription]', err.message);

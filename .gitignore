@@ -1,0 +1,5 @@
+.env
+.env.local
+.env.*.local
+.cursor/mcp.json
+node_modules/

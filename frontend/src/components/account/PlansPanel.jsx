@@ -1,21 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
-import { Check, FileText, Phone, Shield, Timer } from 'lucide-react';
-import {
-    daysUntil,
-    daysUntilEarlyBirdEnd,
-    formatDateLong,
-    formatMoney,
-    GST_RATE,
-    isEarlyBirdActive,
-    PETROFI_PLANS,
-    planPrice,
-    remainingLabel,
-    STANDARD_FROM_LABEL,
-} from '../../lib/subscription';
-import { cardClass } from './AccountBits';
-
-const gstPct = Math.round(GST_RATE * 100);
+import { Check, FileText, Phone, Shield } from 'lucide-react';
+import { daysUntil, formatDateLong, formatMoney, remainingLabel } from '../../lib/subscription';
+import { fetchPaymentCatalog, paymentErrorText } from '../../lib/payments';
+import { cardClass, LoadingState } from './AccountBits';
 
 const BENEFITS = [
     'All PetroFI features',
@@ -24,24 +12,9 @@ const BENEFITS = [
     'Continue without interruption',
 ];
 
-const PLAN_COPY = {
-    'first-year': {
-        cta: 'Continue with 1 Year',
-        period: 'Covers 12 months after payment.',
-    },
-    'six-months': {
-        cta: 'Continue with 6 Months',
-        period: 'Covers 6 months after payment.',
-    },
-    monthly: {
-        cta: 'Continue Monthly',
-        period: 'Billed every month after payment.',
-    },
-};
-
-function trialCopy(pump) {
-    const remaining = daysUntil(pump?.endDate);
-    const dateLabel = formatDateLong(pump?.endDate);
+function trialCopy(subscription) {
+    const remaining = subscription?.remainingDays ?? daysUntil(subscription?.endDate);
+    const dateLabel = formatDateLong(subscription?.endDate);
 
     if (remaining == null) {
         return {
@@ -79,21 +52,32 @@ function trialCopy(pump) {
 }
 
 const PlansPanel = () => {
-    const { pump } = useOutletContext();
-    const early = isEarlyBirdActive();
-    const trial = trialCopy(pump);
-    const daysLeft = daysUntilEarlyBirdEnd();
-    const yearPlan = PETROFI_PLANS.find((plan) => plan.id === 'first-year');
-    const monthlyPlan = PETROFI_PLANS.find((plan) => plan.id === 'monthly');
-    const year = planPrice(yearPlan);
-    const monthly = planPrice(monthlyPlan);
-    const rows = PETROFI_PLANS.map((plan) => ({
-        plan,
-        name: plan.name,
-        now: early && !plan.noDiscount ? plan.earlyBird : plan.standard,
-        later: plan.standard,
-        price: planPrice(plan),
-    }));
+    const { pump, subscription } = useOutletContext();
+    const trial = trialCopy(subscription);
+    const [quotes, setQuotes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        let cancelled = false;
+        fetchPaymentCatalog().then((result) => {
+            if (cancelled) return;
+            setLoading(false);
+            if (!result.ok) {
+                setError(paymentErrorText(result.reason));
+                setQuotes([]);
+                return;
+            }
+            setQuotes(result.quotes || []);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    const gstLabel = quotes[0] ? `+${quotes[0].gstPct}% GST` : null;
+
+    if (loading) return <LoadingState />;
 
     return (
         <div className="max-w-5xl mx-auto space-y-6 sm:space-y-7" data-testid="account-plans">
@@ -153,11 +137,13 @@ const PlansPanel = () => {
                 </div>
             </section>
 
+            {error ? (
+                <p className="text-sm text-rose-600 font-jakarta">{error}</p>
+            ) : null}
+
             <section className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-                {PETROFI_PLANS.map((plan) => {
-                    const price = planPrice(plan);
-                    const copy = PLAN_COPY[plan.id];
-                    const showSave = early && !plan.noDiscount && price.saved > 0;
+                {quotes.map((plan) => {
+                    const perMonth = plan.months > 0 ? plan.base / plan.months : plan.base;
                     return (
                         <article
                             key={plan.id}
@@ -171,57 +157,29 @@ const PlansPanel = () => {
                                     BEST VALUE
                                 </p>
                             ) : null}
-                            <div className="absolute top-3 right-3 z-10">
-                                {plan.noDiscount ? (
-                                    <p className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-0.5 text-[10px] font-bold font-jakarta">
-                                        No discount
-                                    </p>
-                                ) : null}
-                                {showSave ? (
-                                    <p className="rounded-full bg-emerald-50 text-emerald-800 px-2.5 py-0.5 text-[11px] font-bold font-outfit">
-                                        Save {formatMoney(price.saved)}
-                                    </p>
-                                ) : null}
-                            </div>
 
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 font-jakarta pr-20">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 font-jakarta pr-4">
                                 {plan.name}
                             </p>
 
                             <div className="mt-3">
-                                {showSave ? (
-                                    <p className="text-sm text-slate-400 font-outfit line-through">
-                                        {formatMoney(plan.standard)}
-                                    </p>
-                                ) : (
-                                    <p className="h-5" aria-hidden="true" />
-                                )}
                                 <div className="relative inline-flex items-end gap-2 pr-2 flex-wrap">
                                     <p className="text-[32px] leading-none font-bold font-outfit text-pf-navy">
-                                        {formatMoney(price.base)}
+                                        {formatMoney(plan.base, plan.currency)}
                                     </p>
                                     {plan.billedAs ? (
                                         <span className="mb-0.5 text-xs font-medium text-slate-400 font-jakarta whitespace-nowrap">
                                             {plan.billedAs}
                                         </span>
                                     ) : null}
-                                    {showSave ? (
-                                        <span className="-mt-1.5 -rotate-12 rounded-md bg-rose-500 px-2 py-1 text-[11px] font-extrabold tracking-wide text-white shadow-[0_6px_14px_rgba(225,29,72,0.35)] font-outfit">
-                                            {price.off}% OFF
-                                        </span>
-                                    ) : null}
                                 </div>
-                                <p
-                                    className={`mt-2 text-sm font-semibold font-jakarta ${
-                                        plan.id === 'monthly' ? 'invisible' : 'text-pf-navy'
-                                    }`}
-                                >
-                                    {formatMoney(price.perMonth)} per month
+                                <p className="mt-2 text-sm font-semibold font-jakarta text-pf-navy">
+                                    {formatMoney(perMonth, plan.currency)} per month
                                 </p>
                             </div>
 
-                            <p className="mt-6 text-sm font-bold font-outfit text-pf-navy">+{gstPct}% GST</p>
-                            <p className="mt-2 text-sm text-slate-600 font-jakarta leading-snug">{copy.period}</p>
+                            <p className="mt-6 text-sm font-bold font-outfit text-pf-navy">+{plan.gstPct}% GST</p>
+                            <p className="mt-2 text-sm text-slate-600 font-jakarta leading-snug">{plan.period}</p>
 
                             <ul className="mt-3 space-y-1.5">
                                 {BENEFITS.map((item) => (
@@ -239,14 +197,14 @@ const PlansPanel = () => {
 
                             <div className="mt-auto pt-4">
                                 <Link
-                                    to={`/subscription/payments?plan=${plan.id}`}
+                                    to={`/subscription/payments?plan=${encodeURIComponent(plan.id)}`}
                                     className={`inline-flex w-full items-center justify-center whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold font-jakarta ${
                                         plan.featured
                                             ? 'bg-pf-navy text-white hover:bg-pf-navy/90'
                                             : 'border border-slate-200 text-pf-navy hover:bg-slate-50'
                                     }`}
                                 >
-                                    {copy.cta}
+                                    {plan.cta}
                                 </Link>
                             </div>
                         </article>
@@ -254,58 +212,44 @@ const PlansPanel = () => {
                 })}
             </section>
 
-            <section className="relative overflow-hidden rounded-2xl bg-[#E8F4FC] text-pf-navy p-5 sm:p-7 border-2 border-pf-sky shadow-[0_10px_32px_rgba(13,27,62,0.06)]">
-                <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-pf-sky/20 blur-2xl pointer-events-none" />
-                <div className="relative">
-                    <div className="flex flex-wrap items-center gap-2 mb-4">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400 text-emerald-950 px-3 py-1 text-xs font-bold font-jakarta">
-                            Early launch
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-pf-navy font-jakarta ring-1 ring-sky-100">
-                            <Timer size={13} className="text-pf-sky" />
-                            {early ? `${daysLeft} days left` : 'Offer ended'}
-                        </span>
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl font-bold font-outfit leading-tight">
-                        {early ? `1 year for ${formatMoney(year.base)}` : `Prices from ${STANDARD_FROM_LABEL}`}
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-600 font-jakarta">
-                        {early
-                            ? `After 31 Dec this is ${formatMoney(yearPlan.standard)}. You save ${formatMoney(year.saved)}. Monthly stays ${formatMoney(monthly.base)}. No cut.`
-                            : 'GST is extra on every plan.'}
-                    </p>
-
+            {quotes.length ? (
+                <section className="relative overflow-hidden rounded-2xl bg-[#E8F4FC] text-pf-navy p-5 sm:p-7 border-2 border-pf-sky shadow-[0_10px_32px_rgba(13,27,62,0.06)]">
+                    <h2 className="text-2xl sm:text-3xl font-bold font-outfit leading-tight">Plan prices</h2>
+                    <p className="mt-1 text-sm text-slate-600 font-jakarta">GST is applied at the rate stored on each plan.</p>
                     <div className="mt-6 overflow-x-auto">
                         <table className="w-full min-w-[600px] text-left text-sm font-jakarta">
                             <thead>
                                 <tr className="text-xs text-slate-500">
                                     <th className="pb-3 font-semibold">Plan</th>
-                                    <th className="pb-3 font-semibold">Now</th>
-                                    <th className="pb-3 font-semibold">Per month</th>
-                                    <th className="pb-3 font-semibold">After 31 Dec</th>
-                                    <th className="pb-3 font-semibold">You save</th>
+                                    <th className="pb-3 font-semibold">Base</th>
+                                    <th className="pb-3 font-semibold">GST</th>
+                                    <th className="pb-3 font-semibold">Total</th>
+                                    <th className="pb-3 font-semibold">Duration</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {rows.map((row) => (
-                                    <tr key={row.name} className="border-t border-sky-200/70">
-                                        <td className="py-3 font-semibold text-pf-navy">{row.name}</td>
-                                        <td className="py-3 font-semibold text-pf-navy">{formatMoney(row.now)}</td>
-                                        <td className="py-3 text-slate-600">{formatMoney(row.price.perMonth)}</td>
-                                        <td className="py-3 text-slate-400">{formatMoney(row.later)}</td>
-                                        <td className="py-3 text-emerald-700 font-semibold">
-                                            {row.plan.noDiscount ? 'No cut' : formatMoney(row.price.saved)}
+                                {quotes.map((plan) => (
+                                    <tr key={plan.id} className="border-t border-sky-200/70">
+                                        <td className="py-3 font-semibold text-pf-navy">{plan.name}</td>
+                                        <td className="py-3 font-semibold text-pf-navy">
+                                            {formatMoney(plan.base, plan.currency)}
+                                        </td>
+                                        <td className="py-3 text-slate-600">
+                                            {formatMoney(plan.gst, plan.currency)} ({plan.gstPct}%)
+                                        </td>
+                                        <td className="py-3 font-semibold text-pf-navy">
+                                            {formatMoney(plan.total, plan.currency)}
+                                        </td>
+                                        <td className="py-3 text-slate-600">
+                                            {plan.days} days · {plan.months} {plan.months === 1 ? 'month' : 'months'}
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-                    <p className="mt-4 text-sm text-slate-500 font-jakarta">
-                        1 year is {formatMoney(year.perMonth)} a month now. Monthly plan is {formatMoney(monthly.base)} with no discount.
-                    </p>
-                </div>
-            </section>
+                </section>
+            ) : null}
 
             <footer className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1 text-xs text-slate-500 font-jakarta">
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -319,7 +263,7 @@ const PlansPanel = () => {
                     </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <span className="font-bold text-pf-navy">+{gstPct}% GST</span>
+                    {gstLabel ? <span className="font-bold text-pf-navy">{gstLabel}</span> : null}
                     <a href="tel:+917398621812" className="inline-flex items-center gap-1.5 font-semibold text-pf-navy hover:text-pf-sky">
                         <Phone size={13} />
                         Need help? +91 73986 21812

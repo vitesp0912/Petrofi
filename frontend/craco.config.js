@@ -1,5 +1,7 @@
 // craco.config.js
 const path = require("path");
+// Repo-root .env first, then frontend/.env so local API routes see Cashfree keys.
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
 

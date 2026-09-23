@@ -1,5 +1,4 @@
 import { supabase } from './supabase';
-import PLAN_CATALOG from './plan-catalog.json';
 
 export async function fetchPumpSubscription() {
     if (!supabase) {
@@ -66,65 +65,15 @@ export function formatDateLong(value) {
     });
 }
 
-export function formatMoney(amount) {
+export function formatMoney(amount, currency = 'INR') {
     const value = Number(amount);
     if (!Number.isFinite(value)) return '-';
     return new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: 'INR',
-        maximumFractionDigits: 0,
+        currency: currency || 'INR',
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
     }).format(value);
-}
-
-export const GST_RATE = PLAN_CATALOG.gstRate;
-export const EARLY_BIRD_LAST_DAY = PLAN_CATALOG.earlyBirdLastDay;
-export const EARLY_BIRD_END_LABEL = '31 December 2026';
-export const STANDARD_FROM_LABEL = '1 January 2027';
-
-export const PETROFI_PLANS = PLAN_CATALOG.plans;
-
-function kolkataDay(now = new Date()) {
-    return new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Kolkata',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-    }).format(now);
-}
-
-export function isEarlyBirdActive(now = new Date()) {
-    return kolkataDay(now) <= EARLY_BIRD_LAST_DAY;
-}
-
-export function daysUntilEarlyBirdEnd(now = new Date()) {
-    const end = new Date('2026-12-31T18:29:59.000Z');
-    return Math.max(0, Math.ceil((end.getTime() - now.getTime()) / 86400000));
-}
-
-export function gstAmount(base) {
-    return Math.round(Number(base) * GST_RATE);
-}
-
-export function totalWithGst(base) {
-    return Number(base) + gstAmount(base);
-}
-
-export function planPrice(plan, now = new Date()) {
-    const early = isEarlyBirdActive(now);
-    const base = early ? plan.earlyBird : plan.standard;
-    const saved = Math.max(0, plan.standard - plan.earlyBird);
-    const off = plan.standard > 0 ? Math.round((saved / plan.standard) * 100) : 0;
-    return {
-        early,
-        base,
-        gst: gstAmount(base),
-        total: totalWithGst(base),
-        saved,
-        off,
-        perMonth: Math.round(base / plan.months),
-        laterPerMonth: Math.round(plan.standard / plan.months),
-        savedPerMonth: Math.round(saved / plan.months),
-    };
 }
 
 export function remainingLabel(remaining) {

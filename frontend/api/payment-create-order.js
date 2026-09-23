@@ -30,7 +30,13 @@ module.exports = async (req, res) => {
         }
 
         const planId = String(body?.planId || '').trim();
-        const quote = quoteById(planId);
+        let quote;
+        try {
+            quote = await quoteById(planId);
+        } catch (err) {
+            send(res, 500, { ok: false, reason: err.reason || 'load_failed' });
+            return;
+        }
         if (!quote) {
             send(res, 400, { ok: false, reason: 'unknown_plan' });
             return;
@@ -109,10 +115,10 @@ module.exports = async (req, res) => {
             plan_id: quote.id,
             plan_name: quote.name,
             months: quote.months,
-            amount_base: quote.base,
-            amount_gst: quote.gst,
-            amount_total: quote.total,
-            currency: 'INR',
+            amount_base: Math.round(quote.base),
+            amount_gst: Math.round(quote.gst),
+            amount_total: Math.round(quote.total),
+            currency: quote.currency,
             gstin: gstin || null,
             billing_name: buyer.name,
             billing_email: buyer.email || null,
@@ -131,6 +137,7 @@ module.exports = async (req, res) => {
             cfOrder = await createCashfreeOrder({
                 orderId,
                 amount: quote.total,
+                currency: quote.currency,
                 customer: cashfreeCustomer(auth.user.id, buyer),
                 returnUrl,
                 notifyUrl,
@@ -164,6 +171,7 @@ module.exports = async (req, res) => {
             })
             .eq('order_id', orderId);
 
+        const quotes = await listQuotes().catch(() => []);
         send(res, 200, {
             ok: true,
             orderId,
@@ -171,7 +179,7 @@ module.exports = async (req, res) => {
             mode: cfg.mode,
             amount: quote.total,
             plan: quote,
-            quotes: listQuotes(),
+            quotes,
         });
     } catch (err) {
         console.error('[payments] create-order', err.message);

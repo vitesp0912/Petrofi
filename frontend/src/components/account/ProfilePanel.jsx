@@ -2,14 +2,7 @@ import React from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { getAuthDisplayName } from '../../lib/auth';
-import {
-    daysUntil,
-    formatDate,
-    periodProgress,
-    remainingLabel,
-    roleLabel,
-    titleCase,
-} from '../../lib/subscription';
+import { formatDate, periodProgress, roleLabel, titleCase } from '../../lib/subscription';
 import { cardClass, FieldRow, GateCard, LoadingState, PageIntro, StatusPill } from './AccountBits';
 
 const Metric = ({ label, value, hint }) => (
@@ -21,12 +14,11 @@ const Metric = ({ label, value, hint }) => (
 );
 
 const ProfilePanel = () => {
-    const { user, loading, reason, profile, pump } = useOutletContext();
-    const remaining = daysUntil(pump?.endDate);
-    const progress = periodProgress(pump?.startDate, pump?.endDate);
+    const { user, loading, reason, profile, pump, subscription } = useOutletContext();
+    const progress = periodProgress(subscription?.startDate, subscription?.endDate);
     const location = [pump?.city, pump?.state].filter(Boolean).join(', ');
     const displayName = profile?.name || getAuthDisplayName(user);
-    const status = pump?.subscriptionStatus;
+    const status = subscription?.status;
 
     if (loading) return <LoadingState />;
 
@@ -82,26 +74,10 @@ const ProfilePanel = () => {
                     </div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 pt-6 border-t border-white/10">
-                        <Metric
-                            label="Subscription"
-                            value={titleCase(status || 'None')}
-                            hint={pump?.active ? 'App access is on' : 'App access is off'}
-                        />
-                        <Metric
-                            label="Plan"
-                            value={titleCase(pump?.plan)}
-                            hint={titleCase(pump?.billingCycle)}
-                        />
-                        <Metric
-                            label="Valid till"
-                            value={formatDate(pump?.endDate)}
-                            hint={pump?.startDate ? `From ${formatDate(pump.startDate)}` : 'No start date'}
-                        />
-                        <Metric
-                            label="Time left"
-                            value={remaining == null ? 'Not set' : remainingLabel(remaining)}
-                            hint={pump?.paymentVerified ? 'Payment verified' : 'Payment not verified'}
-                        />
+                        <Metric label="Subscription" value={titleCase(status || 'None')} />
+                        <Metric label="Plan" value={subscription?.planName || 'Not set'} />
+                        <Metric label="Valid till" value={formatDate(subscription?.endDate)} />
+                        <Metric label="Time left" value={subscription?.timeLeft || 'Not set'} />
                     </div>
 
                     {progress != null ? (

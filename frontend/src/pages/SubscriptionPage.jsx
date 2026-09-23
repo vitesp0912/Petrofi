@@ -20,7 +20,14 @@ function SubscriptionPage() {
     const navigate = useNavigate();
     const [registerOpen, setRegisterOpen] = useState(false);
     const [registerPrefill, setRegisterPrefill] = useState(null);
-    const [state, setState] = useState({ loading: true, reason: '', profile: null, pump: null, history: [] });
+    const [state, setState] = useState({
+        loading: true,
+        reason: '',
+        profile: null,
+        pump: null,
+        subscription: null,
+        history: [],
+    });
 
     usePageMeta({
         title: 'Account | PetroFI',
@@ -32,7 +39,14 @@ function SubscriptionPage() {
 
         if (authLoading) return undefined;
         if (!user) {
-            setState({ loading: false, reason: 'signed_out', profile: null, pump: null, history: [] });
+            setState({
+                loading: false,
+                reason: 'signed_out',
+                profile: null,
+                pump: null,
+                subscription: null,
+                history: [],
+            });
             return undefined;
         }
 
@@ -40,7 +54,14 @@ function SubscriptionPage() {
         fetchPumpSubscription().then((result) => {
             if (cancelled) return;
             if (!result.ok) {
-                setState({ loading: false, reason: result.reason, profile: null, pump: null, history: [] });
+                setState({
+                    loading: false,
+                    reason: result.reason,
+                    profile: null,
+                    pump: null,
+                    subscription: null,
+                    history: [],
+                });
                 return;
             }
             setState({
@@ -48,6 +69,7 @@ function SubscriptionPage() {
                 reason: '',
                 profile: result.profile,
                 pump: result.pump,
+                subscription: result.subscription,
                 history: result.history,
             });
         });
@@ -63,6 +85,7 @@ function SubscriptionPage() {
         reason: state.reason,
         profile: state.profile,
         pump: state.pump,
+        subscription: state.subscription,
         history: state.history,
     }), [user, authLoading, state]);
 

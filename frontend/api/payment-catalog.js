@@ -38,10 +38,11 @@ module.exports = async (req, res) => {
         }
 
         const buyer = buyerFrom(auth.user, profile, pump);
+        const quotes = await listQuotes();
         send(res, 200, {
             ok: true,
             ready,
-            quotes: listQuotes(),
+            quotes,
             buyer: {
                 name: buyer.name,
                 email: buyer.email,

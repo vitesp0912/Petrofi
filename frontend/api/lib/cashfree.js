@@ -62,13 +62,13 @@ function createOrderId(planId) {
     return `pf_${plan}_${stamp}_${rand}`.slice(0, 45);
 }
 
-async function createCashfreeOrder({ orderId, amount, customer, returnUrl, notifyUrl, tags }) {
+async function createCashfreeOrder({ orderId, amount, customer, returnUrl, notifyUrl, tags, currency }) {
     const orderMeta = { return_url: returnUrl };
     if (notifyUrl) orderMeta.notify_url = notifyUrl;
     const body = {
         order_id: orderId,
         order_amount: amount,
-        order_currency: 'INR',
+        order_currency: currency || 'INR',
         order_meta: orderMeta,
         customer_details: customer,
         order_note: 'PetroFI subscription',
