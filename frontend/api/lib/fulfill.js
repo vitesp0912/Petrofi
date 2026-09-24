@@ -1,4 +1,6 @@
 const { billingCycleForMonths, pumpPlanForCheckout } = require('./catalog');
+const { isUuid } = require('./http');
+const { savePaymentOrder } = require('./save-payment-order');
 
 function addMonths(date, months) {
     const next = new Date(date.getTime());
@@ -19,13 +21,18 @@ function orderFrom(row) {
         user_id: row.user_id,
         pump_id: row.pump_id,
         plan_id: row.plan_id,
-        plan_name: row.plan_name,
-        months: row.months,
         amount_total: row.amount_total,
     };
 }
 
-async function activatePump(admin, order, extras = {}, { rollbackOnFail = false, previousStatus = 'pending', force = false } = {}) {
+async function monthsForPlan(admin, planId) {
+    if (!isUuid(planId)) return null;
+    const { data } = await admin.from('plans').select('duration_months').eq('id', planId).maybeSingle();
+    const months = Number(data?.duration_months);
+    return Number.isFinite(months) && months > 0 ? months : null;
+}
+
+async function activatePump(admin, order, extras = {}, { force = false } = {}) {
     const { data: pump, error: pumpError } = await admin
         .from('pumps')
         .select('id, subscription_end_date, subscription_plan')
@@ -42,7 +49,12 @@ async function activatePump(admin, order, extras = {}, { rollbackOnFail = false,
     }
 
     const paidAt = extras.paidAt || new Date().toISOString();
-    const period = periodForPump(pump, order.months);
+    const months = await monthsForPlan(admin, order.plan_id);
+    if (!months) {
+        console.error('[payments] plan duration missing');
+        return { ok: false, reason: 'fulfill_failed' };
+    }
+    const period = periodForPump(pump, months);
     const { error: pumpUpdateError } = await admin
         .from('pumps')
         .update({
@@ -51,7 +63,7 @@ async function activatePump(admin, order, extras = {}, { rollbackOnFail = false,
             payment_verified_at: paidAt,
             is_active: true,
             subscription_plan: pumpPlanForCheckout(),
-            billing_cycle: billingCycleForMonths(order.months),
+            billing_cycle: billingCycleForMonths(months),
             subscription_start_date: period.start.toISOString(),
             subscription_end_date: period.end.toISOString(),
         })
@@ -59,40 +71,7 @@ async function activatePump(admin, order, extras = {}, { rollbackOnFail = false,
 
     if (pumpUpdateError) {
         console.error('[payments] pump activate failed', pumpUpdateError.code, pumpUpdateError.message);
-        if (rollbackOnFail) {
-            await admin
-                .from('payment_orders')
-                .update({
-                    status: previousStatus && previousStatus !== 'paid' ? previousStatus : 'pending',
-                    paid_at: null,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('order_id', order.order_id)
-                .eq('status', 'paid');
-        }
         return { ok: false, reason: 'fulfill_failed' };
-    }
-
-    let planUuid = extras.planUuid || null;
-    if (!planUuid && order.plan_id) {
-        const { data: planRow } = await admin.from('plans').select('id').eq('code', order.plan_id).maybeSingle();
-        planUuid = planRow?.id || null;
-    }
-
-    if (!planUuid) {
-        console.error('[payments] history insert skipped missing plan_id');
-    } else {
-        const { error: historyError } = await admin.from('subscriptions').insert({
-            pump_id: order.pump_id,
-            plan_id: planUuid,
-            status: 'active',
-            start_date: period.start.toISOString(),
-            end_date: period.end.toISOString(),
-        });
-
-        if (historyError) {
-            console.error('[payments] history insert skipped', historyError.code, historyError.message);
-        }
     }
 
     return { ok: true, already: false };
@@ -103,36 +82,31 @@ async function fulfillPaidOrder(admin, row, extras = {}) {
         return { ok: false, reason: 'unavailable' };
     }
 
-    const paidStamp = {
-        status: 'paid',
-        paid_at: extras.paidAt || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        cf_order_id: extras.cfOrderId || row.cf_order_id || null,
-        cf_payment_id: extras.cfPaymentId || row.cf_payment_id || null,
-        payment_method: extras.paymentMethod || row.payment_method || null,
-    };
-
-    const { data: claimed, error: claimError } = await admin
-        .from('payment_orders')
-        .update(paidStamp)
-        .eq('order_id', row.order_id)
-        .neq('status', 'paid')
-        .select('order_id, user_id, pump_id, plan_id, plan_name, months, amount_total')
-        .maybeSingle();
-
-    if (claimError) {
-        console.error('[payments] claim paid failed', claimError.code, claimError.message);
+    let claimed;
+    try {
+        claimed = await savePaymentOrder(admin, {
+            orderId: row.order_id,
+            status: 'paid',
+            userId: row.user_id,
+            pumpId: row.pump_id,
+            amountTotal: row.amount_total,
+            planId: row.plan_id,
+            cfOrderId: extras.cfOrderId || row.cf_order_id || null,
+            cfPaymentId: extras.cfPaymentId || row.cf_payment_id || null,
+            paymentMethod: extras.paymentMethod || row.payment_method || null,
+            paidAt: extras.paidAt || new Date().toISOString(),
+        });
+    } catch (err) {
+        if (err.reason === 'already_paid') {
+            return activatePump(admin, orderFrom(row), extras, { force: false });
+        }
+        console.error('[payments] claim paid failed', err.reason || err.message);
         return { ok: false, reason: 'fulfill_failed' };
     }
 
-    if (!claimed) {
-        return activatePump(admin, orderFrom(row), extras, { rollbackOnFail: false });
-    }
-
-    return activatePump(admin, claimed, extras, {
-        rollbackOnFail: true,
-        previousStatus: row.status,
-        force: true,
+    const wasAlreadyPaid = String(row.status || '').toLowerCase() === 'paid';
+    return activatePump(admin, orderFrom(claimed || row), extras, {
+        force: !wasAlreadyPaid,
     });
 }
 

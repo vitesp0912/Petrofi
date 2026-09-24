@@ -6,6 +6,7 @@ import {
     createPaymentOrder,
     fetchPaymentCatalog,
     fetchPaymentStatus,
+    savePaymentStatus,
     loadCashfreeSdk,
     paymentErrorText,
 } from '../../lib/payments';
@@ -18,7 +19,7 @@ const METHODS = [
 ];
 
 const PaymentsPanel = () => {
-    const { user, loading, reason, pump, profile, history } = useOutletContext();
+    const { user, loading, pump, profile } = useOutletContext();
     const [params] = useSearchParams();
     const requestedPlan = params.get('plan') || '';
     const returnOrderId = params.get('order_id') || '';
@@ -58,6 +59,10 @@ const PaymentsPanel = () => {
             if (cancelled) return;
             if (result.ok && result.status === 'paid') {
                 setPayStatus('paid');
+                fetchPaymentCatalog().then((catalogResult) => {
+                    if (cancelled || !catalogResult.ok) return;
+                    setCatalog(catalogResult);
+                });
                 return;
             }
             setPayStatus(result.status || 'pending');
@@ -68,6 +73,8 @@ const PaymentsPanel = () => {
     }, [returnOrderId]);
 
     const quotes = catalog?.quotes || [];
+    const orders = catalog?.orders || [];
+    const ordersFailed = Boolean(catalogError);
     const quote = useMemo(
         () => quotes.find((item) => item.id === planId) || quotes[0] || null,
         [quotes, planId]
@@ -80,7 +87,6 @@ const PaymentsPanel = () => {
         pumpCode: pump?.code || '',
         hasPump: Boolean(pump),
     };
-    const historyFailed = reason === 'unavailable' || reason === 'load_failed';
     const phoneLocked = Boolean(buyer?.phone);
     const canPay = Boolean(catalog?.ready && buyer?.hasPump && quote && (phoneLocked || phone.length === 10) && !paying);
 
@@ -107,6 +113,9 @@ const PaymentsPanel = () => {
                 redirectTarget: '_self',
             });
         } catch {
+            if (created.orderId) {
+                await savePaymentStatus(created.orderId, 'user_dropped');
+            }
             setPayError('Cashfree checkout did not open. Try again.');
         } finally {
             setPaying(false);
@@ -282,37 +291,37 @@ const PaymentsPanel = () => {
             </form>
 
             <section className={`${cardClass} p-6 sm:p-7`}>
-                <h3 className="text-lg font-bold font-outfit text-pf-navy mb-1">Receipts</h3>
-                <p className="text-sm text-slate-500 font-jakarta mb-4">Payments made for this pump will list here.</p>
-                {historyFailed ? (
-                    <p className="text-sm text-slate-500 font-jakarta">Receipts could not load. Refresh the page.</p>
-                ) : history.length > 0 ? (
+                <h3 className="text-lg font-bold font-outfit text-pf-navy mb-1">Transactions</h3>
+                <p className="text-sm text-slate-500 font-jakarta mb-4">Payments for this pump are listed here.</p>
+                {ordersFailed ? (
+                    <p className="text-sm text-slate-500 font-jakarta">Transactions could not load. Refresh the page.</p>
+                ) : orders.length > 0 ? (
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[520px] text-left text-sm font-jakarta">
                             <thead>
                                 <tr className="text-xs text-slate-400">
                                     <th className="pb-3 font-semibold">Plan</th>
                                     <th className="pb-3 font-semibold">Status</th>
-                                    <th className="pb-3 font-semibold">Period</th>
-                                    <th className="pb-3 font-semibold">Time left</th>
+                                    <th className="pb-3 font-semibold">Date</th>
+                                    <th className="pb-3 font-semibold">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {history.map((row, index) => (
-                                    <tr key={`${row.planName}-${row.startDate}-${index}`} className="border-t border-slate-100">
+                                {orders.map((row) => (
+                                    <tr key={row.orderId} className="border-t border-slate-100">
                                         <td className="py-3.5 font-semibold text-pf-navy">{row.planName || 'Not set'}</td>
                                         <td className="py-3.5"><StatusPill value={row.status} /></td>
-                                        <td className="py-3.5 text-slate-600">
-                                            {formatDate(row.startDate)} to {formatDate(row.endDate)}
+                                        <td className="py-3.5 text-slate-600">{formatDate(row.paidAt || row.createdAt)}</td>
+                                        <td className="py-3.5 font-semibold text-pf-navy">
+                                            {formatMoney(row.amount, row.currency)}
                                         </td>
-                                        <td className="py-3.5 font-semibold text-pf-navy">{row.timeLeft || 'Not set'}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
                 ) : (
-                    <p className="text-sm text-slate-500 font-jakarta">No receipts yet.</p>
+                    <p className="text-sm text-slate-500 font-jakarta">No transactions yet.</p>
                 )}
             </section>
         </div>

@@ -2,6 +2,7 @@ const { send, requireUser, isUuid, publicSiteUrl, readJsonBody, adminClient } = 
 const { listQuotes, quoteById } = require('./lib/catalog');
 const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = require('./lib/cashfree');
 const { buyerFrom, cashfreeCustomer, normalizeGstin, indianMobile } = require('./lib/buyer');
+const { savePaymentOrder } = require('./lib/save-payment-order');
 
 const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, subscription_end_date';
 const RATE_LIMIT_MS = 20 * 1000;
@@ -108,36 +109,35 @@ module.exports = async (req, res) => {
         const returnUrl = `${site}/subscription/payments?order_id={order_id}`;
         const notifyUrl = site.startsWith('https://') ? `${site}/api/payment-webhook` : '';
 
-        const { error: insertError } = await admin.from('payment_orders').insert({
-            order_id: orderId,
-            user_id: auth.user.id,
-            pump_id: pumpId,
-            plan_id: quote.id,
-            plan_name: quote.name,
-            months: quote.months,
-            amount_base: Math.round(quote.base),
-            amount_gst: Math.round(quote.gst),
-            amount_total: Math.round(quote.total),
-            currency: quote.currency,
-            gstin: gstin || null,
-            billing_name: buyer.name,
-            billing_email: buyer.email || null,
-            billing_phone: buyer.phone,
-            status: 'created',
-        });
-
-        if (insertError) {
-            console.error('[payments] insert order failed');
-            send(res, 500, { ok: false, reason: 'create_failed' });
+        let saved;
+        try {
+            saved = await savePaymentOrder(admin, {
+                orderId,
+                status: 'created',
+                userId: auth.user.id,
+                pumpId,
+                planId: quote.planUuid || quote.id,
+                amountTotal: quote.total,
+                currency: quote.currency,
+                gstin: gstin || null,
+                billingName: buyer.name,
+                billingEmail: buyer.email || null,
+                billingPhone: buyer.phone,
+            });
+        } catch (err) {
+            console.error('[payments] insert order failed', err.reason || err.message);
+            send(res, 500, { ok: false, reason: err.reason || 'create_failed' });
             return;
         }
+
+        const chargeAmount = Number(saved?.amount_total != null ? saved.amount_total : quote.total);
 
         let cfOrder;
         try {
             cfOrder = await createCashfreeOrder({
                 orderId,
-                amount: quote.total,
-                currency: quote.currency,
+                amount: chargeAmount,
+                currency: saved?.currency || quote.currency,
                 customer: cashfreeCustomer(auth.user.id, buyer),
                 returnUrl,
                 notifyUrl,
@@ -148,7 +148,7 @@ module.exports = async (req, res) => {
                 },
             });
         } catch (err) {
-            await admin.from('payment_orders').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('order_id', orderId);
+            await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
             console.error('[payments] cashfree create failed');
             send(res, 502, { ok: false, reason: err.reason || 'cashfree_error' });
             return;
@@ -156,20 +156,18 @@ module.exports = async (req, res) => {
 
         const sessionId = cfOrder?.payment_session_id;
         if (!sessionId) {
-            await admin.from('payment_orders').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('order_id', orderId);
+            await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
             send(res, 502, { ok: false, reason: 'cashfree_error' });
             return;
         }
 
-        await admin
-            .from('payment_orders')
-            .update({
-                status: 'pending',
-                cf_order_id: cfOrder.cf_order_id ? String(cfOrder.cf_order_id) : null,
-                payment_session_id: sessionId,
-                updated_at: new Date().toISOString(),
-            })
-            .eq('order_id', orderId);
+        await savePaymentOrder(admin, {
+            orderId,
+            status: 'pending',
+            userId: auth.user.id,
+            cfOrderId: cfOrder.cf_order_id ? String(cfOrder.cf_order_id) : null,
+            paymentSessionId: sessionId,
+        });
 
         const quotes = await listQuotes().catch(() => []);
         send(res, 200, {
@@ -177,7 +175,7 @@ module.exports = async (req, res) => {
             orderId,
             paymentSessionId: sessionId,
             mode: cfg.mode,
-            amount: quote.total,
+            amount: chargeAmount,
             plan: quote,
             quotes,
         });

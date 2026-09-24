@@ -42,6 +42,21 @@ export async function createPaymentOrder({ planId, gstin, phone }) {
     }
 }
 
+export async function savePaymentStatus(orderId, status) {
+    const headers = await authHeader();
+    if (!headers) return { ok: false, reason: 'signed_out' };
+    try {
+        const res = await fetch('/api/payment-save', {
+            method: 'POST',
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, status }),
+        });
+        return readJson(res);
+    } catch {
+        return { ok: false, reason: 'unavailable' };
+    }
+}
+
 export async function fetchPaymentStatus(orderId) {
     const headers = await authHeader();
     if (!headers) return { ok: false, reason: 'signed_out' };

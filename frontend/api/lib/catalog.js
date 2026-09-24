@@ -30,6 +30,7 @@ function toQuote(row, featuredCode) {
         period: copy.period,
         cta: copy.cta,
         featured: Boolean(featuredCode) && row.code === featuredCode,
+        planUuid: row.id,
         base: money(row.price_base_inr),
         gst: money(row.gst_inr),
         total: money(row.price_total_inr),
@@ -105,7 +106,9 @@ async function quoteById(planId) {
     }
 
     if (!data) return null;
-    return toQuote(data, data.code);
+    const quote = toQuote(data, data.code);
+    quote.planUuid = data.id;
+    return quote;
 }
 
 // pumps.billing_cycle only allows monthly | quarterly | yearly.

@@ -1,9 +1,49 @@
-const { send, requireUser, isUuid } = require('./lib/http');
+const { send, requireUser, isUuid, adminClient } = require('./lib/http');
 const { listQuotes } = require('./lib/catalog');
 const { paymentsReady } = require('./lib/cashfree');
 const { buyerFrom, indianMobile } = require('./lib/buyer');
 
 const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email';
+const ORDER_COLUMNS = 'order_id, amount_total, currency, status, payment_method, paid_at, created_at, plan_id';
+
+function mapOrder(row, planName) {
+    return {
+        orderId: row.order_id,
+        planName: planName || null,
+        amount: row.amount_total,
+        currency: row.currency || 'INR',
+        status: row.status || null,
+        paymentMethod: row.payment_method || null,
+        paidAt: row.paid_at || null,
+        createdAt: row.created_at || null,
+    };
+}
+
+async function ordersForPump(pumpId) {
+    if (!isUuid(pumpId)) return [];
+    const admin = adminClient();
+    if (!admin) return [];
+    const { data, error } = await admin
+        .from('payment_orders')
+        .select(ORDER_COLUMNS)
+        .eq('pump_id', pumpId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+    if (error) {
+        console.error('[payments] orders', error.code, error.message);
+        const err = new Error('load_failed');
+        err.reason = 'load_failed';
+        throw err;
+    }
+    const rows = data || [];
+    const ids = [...new Set(rows.map((row) => row.plan_id).filter((id) => isUuid(id)))];
+    let names = {};
+    if (ids.length) {
+        const { data: plans } = await admin.from('plans').select('id, name').in('id', ids);
+        names = Object.fromEntries((plans || []).map((plan) => [plan.id, plan.name]));
+    }
+    return rows.map((row) => mapOrder(row, names[row.plan_id]));
+}
 
 module.exports = async (req, res) => {
     if (req.method !== 'GET') {
@@ -38,11 +78,15 @@ module.exports = async (req, res) => {
         }
 
         const buyer = buyerFrom(auth.user, profile, pump);
-        const quotes = await listQuotes();
+        const [quotes, orders] = await Promise.all([
+            listQuotes(),
+            ordersForPump(pump?.id),
+        ]);
         send(res, 200, {
             ok: true,
             ready,
             quotes,
+            orders,
             buyer: {
                 name: buyer.name,
                 email: buyer.email,

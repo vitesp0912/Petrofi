@@ -1,6 +1,6 @@
 const { send, requireUser, adminClient } = require('./lib/http');
 const { listQuotes } = require('./lib/catalog');
-const { paymentsReady, getCashfreeOrder, orderIsPaid, amountsMatch } = require('./lib/cashfree');
+const { paymentsReady, getCashfreeOrder, getSuccessfulPaymentId, orderIsPaid, amountsMatch } = require('./lib/cashfree');
 const { fulfillPaidOrder } = require('./lib/fulfill');
 
 module.exports = async (req, res) => {
@@ -71,8 +71,15 @@ module.exports = async (req, res) => {
             return;
         }
 
+        const cfPaymentId = (await getSuccessfulPaymentId(orderId).catch(() => null)) || row.cf_payment_id;
+        if (!cfPaymentId) {
+            send(res, 200, { ok: true, status: 'pending', orderId, quotes });
+            return;
+        }
+
         const result = await fulfillPaidOrder(admin, row, {
             cfOrderId: cfOrder.cf_order_id,
+            cfPaymentId,
             paidAt: new Date().toISOString(),
         });
 

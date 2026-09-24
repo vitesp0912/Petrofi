@@ -1,6 +1,7 @@
 const { send, adminClient } = require('./lib/http');
-const { paymentsReady, verifyWebhookSignature, orderIsPaid, amountsMatch, getCashfreeOrder } = require('./lib/cashfree');
+const { paymentsReady, verifyWebhookSignature, orderIsPaid, amountsMatch, getCashfreeOrder, getSuccessfulPaymentId } = require('./lib/cashfree');
 const { fulfillPaidOrder } = require('./lib/fulfill');
+const { savePaymentOrder } = require('./lib/save-payment-order');
 
 module.exports.config = {
     api: { bodyParser: false },
@@ -111,12 +112,18 @@ module.exports = async (req, res) => {
 
     const success = event.paymentStatus === 'SUCCESS' || event.paymentStatus === 'PAID' || /SUCCESS/i.test(event.type);
     if (!success) {
-        if (event.paymentStatus === 'FAILED' || /FAILED/i.test(event.type)) {
-            await admin
-                .from('payment_orders')
-                .update({ status: 'failed', updated_at: new Date().toISOString() })
-                .eq('order_id', row.order_id)
-                .neq('status', 'paid');
+        let next = null;
+        if (event.paymentStatus === 'FAILED' || /FAILED/i.test(event.type)) next = 'failed';
+        else if (event.paymentStatus === 'EXPIRED' || /EXPIRED/i.test(event.type)) next = 'expired';
+        else if (
+            event.paymentStatus === 'USER_DROPPED' ||
+            event.paymentStatus === 'CANCELLED' ||
+            /USER_DROPPED|CANCELLED/i.test(event.type)
+        ) {
+            next = 'user_dropped';
+        }
+        if (next) {
+            await savePaymentOrder(admin, { orderId: row.order_id, status: next }).catch(() => {});
         }
         send(res, 200, { ok: true });
         return;
@@ -135,9 +142,18 @@ module.exports = async (req, res) => {
         }
     }
 
+    let cfPaymentId = event.cfPaymentId || row.cf_payment_id || null;
+    if (!cfPaymentId) {
+        cfPaymentId = await getSuccessfulPaymentId(row.order_id).catch(() => null);
+    }
+    if (!cfPaymentId) {
+        send(res, 200, { ok: true });
+        return;
+    }
+
     const result = await fulfillPaidOrder(admin, row, {
         cfOrderId: event.cfOrderId,
-        cfPaymentId: event.cfPaymentId,
+        cfPaymentId,
         paymentMethod: event.paymentMethod,
         paidAt: new Date().toISOString(),
     });

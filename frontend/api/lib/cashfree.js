@@ -84,6 +84,25 @@ async function getCashfreeOrder(orderId) {
     return cashfreeRequest(`/orders/${encodeURIComponent(orderId)}`);
 }
 
+async function getCashfreePayments(orderId) {
+    return cashfreeRequest(`/orders/${encodeURIComponent(orderId)}/payments`);
+}
+
+function successfulPaymentId(payments) {
+    const rows = Array.isArray(payments) ? payments : payments ? [payments] : [];
+    const paid = rows.find((item) => {
+        const status = String(item?.payment_status || '').toUpperCase();
+        return status === 'SUCCESS' || status === 'PAID';
+    });
+    const id = paid?.cf_payment_id || paid?.payment_id;
+    return id ? String(id) : null;
+}
+
+async function getSuccessfulPaymentId(orderId) {
+    const payments = await getCashfreePayments(orderId).catch(() => []);
+    return successfulPaymentId(payments);
+}
+
 function safeEqual(a, b) {
     const left = Buffer.from(String(a || ''), 'utf8');
     const right = Buffer.from(String(b || ''), 'utf8');
@@ -111,7 +130,7 @@ function amountsMatch(expectedRupees, received) {
     const left = Number(expectedRupees);
     const right = Number(received);
     if (!Number.isFinite(left) || !Number.isFinite(right)) return false;
-    return Math.round(left) === Math.round(right);
+    return Math.round(left * 100) === Math.round(right * 100);
 }
 
 module.exports = {
@@ -120,6 +139,9 @@ module.exports = {
     createOrderId,
     createCashfreeOrder,
     getCashfreeOrder,
+    getCashfreePayments,
+    getSuccessfulPaymentId,
+    successfulPaymentId,
     verifyWebhookSignature,
     orderIsPaid,
     amountsMatch,

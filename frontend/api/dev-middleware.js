@@ -7,6 +7,7 @@ const HANDLERS = {
     '/api/payment-catalog': path.join(__dirname, 'payment-catalog.js'),
     '/api/payment-create-order': path.join(__dirname, 'payment-create-order.js'),
     '/api/payment-status': path.join(__dirname, 'payment-status.js'),
+    '/api/payment-save': path.join(__dirname, 'payment-save.js'),
     '/api/payment-webhook': path.join(__dirname, 'payment-webhook.js'),
 };
 
@@ -53,7 +54,13 @@ function localApiMiddleware(req, res, next) {
     }
 
     const run = () => {
-        delete require.cache[require.resolve(file)];
+        const apiRoot = path.resolve(__dirname).replace(/\\/g, '/').toLowerCase();
+        Object.keys(require.cache).forEach((id) => {
+            const normalized = String(id).replace(/\\/g, '/').toLowerCase();
+            if (normalized.startsWith(apiRoot) && !normalized.includes('/node_modules/')) {
+                delete require.cache[id];
+            }
+        });
         const handler = require(file);
         return Promise.resolve(handler(req, res));
     };
