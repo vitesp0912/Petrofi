@@ -143,24 +143,25 @@ module.exports = async (req, res) => {
         if (buyer.state) billing.state = buyer.state.slice(0, 50);
         if (buyer.pincode && buyer.pincode.length === 6) billing.pincode = buyer.pincode;
 
-        const cartLine = [
-            buyer.name,
-            [buyer.pumpName, buyer.pumpCode].filter(Boolean).join(' · '),
-            buyer.email,
-            [buyer.address, buyer.city, buyer.state, buyer.pincode].filter(Boolean).join(', '),
+        const pumpLabel = buyer.pumpName || '-';
+        const orderNote = [
+            `Plan: ${quote.name}`,
+            `Pump: ${pumpLabel}`,
+            `Owner: ${buyer.name}`,
+            buyer.email ? `Email: ${buyer.email}` : '',
         ]
             .filter(Boolean)
-            .join(' · ')
-            .slice(0, 250);
+            .join(' | ')
+            .slice(0, 200);
 
         const cart = {
             cart_name: quote.name,
-            customer_note: cartLine,
+            customer_note: orderNote,
             cart_items: [
                 {
                     item_id: String(quote.id).slice(0, 40),
-                    item_name: (buyer.pumpName ? `${quote.name} · ${buyer.pumpName}` : quote.name).slice(0, 100),
-                    item_description: cartLine || quote.period || quote.name,
+                    item_name: `${quote.name}${buyer.pumpName ? ` - ${buyer.pumpName}` : ''}`.slice(0, 100),
+                    item_description: orderNote,
                     item_original_unit_price: chargeAmount,
                     item_discounted_unit_price: chargeAmount,
                     item_currency: saved?.currency || quote.currency || 'INR',
@@ -177,7 +178,7 @@ module.exports = async (req, res) => {
             customer: cashfreeCustomer(auth.user.id, buyer),
             returnUrl,
             notifyUrl,
-            note: `${quote.name}${buyer.pumpName ? ` · ${buyer.pumpName}` : ''}`.slice(0, 120),
+            note: orderNote,
             tags: {
                 plan_id: quote.id,
                 pump_id: String(pumpId).replace(/-/g, ''),

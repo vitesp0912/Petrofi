@@ -38,10 +38,10 @@ function buyerFrom(user, profile, pump) {
 function cashfreeCustomer(userId, buyer) {
     const customer = {
         customer_id: `u${String(userId || '').replace(/-/g, '')}`.slice(0, 50),
-        customer_name: String(buyer.name || 'Customer').slice(0, 80),
+        customer_name: String(buyer.name || 'Customer').slice(0, 100),
         customer_phone: buyer.phone,
     };
-    if (buyer.email) customer.customer_email = buyer.email;
+    if (buyer.email) customer.customer_email = String(buyer.email).slice(0, 100);
     return customer;
 }
 
