@@ -114,3 +114,76 @@ code {
         border-bottom-color: inherit;
     }
 }
+
+@keyframes pf-result-in {
+    from {
+        transform: scale(0.86);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pf-check-stroke {
+    from {
+        stroke-dashoffset: 28;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes pf-pending-ring {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.07);
+        opacity: 0.72;
+    }
+}
+
+@keyframes pf-fail-tilt {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    30% {
+        transform: rotate(-7deg);
+    }
+    55% {
+        transform: rotate(5deg);
+    }
+}
+
+.pf-result-icon {
+    animation: pf-result-in 0.38s ease-out both;
+}
+
+.pf-result-check {
+    stroke-dasharray: 28;
+    stroke-dashoffset: 28;
+    animation: pf-check-stroke 0.42s ease-out 0.16s forwards;
+}
+
+.pf-result-pending-ring {
+    animation: pf-pending-ring 1.7s ease-in-out infinite;
+}
+
+.pf-result-fail {
+    animation: pf-fail-tilt 0.48s ease-out 0.18s 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pf-result-icon,
+    .pf-result-check,
+    .pf-result-pending-ring,
+    .pf-result-fail {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
