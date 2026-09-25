@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const { isLoginAllowed } = require('./login-allowlist');
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -81,6 +82,10 @@ async function requireUser(req, res) {
     }
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data?.user) {
+        send(res, 401, { ok: false, reason: 'signed_out' });
+        return null;
+    }
+    if (!isLoginAllowed(data.user)) {
         send(res, 401, { ok: false, reason: 'signed_out' });
         return null;
     }

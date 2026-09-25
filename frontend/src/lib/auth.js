@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { isLoginAllowed, LOGIN_ALLOWLIST_MESSAGE } from './login-allowlist';
 
 export const IDENTIFIER_MAX_LENGTH = 254;
 export const OTP_LENGTH = 6;
@@ -147,6 +148,10 @@ export async function sendLoginOtp(parsed) {
         return { ok: false, error: cooldownError(remaining), cooldown: remaining };
     }
 
+    if (!isLoginAllowed(parsed)) {
+        return { ok: false, error: LOGIN_ALLOWLIST_MESSAGE };
+    }
+
     if (parsed.kind === 'phone') {
         const { data, error } = await supabase.rpc('validate_phone_for_login', {
             phone_number: parsed.phone10,
@@ -216,6 +221,10 @@ export async function verifyLoginOtp(parsed, token) {
     const otp = sanitizeOtpInput(token);
     if (otp.length !== OTP_LENGTH) {
         return { ok: false, error: 'Enter the 6-digit code.' };
+    }
+
+    if (!isLoginAllowed(parsed)) {
+        return { ok: false, error: LOGIN_ALLOWLIST_MESSAGE };
     }
 
     const { error } = parsed.kind === 'phone'
