@@ -55,25 +55,37 @@ module.exports = async (req, res) => {
         const auth = await requireUser(req, res);
         if (!auth) return;
 
+        const admin = adminClient();
+        if (!admin) {
+            send(res, 503, { ok: false, reason: 'unavailable' });
+            return;
+        }
+
         const ready = paymentsReady();
-        const { data: profile, error: profileError } = await auth.supabase
+        const { data: profile, error: profileError } = await admin
             .from('users')
             .select('name, role, pump_id')
             .eq('id', auth.user.id)
             .maybeSingle();
 
         if (profileError) {
+            console.error('[payments] catalog profile', profileError.code, profileError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
 
         let pump = null;
         if (isUuid(profile?.pump_id)) {
-            const { data: pumpRow } = await auth.supabase
+            const { data: pumpRow, error: pumpError } = await admin
                 .from('pumps')
                 .select(PUMP_COLUMNS)
                 .eq('id', profile.pump_id)
                 .maybeSingle();
+            if (pumpError) {
+                console.error('[payments] catalog pump', pumpError.code, pumpError.message);
+                send(res, 500, { ok: false, reason: 'load_failed' });
+                return;
+            }
             if (pumpRow && pumpRow.id === profile.pump_id) pump = pumpRow;
         }
 

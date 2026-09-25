@@ -92,14 +92,20 @@ module.exports = async (req, res) => {
         const auth = await requireUser(req, res);
         if (!auth) return;
 
-        const { data: profile, error: profileError } = await auth.supabase
+        const admin = adminClient();
+        if (!admin) {
+            send(res, 503, { ok: false, reason: 'unavailable' });
+            return;
+        }
+
+        const { data: profile, error: profileError } = await admin
             .from('users')
             .select('name, role, pump_id')
             .eq('id', auth.user.id)
             .maybeSingle();
 
         if (profileError) {
-            console.error('[api/subscription] profile failed');
+            console.error('[api/subscription] profile failed', profileError.code, profileError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -111,8 +117,8 @@ module.exports = async (req, res) => {
         }
 
         const [{ data: pumpRow, error: pumpError }, { data: subRows, error: subError }] = await Promise.all([
-            auth.supabase.from('pumps').select(PUMP_COLUMNS).eq('id', pumpId).maybeSingle(),
-            auth.supabase
+            admin.from('pumps').select(PUMP_COLUMNS).eq('id', pumpId).maybeSingle(),
+            admin
                 .from('subscriptions')
                 .select(SUB_COLUMNS)
                 .eq('pump_id', pumpId)
@@ -121,7 +127,7 @@ module.exports = async (req, res) => {
         ]);
 
         if (pumpError) {
-            console.error('[api/subscription] pump failed');
+            console.error('[api/subscription] pump failed', pumpError.code, pumpError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }

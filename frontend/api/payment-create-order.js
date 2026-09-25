@@ -49,13 +49,20 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const { data: profile, error: profileError } = await auth.supabase
+        const admin = adminClient();
+        if (!admin) {
+            send(res, 503, { ok: false, reason: 'payments_offline' });
+            return;
+        }
+
+        const { data: profile, error: profileError } = await admin
             .from('users')
             .select('name, role, pump_id')
             .eq('id', auth.user.id)
             .maybeSingle();
 
         if (profileError) {
+            console.error('[payments] create profile', profileError.code, profileError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -66,7 +73,7 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const { data: pump, error: pumpError } = await auth.supabase
+        const { data: pump, error: pumpError } = await admin
             .from('pumps')
             .select(PUMP_COLUMNS)
             .eq('id', pumpId)
@@ -81,12 +88,6 @@ module.exports = async (req, res) => {
         buyer.phone = indianMobile(body?.phone) || buyer.phone;
         if (!buyer.phone) {
             send(res, 400, { ok: false, reason: 'phone_required' });
-            return;
-        }
-
-        const admin = adminClient();
-        if (!admin) {
-            send(res, 503, { ok: false, reason: 'payments_offline' });
             return;
         }
 

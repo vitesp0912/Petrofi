@@ -73,7 +73,17 @@ function localApiMiddleware(req, res, next) {
     const isWebhook = pathnameOf(req) === '/api/payment-webhook';
     const needsBody = !isWebhook && (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH');
     const task = needsBody ? readJsonBody(req).then(run) : run();
-    task.catch(next);
+    task.catch((err) => {
+        console.error('[api]', pathnameOf(req), err && err.message);
+        if (res.headersSent) {
+            next(err);
+            return;
+        }
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store');
+        res.end(JSON.stringify({ ok: false, reason: 'load_failed' }));
+    });
 }
 
 module.exports = { localApiMiddleware };
