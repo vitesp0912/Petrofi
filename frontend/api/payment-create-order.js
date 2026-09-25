@@ -4,7 +4,7 @@ const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = re
 const { buyerFrom, cashfreeCustomer, normalizeGstin, indianMobile } = require('../server/buyer');
 const { savePaymentOrder } = require('../server/save-payment-order');
 
-const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, address, city, state, pincode, subscription_end_date';
+const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, address, city, state, pincode';
 const RATE_LIMIT_MS = 20 * 1000;
 
 module.exports = async (req, res) => {

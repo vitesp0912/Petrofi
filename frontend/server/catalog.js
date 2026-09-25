@@ -110,22 +110,7 @@ async function quoteById(planId) {
     return quote;
 }
 
-// pumps.billing_cycle only allows monthly | quarterly | yearly.
-function billingCycleForMonths(months) {
-    const value = Number(months);
-    if (value <= 1) return 'monthly';
-    if (value <= 3) return 'quarterly';
-    return 'yearly';
-}
-
-// pumps.subscription_plan only allows basic | premium | enterprise.
-function pumpPlanForCheckout() {
-    return 'premium';
-}
-
 module.exports = {
     listQuotes,
     quoteById,
-    billingCycleForMonths,
-    pumpPlanForCheckout,
 };
