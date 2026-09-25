@@ -1,7 +1,7 @@
 const { send, requireUser, isUuid, adminClient } = require('../server/http');
 
 const PUMP_COLUMNS =
-    'id, pump_code, name, city, state, owner_name, phone, email, registration_status, is_active';
+    'id, pump_code, name, city, state, address, pincode, owner_name, phone, email, registration_status, is_active';
 const SUB_COLUMNS = 'id, plan_id, status, start_date, end_date, created_at';
 
 function emptyPayload(profile) {
@@ -20,6 +20,8 @@ function mapPump(row) {
         name: row.name || null,
         city: row.city || null,
         state: row.state || null,
+        address: row.address || null,
+        pincode: row.pincode || null,
         ownerName: row.owner_name || null,
         phone: row.phone || null,
         email: row.email || null,

@@ -114,6 +114,7 @@ const ProfilePanel = () => {
                             <FieldRow label="Name" value={pump.name} />
                             <FieldRow label="Code" value={pump.code} />
                             <FieldRow label="Owner" value={pump.ownerName} />
+                            <FieldRow label="Address" value={pump.address} />
                             <FieldRow label="City" value={location} />
                             <FieldRow label="Phone" value={pump.phone} />
                             <FieldRow label="Email" value={pump.email} />

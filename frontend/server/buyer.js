@@ -20,7 +20,7 @@ function normalizeGstin(value) {
 
 function buyerFrom(user, profile, pump) {
     const name = String(profile?.name || pump?.owner_name || pump?.name || '').trim().slice(0, 80);
-    const email = String(pump?.email || user?.email || '').trim().toLowerCase().slice(0, 120);
+    const email = String(user?.email || pump?.email || '').trim().toLowerCase().slice(0, 120);
     const phone = indianMobile(pump?.phone || user?.phone || '');
     return {
         name: name || 'PetroFI customer',
@@ -34,7 +34,7 @@ function buyerFrom(user, profile, pump) {
 function cashfreeCustomer(userId, buyer) {
     const customer = {
         customer_id: `u${String(userId || '').replace(/-/g, '')}`.slice(0, 50),
-        customer_name: buyer.name,
+        customer_name: String(buyer.name || 'Customer').slice(0, 80),
         customer_phone: buyer.phone,
     };
     if (buyer.email) customer.customer_email = buyer.email;

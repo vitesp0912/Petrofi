@@ -59,7 +59,7 @@ function trialCopy(subscription) {
 }
 
 const PlansPanel = () => {
-    const { subscription } = useOutletContext();
+    const { user, profile, pump, subscription } = useOutletContext();
     const trial = trialCopy(subscription);
     const [quotes, setQuotes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -86,6 +86,13 @@ const PlansPanel = () => {
     }, []);
 
     const gstLabel = quotes[0] ? `+${quotes[0].gstPct}% GST` : null;
+    const billing = {
+        name: profile?.name || user?.email || '',
+        pumpName: pump?.name || '',
+        email: user?.email || pump?.email || '',
+        phone: pump?.phone || user?.phone || '',
+        address: [pump?.address, pump?.city, pump?.state, pump?.pincode].filter(Boolean).join(', '),
+    };
 
     const handleConfirmPay = async () => {
         if (!selected || paying) return;
@@ -309,6 +316,7 @@ const PlansPanel = () => {
             <ConfirmPayDialog
                 open={Boolean(selected)}
                 plan={selected}
+                billing={billing}
                 paying={paying}
                 error={payError}
                 onOpenChange={(next) => {

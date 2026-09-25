@@ -9,7 +9,25 @@ import {
 } from '../ui/dialog';
 import { formatMoney } from '../../lib/subscription';
 
-export function ConfirmPayDialog({ open, plan, paying, error, onOpenChange, onConfirm }) {
+function Detail({ label, value }) {
+    if (!value) return null;
+    return (
+        <div className="flex items-start justify-between gap-4 py-2 border-b border-slate-100 last:border-b-0">
+            <dt className="text-slate-500 shrink-0">{label}</dt>
+            <dd className="font-semibold text-pf-navy text-right break-words">{value}</dd>
+        </div>
+    );
+}
+
+function displayPhone(phone) {
+    const digits = String(phone || '').replace(/\D/g, '');
+    let ten = digits;
+    if (ten.startsWith('91') && ten.length === 12) ten = ten.slice(2);
+    if (ten.length === 10) return `+91 ${ten}`;
+    return phone || '';
+}
+
+export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenChange, onConfirm }) {
     return (
         <Dialog open={open} onOpenChange={(next) => { if (!paying) onOpenChange(next); }}>
             <DialogContent className="sm:max-w-md rounded-2xl" data-testid="pay-confirm-dialog">
@@ -17,21 +35,30 @@ export function ConfirmPayDialog({ open, plan, paying, error, onOpenChange, onCo
                     <DialogTitle className="font-outfit text-pf-navy">Confirm payment</DialogTitle>
                     <DialogDescription className="font-jakarta text-slate-500">
                         {plan
-                            ? `Continue with ${plan.name}. You will be taken to a secure payment page.`
+                            ? `Continue with ${plan.name}. Check these details, then pay.`
                             : 'Select a plan to continue.'}
                     </DialogDescription>
                 </DialogHeader>
                 {plan ? (
-                    <dl className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-jakarta">
-                        <div className="flex justify-between gap-4">
-                            <dt className="text-slate-500">Plan</dt>
-                            <dd className="font-semibold text-pf-navy">{plan.name}</dd>
-                        </div>
-                        <div className="mt-2 flex justify-between gap-4">
-                            <dt className="text-slate-500">Amount</dt>
-                            <dd className="font-semibold text-pf-navy">{formatMoney(plan.total, plan.currency)}</dd>
-                        </div>
-                    </dl>
+                    <div className="space-y-3">
+                        <dl className="rounded-xl bg-slate-50 px-4 py-2 text-sm font-jakarta">
+                            <Detail label="Name" value={billing?.name} />
+                            <Detail label="Pump" value={billing?.pumpName} />
+                            <Detail label="Email" value={billing?.email} />
+                            <Detail label="Mobile" value={displayPhone(billing?.phone)} />
+                            <Detail label="Address" value={billing?.address} />
+                        </dl>
+                        <dl className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-jakarta">
+                            <div className="flex justify-between gap-4">
+                                <dt className="text-slate-500">Plan</dt>
+                                <dd className="font-semibold text-pf-navy">{plan.name}</dd>
+                            </div>
+                            <div className="mt-2 flex justify-between gap-4">
+                                <dt className="text-slate-500">Amount</dt>
+                                <dd className="font-semibold text-pf-navy">{formatMoney(plan.total, plan.currency)}</dd>
+                            </div>
+                        </dl>
+                    </div>
                 ) : null}
                 {error ? <p className="text-sm text-rose-600 font-jakarta">{error}</p> : null}
                 <DialogFooter className="gap-2 sm:gap-2">
