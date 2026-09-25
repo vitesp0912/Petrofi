@@ -72,7 +72,7 @@ const PaymentsPanel = () => {
         };
     }, [returnOrderId]);
 
-    const quotes = catalog?.quotes || [];
+    const quotes = useMemo(() => catalog?.quotes || [], [catalog]);
     const orders = catalog?.orders || [];
     const ordersFailed = Boolean(catalogError);
     const quote = useMemo(
