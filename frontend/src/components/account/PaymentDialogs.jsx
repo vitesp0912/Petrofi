@@ -93,7 +93,6 @@ function resultCopy(status, planName) {
             text: plan
                 ? `Your transaction is complete. The ${plan} plan is now active for this pump.`
                 : 'Your transaction is complete. The selected plan is now active for this pump.',
-            hint: 'You can download your receipt anytime from the Transactions page.',
             action: 'Go to Dashboard',
             tone: 'success',
         };
@@ -102,7 +101,6 @@ function resultCopy(status, planName) {
         return {
             title: 'Payment is processing',
             text: 'We are waiting for final confirmation from your bank or UPI app. This usually takes 2–3 minutes.',
-            hint: 'You can safely close this window. We will automatically update your account once the bank clears it.',
             action: 'Return to Dashboard',
             tone: 'pending',
         };
@@ -110,7 +108,6 @@ function resultCopy(status, planName) {
     return {
         title: 'Payment failed',
         text: 'Your transaction could not be completed. No money was deducted from your account.',
-        hint: 'This usually happens due to bank downtime or network issues. You can safely try again.',
         action: 'Try Payment Again',
         tone: 'failed',
     };
@@ -172,7 +169,6 @@ export function PaymentResultDialog({ status, planName, onClose }) {
                         {copy.text}
                     </DialogDescription>
                 </DialogHeader>
-                <p className="text-sm font-jakarta leading-relaxed text-slate-500">{copy.hint}</p>
                 <DialogFooter className="sm:justify-center">
                     <button
                         type="button"
