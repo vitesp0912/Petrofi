@@ -143,23 +143,32 @@ module.exports = async (req, res) => {
         if (buyer.state) billing.state = buyer.state.slice(0, 50);
         if (buyer.pincode && buyer.pincode.length === 6) billing.pincode = buyer.pincode;
 
+        const cartLine = [
+            buyer.name,
+            [buyer.pumpName, buyer.pumpCode].filter(Boolean).join(' · '),
+            buyer.email,
+            [buyer.address, buyer.city, buyer.state, buyer.pincode].filter(Boolean).join(', '),
+        ]
+            .filter(Boolean)
+            .join(' · ')
+            .slice(0, 250);
+
         const cart = {
             cart_name: quote.name,
+            customer_note: cartLine,
             cart_items: [
                 {
                     item_id: String(quote.id).slice(0, 40),
-                    item_name: quote.name,
-                    item_description: [buyer.pumpName, buyer.pumpCode].filter(Boolean).join(' · ').slice(0, 120) || quote.period || quote.name,
+                    item_name: (buyer.pumpName ? `${quote.name} · ${buyer.pumpName}` : quote.name).slice(0, 100),
+                    item_description: cartLine || quote.period || quote.name,
                     item_original_unit_price: chargeAmount,
                     item_discounted_unit_price: chargeAmount,
                     item_currency: saved?.currency || quote.currency || 'INR',
                     item_quantity: 1,
                 },
             ],
+            customer_billing_address: billing,
         };
-        if (billing.address_1 || billing.city) {
-            cart.customer_billing_address = billing;
-        }
 
         const orderPayload = {
             orderId,
