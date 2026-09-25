@@ -62,7 +62,7 @@ function createOrderId(planId) {
     return `pf_${plan}_${stamp}_${rand}`.slice(0, 45);
 }
 
-async function createCashfreeOrder({ orderId, amount, customer, returnUrl, notifyUrl, tags, currency }) {
+async function createCashfreeOrder({ orderId, amount, customer, returnUrl, notifyUrl, tags, currency, cart, note }) {
     const orderMeta = { return_url: returnUrl };
     if (notifyUrl) orderMeta.notify_url = notifyUrl;
     const body = {
@@ -71,9 +71,10 @@ async function createCashfreeOrder({ orderId, amount, customer, returnUrl, notif
         order_currency: currency || 'INR',
         order_meta: orderMeta,
         customer_details: customer,
-        order_note: 'PetroFI subscription',
+        order_note: note || 'PetroFI subscription',
     };
     if (tags && Object.keys(tags).length) body.order_tags = tags;
+    if (cart) body.cart_details = cart;
     return cashfreeRequest('/orders', {
         method: 'POST',
         body,

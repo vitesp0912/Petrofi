@@ -4,7 +4,7 @@ const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = re
 const { buyerFrom, cashfreeCustomer, normalizeGstin, indianMobile } = require('../server/buyer');
 const { savePaymentOrder } = require('../server/save-payment-order');
 
-const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, subscription_end_date';
+const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, address, city, state, pincode, subscription_end_date';
 const RATE_LIMIT_MS = 20 * 1000;
 
 module.exports = async (req, res) => {
@@ -134,25 +134,59 @@ module.exports = async (req, res) => {
 
         const chargeAmount = Number(saved?.amount_total != null ? saved.amount_total : quote.total);
 
+        const billing = {
+            full_name: buyer.name,
+            country: 'India',
+        };
+        if (buyer.address) billing.address_1 = buyer.address.slice(0, 120);
+        if (buyer.city) billing.city = buyer.city.slice(0, 50);
+        if (buyer.state) billing.state = buyer.state.slice(0, 50);
+        if (buyer.pincode && buyer.pincode.length === 6) billing.pincode = buyer.pincode;
+
+        const cart = {
+            cart_name: quote.name,
+            cart_items: [
+                {
+                    item_id: String(quote.id).slice(0, 40),
+                    item_name: quote.name,
+                    item_description: [buyer.pumpName, buyer.pumpCode].filter(Boolean).join(' · ').slice(0, 120) || quote.period || quote.name,
+                    item_original_unit_price: chargeAmount,
+                    item_discounted_unit_price: chargeAmount,
+                    item_currency: saved?.currency || quote.currency || 'INR',
+                    item_quantity: 1,
+                },
+            ],
+        };
+        if (billing.address_1 || billing.city) {
+            cart.customer_billing_address = billing;
+        }
+
+        const orderPayload = {
+            orderId,
+            amount: chargeAmount,
+            currency: saved?.currency || quote.currency,
+            customer: cashfreeCustomer(auth.user.id, buyer),
+            returnUrl,
+            notifyUrl,
+            note: `${quote.name}${buyer.pumpName ? ` · ${buyer.pumpName}` : ''}`.slice(0, 120),
+            tags: {
+                plan_id: quote.id,
+                pump_id: String(pumpId).replace(/-/g, ''),
+                ...(gstin ? { gstin } : {}),
+            },
+        };
+
         let cfOrder;
         try {
-            cfOrder = await createCashfreeOrder({
-                orderId,
-                amount: chargeAmount,
-                currency: saved?.currency || quote.currency,
-                customer: cashfreeCustomer(auth.user.id, buyer),
-                returnUrl,
-                notifyUrl,
-                tags: {
-                    plan_id: quote.id,
-                    pump_id: String(pumpId).replace(/-/g, ''),
-                    ...(gstin ? { gstin } : {}),
-                },
-            });
-        } catch (err) {
-            await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
-            send(res, 502, { ok: false, reason: err.reason || 'cashfree_error' });
-            return;
+            cfOrder = await createCashfreeOrder({ ...orderPayload, cart });
+        } catch {
+            try {
+                cfOrder = await createCashfreeOrder(orderPayload);
+            } catch (err) {
+                await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
+                send(res, 502, { ok: false, reason: err.reason || 'cashfree_error' });
+                return;
+            }
         }
 
         const sessionId = cfOrder?.payment_session_id;

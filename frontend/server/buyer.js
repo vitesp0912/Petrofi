@@ -28,6 +28,10 @@ function buyerFrom(user, profile, pump) {
         phone,
         pumpName: pump?.name || '',
         pumpCode: pump?.pump_code || '',
+        address: String(pump?.address || '').trim(),
+        city: String(pump?.city || '').trim(),
+        state: String(pump?.state || pump?.pump_state || '').trim(),
+        pincode: String(pump?.pincode || '').replace(/\D/g, '').slice(0, 6),
     };
 }
 
