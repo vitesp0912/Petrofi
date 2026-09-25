@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Dialog,
     DialogContent,
@@ -29,7 +30,7 @@ function displayPhone(phone) {
 
 export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenChange, onConfirm }) {
     return (
-        <Dialog open={open} onOpenChange={(next) => { if (!paying) onOpenChange(next); }}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md rounded-2xl" data-testid="pay-confirm-dialog">
                 <DialogHeader>
                     <DialogTitle className="font-outfit text-pf-navy">Confirm payment</DialogTitle>
@@ -64,7 +65,6 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
                 <DialogFooter className="gap-2 sm:gap-2">
                     <button
                         type="button"
-                        disabled={paying}
                         onClick={() => onOpenChange(false)}
                         className="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-pf-navy font-jakarta hover:bg-slate-50 disabled:opacity-50"
                     >
@@ -89,37 +89,95 @@ function resultCopy(status) {
     if (status === 'paid') {
         return {
             title: 'Payment successful',
-            text: 'Your payment went through. This pump is now on the selected plan.',
+            text: 'We received your payment. This pump is now on the selected plan.',
+            hint: 'A record is already on the Transactions page.',
+            action: 'Done',
+            tone: 'success',
         };
     }
     if (status === 'pending') {
         return {
-            title: 'Payment pending',
-            text: 'We have not confirmed this payment yet. It can take a few minutes. You can check Transactions shortly.',
+            title: 'Confirming your payment',
+            text: 'The bank or UPI app is still finishing this. It usually takes a few minutes.',
+            hint: 'Nothing extra will be charged while we wait. Check Transactions shortly.',
+            action: 'Got it',
+            tone: 'pending',
         };
     }
     return {
-        title: 'Payment failed',
-        text: 'This payment did not complete. No amount was captured. You can try again from Subscriptions.',
+        title: 'Payment did not go through',
+        text: 'This payment did not complete. No amount was taken from your account.',
+        hint: 'You can try the same plan again from Subscriptions.',
+        action: 'Try again',
+        tone: 'failed',
     };
 }
 
+function ResultMark({ tone }) {
+    if (tone === 'success') {
+        return (
+            <div className="pf-result-icon mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-8 ring-emerald-50/80">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                        className="pf-result-check"
+                        d="M6.5 12.5 10 16l7.5-8"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
+            </div>
+        );
+    }
+    if (tone === 'pending') {
+        return (
+            <div className="pf-result-icon relative mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 text-amber-600 ring-8 ring-amber-50/80">
+                <span className="pf-result-pending-ring pointer-events-none absolute inset-0 rounded-full border-2 border-amber-200" />
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="8.25" stroke="currentColor" strokeWidth="2" />
+                    <path d="M12 8.5v4l2.5 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </div>
+        );
+    }
+    return (
+        <div className="pf-result-icon mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose-50 text-rose-600 ring-8 ring-rose-50/80">
+            <svg className="pf-result-fail" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+            </svg>
+        </div>
+    );
+}
+
 export function PaymentResultDialog({ status, onClose }) {
+    const navigate = useNavigate();
     const copy = resultCopy(status);
+    const handleAction = () => {
+        onClose();
+        if (copy.tone === 'failed') navigate('/subscription/plans');
+    };
+
     return (
         <Dialog open={Boolean(status)} onOpenChange={(next) => { if (!next) onClose(); }}>
-            <DialogContent className="sm:max-w-md rounded-2xl" data-testid="pay-result-dialog">
-                <DialogHeader>
-                    <DialogTitle className="font-outfit text-pf-navy">{copy.title}</DialogTitle>
-                    <DialogDescription className="font-jakarta text-slate-500">{copy.text}</DialogDescription>
+            <DialogContent className="sm:max-w-[22rem] rounded-2xl px-6 py-7 text-center" data-testid="pay-result-dialog">
+                <DialogHeader className="items-center space-y-3 sm:text-center">
+                    <ResultMark tone={copy.tone} />
+                    <DialogTitle className="font-outfit text-xl text-pf-navy pt-1">{copy.title}</DialogTitle>
+                    <DialogDescription className="font-jakarta text-[15px] leading-relaxed text-slate-600">
+                        {copy.text}
+                    </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
+                <p className="text-sm font-jakarta leading-relaxed text-slate-500">{copy.hint}</p>
+                <DialogFooter className="sm:justify-center">
                     <button
                         type="button"
-                        onClick={onClose}
-                        className="inline-flex items-center justify-center rounded-full bg-pf-navy text-white px-5 py-2.5 text-sm font-bold font-jakarta"
+                        onClick={handleAction}
+                        className={`inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 text-sm font-bold font-jakarta text-white ${
+                            copy.tone === 'failed' ? 'bg-pf-navy hover:bg-pf-navy/90' : copy.tone === 'success' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-pf-navy hover:bg-pf-navy/90'
+                        }`}
                     >
-                        OK
+                        {copy.action}
                     </button>
                 </DialogFooter>
             </DialogContent>

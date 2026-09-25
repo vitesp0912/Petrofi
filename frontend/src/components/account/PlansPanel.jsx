@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Check, FileText, Phone, Shield } from 'lucide-react';
 import { daysUntil, formatDateLong, formatMoney, remainingLabel } from '../../lib/subscription';
@@ -67,6 +67,16 @@ const PlansPanel = () => {
     const [selected, setSelected] = useState(null);
     const [paying, setPaying] = useState(false);
     const [payError, setPayError] = useState('');
+    const payLock = useRef(0);
+
+    useEffect(() => {
+        const unlockPay = () => {
+            payLock.current += 1;
+            setPaying(false);
+        };
+        window.addEventListener('pageshow', unlockPay);
+        return () => window.removeEventListener('pageshow', unlockPay);
+    }, []);
 
     useEffect(() => {
         let cancelled = false;
@@ -96,9 +106,11 @@ const PlansPanel = () => {
 
     const handleConfirmPay = async () => {
         if (!selected || paying) return;
+        const lock = ++payLock.current;
         setPaying(true);
         setPayError('');
         const created = await createPaymentOrder({ planId: selected.id });
+        if (lock !== payLock.current) return;
         if (!created.ok) {
             setPaying(false);
             setPayError(paymentErrorText(created.reason));
@@ -107,11 +119,13 @@ const PlansPanel = () => {
         try {
             await startHostedCheckout(created);
         } catch {
+            if (lock !== payLock.current) return;
             if (created.orderId) {
                 await savePaymentStatus(created.orderId, 'user_dropped');
             }
             setPayError('The payment page could not open. Try again.');
-            setPaying(false);
+        } finally {
+            if (lock === payLock.current) setPaying(false);
         }
     };
 
@@ -320,7 +334,9 @@ const PlansPanel = () => {
                 paying={paying}
                 error={payError}
                 onOpenChange={(next) => {
-                    if (!next && !paying) {
+                    if (!next) {
+                        payLock.current += 1;
+                        setPaying(false);
                         setSelected(null);
                         setPayError('');
                     }
