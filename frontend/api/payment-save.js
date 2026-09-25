@@ -1,5 +1,5 @@
-const { send, requireUser, adminClient, readJsonBody } = require('./lib/http');
-const { savePaymentOrder } = require('./lib/save-payment-order');
+const { send, requireUser, adminClient, readJsonBody } = require('../server/http');
+const { savePaymentOrder } = require('../server/save-payment-order');
 
 const CLIENT_STATUSES = new Set(['failed', 'expired', 'user_dropped']);
 const ORDER_ID_RE = /^pf_[a-z0-9_]+$/i;

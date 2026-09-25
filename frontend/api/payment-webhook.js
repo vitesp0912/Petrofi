@@ -1,7 +1,7 @@
-const { send, adminClient } = require('./lib/http');
-const { paymentsReady, verifyWebhookSignature, orderIsPaid, amountsMatch, getCashfreeOrder, getSuccessfulPaymentId } = require('./lib/cashfree');
-const { fulfillPaidOrder } = require('./lib/fulfill');
-const { savePaymentOrder } = require('./lib/save-payment-order');
+const { send, adminClient } = require('../server/http');
+const { paymentsReady, verifyWebhookSignature, orderIsPaid, amountsMatch, getCashfreeOrder, getSuccessfulPaymentId } = require('../server/cashfree');
+const { fulfillPaidOrder } = require('../server/fulfill');
+const { savePaymentOrder } = require('../server/save-payment-order');
 
 module.exports.config = {
     api: { bodyParser: false },

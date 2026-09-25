@@ -1,7 +1,7 @@
-const { send, requireUser, isUuid, adminClient } = require('./lib/http');
-const { listQuotes } = require('./lib/catalog');
-const { paymentsReady } = require('./lib/cashfree');
-const { buyerFrom, indianMobile } = require('./lib/buyer');
+const { send, requireUser, isUuid, adminClient } = require('../server/http');
+const { listQuotes } = require('../server/catalog');
+const { paymentsReady } = require('../server/cashfree');
+const { buyerFrom, indianMobile } = require('../server/buyer');
 
 const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email';
 const ORDER_COLUMNS = 'order_id, amount_total, currency, status, payment_method, paid_at, created_at, plan_id';

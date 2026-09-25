@@ -1,4 +1,4 @@
-const { send, requireUser, isUuid, adminClient } = require('./lib/http');
+const { send, requireUser, isUuid, adminClient } = require('../server/http');
 
 const PUMP_COLUMNS =
     'id, pump_code, name, city, state, owner_name, phone, email, registration_status, is_active';

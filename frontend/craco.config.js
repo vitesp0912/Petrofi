@@ -106,7 +106,7 @@ if (isDevServer) {
       ? previousDevServer(devServerConfig)
       : { ...devServerConfig, ...(previousDevServer || {}) };
     const originalSetupMiddlewares = resolved.setupMiddlewares;
-    const { localApiMiddleware } = require("./api/dev-middleware");
+    const { localApiMiddleware } = require("./server/dev-middleware");
 
     resolved.setupMiddlewares = (middlewares, devServer) => {
       if (originalSetupMiddlewares) {

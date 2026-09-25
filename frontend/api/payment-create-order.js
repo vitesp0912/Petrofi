@@ -1,8 +1,8 @@
-const { send, requireUser, isUuid, publicSiteUrl, readJsonBody, adminClient } = require('./lib/http');
-const { listQuotes, quoteById } = require('./lib/catalog');
-const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = require('./lib/cashfree');
-const { buyerFrom, cashfreeCustomer, normalizeGstin, indianMobile } = require('./lib/buyer');
-const { savePaymentOrder } = require('./lib/save-payment-order');
+const { send, requireUser, isUuid, publicSiteUrl, readJsonBody, adminClient } = require('../server/http');
+const { listQuotes, quoteById } = require('../server/catalog');
+const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = require('../server/cashfree');
+const { buyerFrom, cashfreeCustomer, normalizeGstin, indianMobile } = require('../server/buyer');
+const { savePaymentOrder } = require('../server/save-payment-order');
 
 const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, subscription_end_date';
 const RATE_LIMIT_MS = 20 * 1000;

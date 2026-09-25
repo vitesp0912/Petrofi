@@ -1,7 +1,7 @@
-const { send, requireUser, adminClient } = require('./lib/http');
-const { listQuotes } = require('./lib/catalog');
-const { paymentsReady, getCashfreeOrder, getSuccessfulPaymentId, orderIsPaid, amountsMatch } = require('./lib/cashfree');
-const { fulfillPaidOrder } = require('./lib/fulfill');
+const { send, requireUser, adminClient } = require('../server/http');
+const { listQuotes } = require('../server/catalog');
+const { paymentsReady, getCashfreeOrder, getSuccessfulPaymentId, orderIsPaid, amountsMatch } = require('../server/cashfree');
+const { fulfillPaidOrder } = require('../server/fulfill');
 
 module.exports = async (req, res) => {
     if (req.method !== 'GET') {

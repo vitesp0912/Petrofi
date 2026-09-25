@@ -1,14 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 
+const apiDir = path.join(__dirname, '..', 'api');
+
 const HANDLERS = {
-    '/api/subscription': path.join(__dirname, 'subscription.js'),
-    '/api/send-demo-mail': path.join(__dirname, 'send-demo-mail.js'),
-    '/api/payment-catalog': path.join(__dirname, 'payment-catalog.js'),
-    '/api/payment-create-order': path.join(__dirname, 'payment-create-order.js'),
-    '/api/payment-status': path.join(__dirname, 'payment-status.js'),
-    '/api/payment-save': path.join(__dirname, 'payment-save.js'),
-    '/api/payment-webhook': path.join(__dirname, 'payment-webhook.js'),
+    '/api/subscription': path.join(apiDir, 'subscription.js'),
+    '/api/send-demo-mail': path.join(apiDir, 'send-demo-mail.js'),
+    '/api/payment-catalog': path.join(apiDir, 'payment-catalog.js'),
+    '/api/payment-create-order': path.join(apiDir, 'payment-create-order.js'),
+    '/api/payment-status': path.join(apiDir, 'payment-status.js'),
+    '/api/payment-save': path.join(apiDir, 'payment-save.js'),
+    '/api/payment-webhook': path.join(apiDir, 'payment-webhook.js'),
 };
 
 function pathnameOf(req) {
@@ -54,10 +56,13 @@ function localApiMiddleware(req, res, next) {
     }
 
     const run = () => {
-        const apiRoot = path.resolve(__dirname).replace(/\\/g, '/').toLowerCase();
+        const roots = [path.resolve(apiDir), path.resolve(__dirname)].map((root) =>
+            root.replace(/\\/g, '/').toLowerCase()
+        );
         Object.keys(require.cache).forEach((id) => {
             const normalized = String(id).replace(/\\/g, '/').toLowerCase();
-            if (normalized.startsWith(apiRoot) && !normalized.includes('/node_modules/')) {
+            if (normalized.includes('/node_modules/')) return;
+            if (roots.some((root) => normalized.startsWith(root))) {
                 delete require.cache[id];
             }
         });
