@@ -85,30 +85,33 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
     );
 }
 
-function resultCopy(status) {
+function resultCopy(status, planName) {
+    const plan = String(planName || '').trim();
     if (status === 'paid') {
         return {
             title: 'Payment successful',
-            text: 'We received your payment. This pump is now on the selected plan.',
-            hint: 'A record is already on the Transactions page.',
-            action: 'Done',
+            text: plan
+                ? `Your transaction is complete. The ${plan} plan is now active for this pump.`
+                : 'Your transaction is complete. The selected plan is now active for this pump.',
+            hint: 'You can download your receipt anytime from the Transactions page.',
+            action: 'Go to Dashboard',
             tone: 'success',
         };
     }
     if (status === 'pending') {
         return {
-            title: 'Confirming your payment',
-            text: 'The bank or UPI app is still finishing this. It usually takes a few minutes.',
-            hint: 'Nothing extra will be charged while we wait. Check Transactions shortly.',
-            action: 'Got it',
+            title: 'Payment is processing',
+            text: 'We are waiting for final confirmation from your bank or UPI app. This usually takes 2–3 minutes.',
+            hint: 'You can safely close this window. We will automatically update your account once the bank clears it.',
+            action: 'Return to Dashboard',
             tone: 'pending',
         };
     }
     return {
-        title: 'Payment did not go through',
-        text: 'This payment did not complete. No amount was taken from your account.',
-        hint: 'You can try the same plan again from Subscriptions.',
-        action: 'Try again',
+        title: 'Payment failed',
+        text: 'Your transaction could not be completed. No money was deducted from your account.',
+        hint: 'This usually happens due to bank downtime or network issues. You can safely try again.',
+        action: 'Try Payment Again',
         tone: 'failed',
     };
 }
@@ -150,12 +153,13 @@ function ResultMark({ tone }) {
     );
 }
 
-export function PaymentResultDialog({ status, onClose }) {
+export function PaymentResultDialog({ status, planName, onClose }) {
     const navigate = useNavigate();
-    const copy = resultCopy(status);
+    const copy = resultCopy(status, planName);
     const handleAction = () => {
         onClose();
         if (copy.tone === 'failed') navigate('/subscription/plans');
+        else navigate('/subscription');
     };
 
     return (

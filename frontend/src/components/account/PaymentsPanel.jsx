@@ -15,6 +15,7 @@ const PaymentsPanel = () => {
     const [orders, setOrders] = useState([]);
     const [loadError, setLoadError] = useState('');
     const [resultStatus, setResultStatus] = useState('');
+    const [resultPlanName, setResultPlanName] = useState('');
 
     useEffect(() => {
         let cancelled = false;
@@ -35,13 +36,16 @@ const PaymentsPanel = () => {
         if (!returnOrderId || handledReturn.current === returnOrderId) return undefined;
         handledReturn.current = returnOrderId;
         let cancelled = false;
-        fetchPaymentStatus(returnOrderId).then((result) => {
+        fetchPaymentStatus(returnOrderId).then(async (result) => {
             if (cancelled) return;
-            setResultStatus(paymentResultKind(result.ok ? result.status : 'failed'));
-            fetchPaymentCatalog('orders').then((catalogResult) => {
-                if (cancelled || !catalogResult.ok) return;
-                setOrders(catalogResult.orders || []);
-            });
+            const kind = paymentResultKind(result.ok ? result.status : 'failed');
+            const catalogResult = await fetchPaymentCatalog('orders');
+            if (cancelled) return;
+            const nextOrders = catalogResult.ok ? catalogResult.orders || [] : [];
+            if (catalogResult.ok) setOrders(nextOrders);
+            const matched = nextOrders.find((row) => row.orderId === returnOrderId);
+            setResultPlanName(matched?.planName || '');
+            setResultStatus(kind);
             navigate('/subscription/payments', { replace: true });
         });
         return () => {
@@ -92,7 +96,14 @@ const PaymentsPanel = () => {
                 )}
             </section>
 
-            <PaymentResultDialog status={resultStatus} onClose={() => setResultStatus('')} />
+            <PaymentResultDialog
+                status={resultStatus}
+                planName={resultPlanName}
+                onClose={() => {
+                    setResultStatus('');
+                    setResultPlanName('');
+                }}
+            />
         </div>
     );
 };
