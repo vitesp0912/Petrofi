@@ -29,8 +29,7 @@ export async function fetchPumpSubscription() {
             return { ok: false, reason: body?.reason || 'load_failed' };
         }
         return body;
-    } catch (err) {
-        console.error('[PetroFI subscription]', err);
+    } catch {
         return { ok: false, reason: 'load_failed' };
     }
 }

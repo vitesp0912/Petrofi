@@ -63,7 +63,6 @@ async function loadActivePaidPlans() {
         .order('sort_order', { ascending: true });
 
     if (error) {
-        console.error('[plans] catalog', error.code, error.message);
         const err = new Error('load_failed');
         err.reason = 'load_failed';
         throw err;
@@ -98,7 +97,6 @@ async function quoteById(planId) {
         .maybeSingle();
 
     if (error) {
-        console.error('[plans] quote', error.code, error.message);
         const err = new Error('load_failed');
         err.reason = 'load_failed';
         throw err;

@@ -108,17 +108,6 @@ function cooldownError(seconds) {
     return `Please wait ${seconds} seconds before requesting another OTP.`;
 }
 
-function logAuthError(step, error, extra = {}) {
-    if (process.env.NODE_ENV !== 'development') return;
-    console.error('[PetroFI login]', {
-        step,
-        message: error?.message ?? null,
-        status: error?.status ?? null,
-        code: error?.code ?? null,
-        ...extra,
-    });
-}
-
 function mapSendError(error, kind) {
     const message = String(error?.message || '').toLowerCase();
     const code = String(error?.code || '').toLowerCase();
@@ -157,7 +146,6 @@ export async function sendLoginOtp(parsed) {
             phone_number: parsed.phone10,
         });
         if (error) {
-            logAuthError('validate_phone_for_login', error, { kind: parsed.kind });
             return { ok: false, error: 'We could not check this account right now. Please try again.' };
         }
         const check = readAccountCheck(data);
@@ -175,7 +163,6 @@ export async function sendLoginOtp(parsed) {
             options: { shouldCreateUser: false },
         });
         if (otpError) {
-            logAuthError('signInWithOtp', otpError, { kind: parsed.kind });
             return { ok: false, error: mapSendError(otpError, parsed.kind) };
         }
     } else {
@@ -183,7 +170,6 @@ export async function sendLoginOtp(parsed) {
             p_email: parsed.email,
         });
         if (error) {
-            logAuthError('validate_email_for_login', error, { kind: parsed.kind });
             return { ok: false, error: 'We could not check this account right now. Please try again.' };
         }
         const check = readAccountCheck(data);
@@ -201,7 +187,6 @@ export async function sendLoginOtp(parsed) {
             options: { shouldCreateUser: false },
         });
         if (otpError) {
-            logAuthError('signInWithOtp', otpError, { kind: parsed.kind });
             return { ok: false, error: mapSendError(otpError, parsed.kind) };
         }
     }
@@ -240,7 +225,6 @@ export async function verifyLoginOtp(parsed, token) {
         });
 
     if (error) {
-        logAuthError('verifyOtp', error, { kind: parsed.kind });
         const message = String(error.message || '').toLowerCase();
         if (message.includes('expired')) {
             return { ok: false, error: 'That code has expired. Please request a new one.' };

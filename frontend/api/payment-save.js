@@ -67,7 +67,6 @@ module.exports = async (req, res) => {
             status: saved.status,
         });
     } catch (err) {
-        console.error('[payments] save', err.message);
         send(res, 500, { ok: false, reason: err.reason || 'save_failed' });
     }
 };

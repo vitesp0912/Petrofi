@@ -21,17 +21,36 @@ function money2(value) {
     return Math.round(n * 100) / 100;
 }
 
+function wholeDays(value) {
+    const days = Number(value);
+    if (!Number.isInteger(days) || days <= 0) return null;
+    return days;
+}
+
+async function durationForPlan(admin, planId) {
+    if (!isUuid(planId)) return null;
+    const { data, error } = await admin.from('plans').select('duration_days').eq('id', planId).maybeSingle();
+    if (error) return null;
+    return wholeDays(data?.duration_days);
+}
+
+async function storeDurationDays(admin, saved, fallbackPlanId) {
+    if (!saved?.order_id || wholeDays(saved.duration_days)) return saved;
+    const days = await durationForPlan(admin, saved.plan_id || fallbackPlanId);
+    if (!days) return saved;
+    const { error } = await admin.from('payment_orders').update({ duration_days: days }).eq('order_id', saved.order_id);
+    if (error) return saved;
+    return { ...saved, duration_days: days };
+}
+
 async function loadPlan(admin, planId) {
     const value = blankToNull(planId);
     if (!value) return null;
-    const query = admin.from('plans').select('id, code, price_total_inr, currency').eq('is_active', true).neq('code', 'trial');
+    const query = admin.from('plans').select('id, code, price_total_inr, currency, duration_days').eq('is_active', true).neq('code', 'trial');
     const { data, error } = isUuid(value)
         ? await query.eq('id', value).maybeSingle()
         : await query.eq('code', value).maybeSingle();
-    if (error) {
-        console.error('[payments] plan lookup', error.code, error.message);
-        return null;
-    }
+    if (error) return null;
     return data || null;
 }
 
@@ -83,7 +102,7 @@ async function savePaymentOrder(admin, input) {
     });
 
     if (input.status === 'created') {
-        if (!payload.p_user_id || !payload.p_pump_id || !payload.p_plan_id || payload.p_amount_total == null) {
+        if (!payload.p_user_id || !payload.p_pump_id || !payload.p_plan_id || payload.p_amount_total == null || !wholeDays(plan?.duration_days)) {
             const err = new Error('unknown_plan');
             err.reason = 'unknown_plan';
             throw err;
@@ -92,12 +111,12 @@ async function savePaymentOrder(admin, input) {
 
     const { data, error } = await admin.rpc('save_payment_order', payload);
     if (error) {
-        console.error('[payments] save_payment_order', error.code, error.message);
         const err = new Error('save_failed');
         err.reason = mapRpcError(error);
         throw err;
     }
-    return Array.isArray(data) ? data[0] : data;
+    const saved = Array.isArray(data) ? data[0] : data;
+    return storeDurationDays(admin, saved, plan?.id || input.planId);
 }
 
 module.exports = { savePaymentOrder };

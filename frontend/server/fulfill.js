@@ -26,7 +26,6 @@ async function fulfillPaidOrder(admin, row, extras = {}) {
         if (err.reason === 'already_paid') {
             return { ok: true, already: true };
         }
-        console.error('[payments] claim paid failed', err.reason || err.message);
         return { ok: false, reason: 'fulfill_failed' };
     }
 
