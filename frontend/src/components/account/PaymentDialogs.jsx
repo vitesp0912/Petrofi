@@ -91,8 +91,8 @@ function resultCopy(status, planName) {
         return {
             title: 'Payment successful',
             text: plan
-                ? `Your transaction is complete. The ${plan} plan is now active for this pump.`
-                : 'Your transaction is complete. The selected plan is now active for this pump.',
+                ? `Your transaction is complete. This payment for ${plan} is recorded.`
+                : 'Your transaction is complete. This payment is recorded.',
             action: 'Go to Dashboard',
             tone: 'success',
         };
