@@ -59,7 +59,10 @@ function userClient(token) {
 function adminClient() {
     const url = supabaseUrl();
     const key = serviceRoleKey();
-    if (!url || !key) return null;
+    if (!url || !key) {
+        console.error('[api] admin client unavailable', { hasUrl: Boolean(url), hasServiceRole: Boolean(key) });
+        return null;
+    }
     return createClient(url, key, {
         auth: {
             persistSession: false,

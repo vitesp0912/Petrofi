@@ -106,7 +106,10 @@ module.exports = async (req, res) => {
 
         const orderId = createOrderId(quote.id);
         const cfg = cashfreeConfig();
-        const site = publicSiteUrl();
+        let site = publicSiteUrl();
+        if (cfg.production && (!site.startsWith('https://') || /localhost|127\.0\.0\.1/i.test(site))) {
+            site = 'https://www.petrofi.in';
+        }
         const returnUrl = `${site}/subscription/payments?order_id={order_id}`;
         const notifyUrl = site.startsWith('https://') ? `${site}/api/payment-webhook` : '';
 
@@ -144,13 +147,17 @@ module.exports = async (req, res) => {
                 notifyUrl,
                 tags: {
                     plan_id: quote.id,
-                    gstin: gstin || '',
-                    pump_id: pumpId,
+                    pump_id: String(pumpId).replace(/-/g, ''),
+                    ...(gstin ? { gstin } : {}),
                 },
             });
         } catch (err) {
             await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
-            console.error('[payments] cashfree create failed');
+            console.error(
+                '[payments] cashfree create failed',
+                err.status || '',
+                err.data?.message || err.data?.code || err.reason || err.message
+            );
             send(res, 502, { ok: false, reason: err.reason || 'cashfree_error' });
             return;
         }
