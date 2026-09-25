@@ -76,7 +76,6 @@ async function planNameMap(planIds) {
     if (!admin) return {};
     const { data, error } = await admin.from('plans').select('id, name').in('id', ids);
     if (error) {
-        console.error('[api/subscription] plans lookup failed', error.code, error.message);
         return {};
     }
     return Object.fromEntries((data || []).map((row) => [row.id, { name: row.name }]));
@@ -105,7 +104,6 @@ module.exports = async (req, res) => {
             .maybeSingle();
 
         if (profileError) {
-            console.error('[api/subscription] profile failed', profileError.code, profileError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -127,13 +125,11 @@ module.exports = async (req, res) => {
         ]);
 
         if (pumpError) {
-            console.error('[api/subscription] pump failed', pumpError.code, pumpError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
 
         if (subError) {
-            console.error('[api/subscription] subscriptions failed', subError.code, subError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -151,8 +147,7 @@ module.exports = async (req, res) => {
             subscription: current ? mapSubscription(current, names[current.plan_id]) : null,
             history,
         });
-    } catch (err) {
-        console.error('[api/subscription]', err.message);
+    } catch {
         send(res, 500, { ok: false, reason: 'load_failed' });
     }
 };

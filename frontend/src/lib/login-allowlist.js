@@ -2,7 +2,7 @@ export const LOGIN_ALLOWLIST_MESSAGE =
     'PetroFI login is temporarily limited. Please contact support if you need access.';
 
 const ALLOWED_EMAIL = 'abhibhai131203@gmail.com';
-const ALLOWED_PHONE10 = '7398621812';
+const ALLOWED_PHONES = new Set(['7398621812', '8700117495']);
 
 export function phone10(value) {
     let digits = String(value || '').replace(/\D/g, '');
@@ -15,5 +15,5 @@ export function isLoginAllowed({ email, phone, phone10: phoneDigits } = {}) {
     const mail = String(email || '').trim().toLowerCase();
     if (mail && mail === ALLOWED_EMAIL) return true;
     const digits = phone10(phoneDigits || phone);
-    return Boolean(digits && digits === ALLOWED_PHONE10);
+    return Boolean(digits && ALLOWED_PHONES.has(digits));
 }

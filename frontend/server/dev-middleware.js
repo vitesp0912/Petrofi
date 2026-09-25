@@ -74,7 +74,6 @@ function localApiMiddleware(req, res, next) {
     const needsBody = !isWebhook && (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH');
     const task = needsBody ? readJsonBody(req).then(run) : run();
     task.catch((err) => {
-        console.error('[api]', pathnameOf(req), err && err.message);
         if (res.headersSent) {
             next(err);
             return;

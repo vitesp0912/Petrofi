@@ -1,9 +1,7 @@
 const { send, requireUser, isUuid, adminClient } = require('../server/http');
 const { listQuotes } = require('../server/catalog');
 const { paymentsReady } = require('../server/cashfree');
-const { buyerFrom, indianMobile } = require('../server/buyer');
 
-const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email';
 const ORDER_COLUMNS = 'order_id, amount_total, currency, status, payment_method, paid_at, created_at, plan_id';
 
 function mapOrder(row, planName) {
@@ -13,7 +11,6 @@ function mapOrder(row, planName) {
         amount: row.amount_total,
         currency: row.currency || 'INR',
         status: row.status || null,
-        paymentMethod: row.payment_method || null,
         paidAt: row.paid_at || null,
         createdAt: row.created_at || null,
     };
@@ -30,7 +27,6 @@ async function ordersForPump(pumpId) {
         .order('created_at', { ascending: false })
         .limit(50);
     if (error) {
-        console.error('[payments] orders', error.code, error.message);
         const err = new Error('load_failed');
         err.reason = 'load_failed';
         throw err;
@@ -61,55 +57,33 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const ready = paymentsReady();
+        const url = new URL(req.url, 'http://localhost');
+        const scope = String(url.searchParams.get('scope') || 'plans').trim();
+
         const { data: profile, error: profileError } = await admin
             .from('users')
-            .select('name, role, pump_id')
+            .select('pump_id')
             .eq('id', auth.user.id)
             .maybeSingle();
 
         if (profileError) {
-            console.error('[payments] catalog profile', profileError.code, profileError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
 
-        let pump = null;
-        if (isUuid(profile?.pump_id)) {
-            const { data: pumpRow, error: pumpError } = await admin
-                .from('pumps')
-                .select(PUMP_COLUMNS)
-                .eq('id', profile.pump_id)
-                .maybeSingle();
-            if (pumpError) {
-                console.error('[payments] catalog pump', pumpError.code, pumpError.message);
-                send(res, 500, { ok: false, reason: 'load_failed' });
-                return;
-            }
-            if (pumpRow && pumpRow.id === profile.pump_id) pump = pumpRow;
+        const pumpId = isUuid(profile?.pump_id) ? profile.pump_id : null;
+        const payload = { ok: true, ready: paymentsReady() };
+
+        if (scope === 'orders') {
+            payload.orders = await ordersForPump(pumpId);
+            send(res, 200, payload);
+            return;
         }
 
-        const buyer = buyerFrom(auth.user, profile, pump);
-        const [quotes, orders] = await Promise.all([
-            listQuotes(),
-            ordersForPump(pump?.id),
-        ]);
-        send(res, 200, {
-            ok: true,
-            ready,
-            quotes,
-            orders,
-            buyer: {
-                name: buyer.name,
-                email: buyer.email,
-                phone: buyer.phone || indianMobile(auth.user.phone),
-                pumpName: buyer.pumpName,
-                pumpCode: buyer.pumpCode,
-                hasPump: Boolean(pump),
-            },
-        });
+        payload.quotes = await listQuotes();
+        payload.hasPump = Boolean(pumpId);
+        send(res, 200, payload);
     } catch (err) {
-        console.error('[payments] catalog', err.message);
         send(res, 500, { ok: false, reason: 'load_failed' });
     }
 };

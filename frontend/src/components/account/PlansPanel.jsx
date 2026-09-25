@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { Check, FileText, Phone, Shield } from 'lucide-react';
 import { daysUntil, formatDateLong, formatMoney, remainingLabel } from '../../lib/subscription';
-import { fetchPaymentCatalog, paymentErrorText } from '../../lib/payments';
+import {
+    createPaymentOrder,
+    fetchPaymentCatalog,
+    paymentErrorText,
+    savePaymentStatus,
+    startHostedCheckout,
+} from '../../lib/payments';
+import { ConfirmPayDialog } from './PaymentDialogs';
 import { cardClass, LoadingState } from './AccountBits';
 
 const BENEFITS = [
@@ -52,11 +59,14 @@ function trialCopy(subscription) {
 }
 
 const PlansPanel = () => {
-    const { pump, subscription } = useOutletContext();
+    const { subscription } = useOutletContext();
     const trial = trialCopy(subscription);
     const [quotes, setQuotes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selected, setSelected] = useState(null);
+    const [paying, setPaying] = useState(false);
+    const [payError, setPayError] = useState('');
 
     useEffect(() => {
         let cancelled = false;
@@ -76,6 +86,27 @@ const PlansPanel = () => {
     }, []);
 
     const gstLabel = quotes[0] ? `+${quotes[0].gstPct}% GST` : null;
+
+    const handleConfirmPay = async () => {
+        if (!selected || paying) return;
+        setPaying(true);
+        setPayError('');
+        const created = await createPaymentOrder({ planId: selected.id });
+        if (!created.ok) {
+            setPaying(false);
+            setPayError(paymentErrorText(created.reason));
+            return;
+        }
+        try {
+            await startHostedCheckout(created);
+        } catch {
+            if (created.orderId) {
+                await savePaymentStatus(created.orderId, 'user_dropped');
+            }
+            setPayError('The payment page could not open. Try again.');
+            setPaying(false);
+        }
+    };
 
     if (loading) return <LoadingState />;
 
@@ -196,8 +227,12 @@ const PlansPanel = () => {
                             </ul>
 
                             <div className="mt-auto pt-4">
-                                <Link
-                                    to={`/subscription/payments?plan=${encodeURIComponent(plan.id)}`}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setPayError('');
+                                        setSelected(plan);
+                                    }}
                                     className={`inline-flex w-full items-center justify-center whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold font-jakarta ${
                                         plan.featured
                                             ? 'bg-pf-navy text-white hover:bg-pf-navy/90'
@@ -205,7 +240,7 @@ const PlansPanel = () => {
                                     }`}
                                 >
                                     {plan.cta}
-                                </Link>
+                                </button>
                             </div>
                         </article>
                     );
@@ -255,7 +290,7 @@ const PlansPanel = () => {
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                     <span className="inline-flex items-center gap-1.5">
                         <Shield size={13} className="text-pf-sky" />
-                        Secure payments · Powered by Cashfree
+                        Secure payments
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                         <FileText size={13} className="text-pf-sky" />
@@ -270,6 +305,20 @@ const PlansPanel = () => {
                     </a>
                 </div>
             </footer>
+
+            <ConfirmPayDialog
+                open={Boolean(selected)}
+                plan={selected}
+                paying={paying}
+                error={payError}
+                onOpenChange={(next) => {
+                    if (!next && !paying) {
+                        setSelected(null);
+                        setPayError('');
+                    }
+                }}
+                onConfirm={handleConfirmPay}
+            />
         </div>
     );
 };

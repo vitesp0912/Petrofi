@@ -1,7 +1,13 @@
 const { send, requireUser, adminClient } = require('../server/http');
-const { listQuotes } = require('../server/catalog');
 const { paymentsReady, getCashfreeOrder, getSuccessfulPaymentId, orderIsPaid, amountsMatch } = require('../server/cashfree');
 const { fulfillPaidOrder } = require('../server/fulfill');
+
+const ORDER_COLUMNS =
+    'order_id, user_id, pump_id, plan_id, amount_total, status, cf_order_id, cf_payment_id, paid_at, payment_method';
+
+function reply(res, status, orderId) {
+    send(res, 200, { ok: true, status, orderId });
+}
 
 module.exports = async (req, res) => {
     if (req.method !== 'GET') {
@@ -28,7 +34,7 @@ module.exports = async (req, res) => {
 
         const { data: row, error } = await admin
             .from('payment_orders')
-            .select('*')
+            .select(ORDER_COLUMNS)
             .eq('order_id', orderId)
             .eq('user_id', auth.user.id)
             .maybeSingle();
@@ -42,8 +48,6 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const quotes = await listQuotes().catch(() => []);
-
         if (row.status === 'paid') {
             const healed = await fulfillPaidOrder(admin, row, {
                 cfOrderId: row.cf_order_id,
@@ -53,27 +57,27 @@ module.exports = async (req, res) => {
                 send(res, 500, { ok: false, reason: 'fulfill_failed' });
                 return;
             }
-            send(res, 200, { ok: true, status: 'paid', orderId, quotes });
+            reply(res, 'paid', orderId);
             return;
         }
 
         let cfOrder;
         try {
             cfOrder = await getCashfreeOrder(orderId);
-        } catch (err) {
-            send(res, 200, { ok: true, status: row.status || 'pending', orderId, quotes });
+        } catch {
+            reply(res, row.status || 'pending', orderId);
             return;
         }
 
         if (!orderIsPaid(cfOrder) || !amountsMatch(row.amount_total, cfOrder.order_amount)) {
             const mapped = String(cfOrder?.order_status || row.status || 'pending').toLowerCase();
-            send(res, 200, { ok: true, status: mapped === 'paid' ? 'pending' : mapped, orderId, quotes });
+            reply(res, mapped === 'paid' ? 'pending' : mapped, orderId);
             return;
         }
 
         const cfPaymentId = (await getSuccessfulPaymentId(orderId).catch(() => null)) || row.cf_payment_id;
         if (!cfPaymentId) {
-            send(res, 200, { ok: true, status: 'pending', orderId, quotes });
+            reply(res, 'pending', orderId);
             return;
         }
 
@@ -88,9 +92,8 @@ module.exports = async (req, res) => {
             return;
         }
 
-        send(res, 200, { ok: true, status: 'paid', orderId, quotes });
-    } catch (err) {
-        console.error('[payments] status', err.message);
+        reply(res, 'paid', orderId);
+    } catch {
         send(res, 500, { ok: false, reason: 'load_failed' });
     }
 };

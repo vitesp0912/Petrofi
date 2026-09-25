@@ -16,11 +16,12 @@ async function readJson(res) {
     return res.json().catch(() => ({ ok: false, reason: 'unavailable' }));
 }
 
-export async function fetchPaymentCatalog() {
+export async function fetchPaymentCatalog(scope = 'plans') {
     const headers = await authHeader();
     if (!headers) return { ok: false, reason: 'signed_out' };
     try {
-        const res = await fetch('/api/payment-catalog', { headers });
+        const query = scope === 'orders' ? '?scope=orders' : '?scope=plans';
+        const res = await fetch(`/api/payment-catalog${query}`, { headers });
         return readJson(res);
     } catch {
         return { ok: false, reason: 'unavailable' };
@@ -75,7 +76,7 @@ export function paymentErrorText(reason) {
     if (reason === 'no_pump') return 'No pump is linked to this login yet.';
     if (reason === 'phone_required') return 'Add a 10-digit mobile number to pay.';
     if (reason === 'too_fast') return 'Wait a few seconds and try again.';
-    if (reason === 'cashfree_error') return 'Cashfree could not start this payment. Try again.';
+    if (reason === 'cashfree_error') return 'We could not start this payment. Try again.';
     if (reason === 'signed_out') return 'Sign in again to pay.';
     return 'We could not start this payment. Try again.';
 }
@@ -100,4 +101,13 @@ export function loadCashfreeSdk() {
         document.head.appendChild(script);
     });
     return cashfreeLoader;
+}
+
+export async function startHostedCheckout(created) {
+    const Checkout = await loadCashfreeSdk();
+    const client = Checkout({ mode: created.mode === 'production' ? 'production' : 'sandbox' });
+    await client.checkout({
+        paymentSessionId: created.paymentSessionId,
+        redirectTarget: '_self',
+    });
 }

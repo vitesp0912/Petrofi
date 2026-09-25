@@ -1,5 +1,5 @@
 const { send, requireUser, isUuid, publicSiteUrl, readJsonBody, adminClient } = require('../server/http');
-const { listQuotes, quoteById } = require('../server/catalog');
+const { quoteById } = require('../server/catalog');
 const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = require('../server/cashfree');
 const { buyerFrom, cashfreeCustomer, normalizeGstin, indianMobile } = require('../server/buyer');
 const { savePaymentOrder } = require('../server/save-payment-order');
@@ -62,7 +62,6 @@ module.exports = async (req, res) => {
             .maybeSingle();
 
         if (profileError) {
-            console.error('[payments] create profile', profileError.code, profileError.message);
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -129,7 +128,6 @@ module.exports = async (req, res) => {
                 billingPhone: buyer.phone,
             });
         } catch (err) {
-            console.error('[payments] insert order failed', err.reason || err.message);
             send(res, 500, { ok: false, reason: err.reason || 'create_failed' });
             return;
         }
@@ -153,11 +151,6 @@ module.exports = async (req, res) => {
             });
         } catch (err) {
             await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
-            console.error(
-                '[payments] cashfree create failed',
-                err.status || '',
-                err.data?.message || err.data?.code || err.reason || err.message
-            );
             send(res, 502, { ok: false, reason: err.reason || 'cashfree_error' });
             return;
         }
@@ -177,18 +170,13 @@ module.exports = async (req, res) => {
             paymentSessionId: sessionId,
         });
 
-        const quotes = await listQuotes().catch(() => []);
         send(res, 200, {
             ok: true,
             orderId,
             paymentSessionId: sessionId,
             mode: cfg.mode,
-            amount: chargeAmount,
-            plan: quote,
-            quotes,
         });
-    } catch (err) {
-        console.error('[payments] create-order', err.message);
+    } catch {
         send(res, 500, { ok: false, reason: 'create_failed' });
     }
 };

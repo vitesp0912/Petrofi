@@ -30,7 +30,6 @@ function toQuote(row, featuredCode) {
         period: copy.period,
         cta: copy.cta,
         featured: Boolean(featuredCode) && row.code === featuredCode,
-        planUuid: row.id,
         base: money(row.price_base_inr),
         gst: money(row.gst_inr),
         total: money(row.price_total_inr),

@@ -18,16 +18,7 @@ function cashfreeConfig() {
 }
 
 function paymentsReady() {
-    const cashfree = Boolean(cashfreeConfig());
-    const serviceRole = Boolean(String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim());
-    if (!cashfree || !serviceRole) {
-        console.error('[payments] offline', {
-            cashfree,
-            serviceRole,
-            env: String(process.env.CASHFREE_ENV || 'sandbox'),
-        });
-    }
-    return cashfree && serviceRole;
+    return Boolean(cashfreeConfig() && String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim());
 }
 
 async function cashfreeRequest(path, { method = 'GET', body } = {}) {
