@@ -52,6 +52,9 @@ function mapSubscription(row, plan) {
     return {
         status: row.status || null,
         planName: plan?.name || null,
+        planCode: plan?.code || null,
+        days: plan?.duration_days != null ? Number(plan.duration_days) : null,
+        months: plan?.duration_months != null ? Number(plan.duration_months) : null,
         startDate: row.start_date || null,
         endDate: row.end_date || null,
         remainingDays,
@@ -76,11 +79,14 @@ async function planNameMap(planIds) {
     if (!ids.length) return {};
     const admin = adminClient();
     if (!admin) return {};
-    const { data, error } = await admin.from('plans').select('id, name').in('id', ids);
+    const { data, error } = await admin
+        .from('plans')
+        .select('id, name, code, duration_days, duration_months')
+        .in('id', ids);
     if (error) {
         return {};
     }
-    return Object.fromEntries((data || []).map((row) => [row.id, { name: row.name }]));
+    return Object.fromEntries((data || []).map((row) => [row.id, row]));
 }
 
 module.exports = async (req, res) => {

@@ -1,7 +1,7 @@
 const { send, requireUser, isUuid, publicSiteUrl, readJsonBody, adminClient } = require('../server/http');
 const { quoteById } = require('../server/catalog');
 const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = require('../server/cashfree');
-const { buyerFrom, cashfreeCustomer, normalizeGstin, indianMobile } = require('../server/buyer');
+const { buyerFrom, applyBuyerOverrides, cashfreeCustomer, normalizeGstin } = require('../server/buyer');
 const { savePaymentOrder } = require('../server/save-payment-order');
 
 const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, address, city, state, pincode';
@@ -84,7 +84,11 @@ module.exports = async (req, res) => {
         }
 
         const buyer = buyerFrom(auth.user, profile, pump);
-        buyer.phone = indianMobile(body?.phone) || buyer.phone;
+        const overrideError = applyBuyerOverrides(buyer, body);
+        if (overrideError) {
+            send(res, 400, { ok: false, reason: overrideError });
+            return;
+        }
         if (!buyer.phone) {
             send(res, 400, { ok: false, reason: 'phone_required' });
             return;

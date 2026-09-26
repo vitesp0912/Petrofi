@@ -1,9 +1,58 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
-import { formatDate, formatMoney } from '../../lib/subscription';
+import { Receipt } from 'lucide-react';
+import { formatDate, formatMoney, titleCase } from '../../lib/subscription';
 import { fetchPaymentCatalog, fetchPaymentStatus } from '../../lib/payments';
 import { PaymentResultDialog, paymentResultKind } from './PaymentDialogs';
-import { cardClass, LoadingState, PageIntro, StatusPill } from './AccountBits';
+import { Bone, cardClass, StatusPill } from './AccountBits';
+
+function methodLabel(value) {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return null;
+    if (key === 'upi') return 'UPI';
+    if (key === 'card' || key === 'cc' || key === 'dc') return 'Card';
+    if (key === 'nb' || key === 'netbanking' || key === 'net_banking') return 'Net banking';
+    if (key === 'wallet') return 'Wallet';
+    return titleCase(value);
+}
+
+const PaymentsSkeleton = () => (
+    <div className="max-w-5xl mx-auto space-y-6 sm:space-y-7" data-testid="account-payments-skeleton" aria-busy="true" aria-live="polite">
+        <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div>
+                <Bone className="h-3 w-20 bg-sky-100" />
+                <Bone className="mt-3 h-8 sm:h-9 w-44 sm:w-56" />
+            </div>
+            <Bone className="h-8 w-24 rounded-full" />
+        </header>
+        <section className={`${cardClass} overflow-hidden`}>
+            <div className="overflow-x-auto">
+                <div className="min-w-[640px]">
+                    <div className="grid grid-cols-[1.4fr_0.9fr_1fr_0.9fr] gap-4 items-center px-5 sm:px-6 py-3 bg-slate-50 border-b border-slate-100">
+                        <Bone className="h-3 w-10" />
+                        <Bone className="h-3 w-12" />
+                        <Bone className="h-3 w-10" />
+                        <Bone className="h-3 w-14 justify-self-end" />
+                    </div>
+                    {[0, 1, 2, 3, 4].map((row) => (
+                        <div
+                            key={row}
+                            className="grid grid-cols-[1.4fr_0.9fr_1fr_0.9fr] gap-4 items-center px-5 sm:px-6 py-4 border-t border-slate-100 first:border-t-0"
+                        >
+                            <div>
+                                <Bone className="h-4 w-24" />
+                                <Bone className="mt-1.5 h-3 w-20" />
+                            </div>
+                            <Bone className="h-6 w-16 rounded-full" />
+                            <Bone className="h-4 w-24" />
+                            <Bone className="h-4 w-16 justify-self-end" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    </div>
+);
 
 const PaymentsPanel = () => {
     const { loading } = useOutletContext();
@@ -13,19 +62,23 @@ const PaymentsPanel = () => {
     const handledReturn = useRef('');
 
     const [orders, setOrders] = useState([]);
+    const [ordersLoading, setOrdersLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
     const [resultStatus, setResultStatus] = useState('');
     const [resultPlanName, setResultPlanName] = useState('');
 
     useEffect(() => {
         let cancelled = false;
+        setOrdersLoading(true);
         fetchPaymentCatalog('orders').then((result) => {
             if (cancelled) return;
             if (!result.ok) {
                 setLoadError('Transactions could not load.');
+                setOrdersLoading(false);
                 return;
             }
             setOrders(result.orders || []);
+            setOrdersLoading(false);
         });
         return () => {
             cancelled = true;
@@ -53,46 +106,77 @@ const PaymentsPanel = () => {
         };
     }, [returnOrderId, navigate]);
 
-    if (loading) return <LoadingState />;
+    if (loading || ordersLoading) return <PaymentsSkeleton />;
 
     return (
-        <div className="space-y-5 sm:space-y-6" data-testid="account-payments">
-            <PageIntro
-                kicker="Payments"
-                title="Transactions"
-                text="Payments for this pump are listed here."
-            />
+        <div className="max-w-5xl mx-auto space-y-6 sm:space-y-7" data-testid="account-payments">
+            <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                <div>
+                    <p className="text-pf-sky text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-2">
+                        Payments
+                    </p>
+                    <h1 className="text-[28px] sm:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
+                        Transactions
+                    </h1>
+                </div>
+                <p className="self-start sm:self-auto inline-flex items-center rounded-full bg-slate-100 text-slate-600 px-3 py-1.5 text-xs font-bold font-jakarta">
+                    {orders.length} {orders.length === 1 ? 'payment' : 'payments'}
+                </p>
+            </header>
 
-            <section className={`${cardClass} p-6 sm:p-7`}>
+            <section className={`${cardClass} overflow-hidden`}>
                 {loadError ? (
-                    <p className="text-sm text-slate-500 font-jakarta">{loadError}</p>
+                    <div className="px-6 py-16 text-center">
+                        <p className="text-sm font-semibold text-pf-navy font-outfit">Transactions could not load</p>
+                    </div>
                 ) : orders.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[520px] text-left text-sm font-jakarta">
+                        <table className="w-full min-w-[640px] text-sm font-jakarta">
                             <thead>
-                                <tr className="text-xs text-slate-400">
-                                    <th className="pb-3 font-semibold">Plan</th>
-                                    <th className="pb-3 font-semibold">Status</th>
-                                    <th className="pb-3 font-semibold">Date</th>
-                                    <th className="pb-3 font-semibold">Amount</th>
+                                <tr className="bg-slate-50 text-sm uppercase tracking-wide text-slate-600">
+                                    <th className="text-left font-bold px-5 sm:px-6 py-3.5">Plan</th>
+                                    <th className="text-left font-bold px-5 sm:px-6 py-3.5">Status</th>
+                                    <th className="text-left font-bold px-5 sm:px-6 py-3.5">Date</th>
+                                    <th className="text-right font-bold px-5 sm:px-6 py-3.5">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {orders.map((row) => (
-                                    <tr key={row.orderId} className="border-t border-slate-100">
-                                        <td className="py-3.5 font-semibold text-pf-navy">{row.planName || 'Not set'}</td>
-                                        <td className="py-3.5"><StatusPill value={row.status} /></td>
-                                        <td className="py-3.5 text-slate-600">{formatDate(row.paidAt || row.createdAt)}</td>
-                                        <td className="py-3.5 font-semibold text-pf-navy">
-                                            {formatMoney(row.amount, row.currency)}
-                                        </td>
-                                    </tr>
-                                ))}
+                                {orders.map((row) => {
+                                    const method = methodLabel(row.paymentMethod);
+                                    return (
+                                        <tr key={row.orderId} className="border-t border-slate-100 hover:bg-slate-50/70">
+                                            <td className="px-5 sm:px-6 py-4 align-middle">
+                                                <p className="font-semibold text-pf-navy font-outfit leading-tight">
+                                                    {row.planName || 'Not set'}
+                                                </p>
+                                                {method ? (
+                                                    <p className="mt-1 text-xs text-slate-400 font-jakarta">
+                                                        {method}
+                                                    </p>
+                                                ) : null}
+                                            </td>
+                                            <td className="px-5 sm:px-6 py-4 align-middle">
+                                                <StatusPill value={row.status} />
+                                            </td>
+                                            <td className="px-5 sm:px-6 py-4 align-middle text-slate-600 whitespace-nowrap">
+                                                {formatDate(row.paidAt || row.createdAt)}
+                                            </td>
+                                            <td className="px-5 sm:px-6 py-4 align-middle text-right font-bold font-outfit text-pf-navy tabular-nums whitespace-nowrap">
+                                                {formatMoney(row.amount, row.currency)}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
                 ) : (
-                    <p className="text-sm text-slate-500 font-jakarta">No transactions yet.</p>
+                    <div className="px-6 py-16 text-center">
+                        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-400">
+                            <Receipt size={22} />
+                        </span>
+                        <p className="mt-4 text-base font-bold font-outfit text-pf-navy">No transactions yet</p>
+                    </div>
                 )}
             </section>
 

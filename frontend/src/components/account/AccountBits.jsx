@@ -16,8 +16,12 @@ export const BrandLink = ({ compact = false }) => (
 export const cardClass =
     'bg-white rounded-2xl border border-slate-200/80 shadow-[0_10px_32px_rgba(13,27,62,0.06)]';
 
+export const Bone = ({ className = '' }) => (
+    <div className={`animate-pulse rounded-md bg-slate-200/90 ${className}`} />
+);
+
 export const StatusPill = ({ value }) => (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold font-jakarta ${statusTone(value)}`}>
+    <span className={`inline-flex items-center justify-center min-h-10 sm:min-h-9 rounded-full border px-3.5 py-2 text-xs font-semibold font-jakarta ${statusTone(value)}`}>
         {titleCase(value)}
     </span>
 );

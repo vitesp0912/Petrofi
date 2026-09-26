@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
-import AccountSidebar, { AccountMobileNav } from '../components/account/AccountSidebar';
+import AccountSidebar, { AccountMobileHeader, AccountMobileTabBar } from '../components/account/AccountSidebar';
 import LoginForm from '../components/LoginForm';
 import Navbar from '../components/Navbar';
 import RegisterPumpDialog from '../components/RegisterPumpDialog';
@@ -17,7 +17,6 @@ const TRIAL_POINTS = [
 
 function SubscriptionPage() {
     const { user, loading: authLoading } = useAuth();
-    const navigate = useNavigate();
     const [registerOpen, setRegisterOpen] = useState(false);
     const [registerPrefill, setRegisterPrefill] = useState(null);
     const [state, setState] = useState({
@@ -138,7 +137,10 @@ function SubscriptionPage() {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => navigate('/', { state: { scrollTo: 'demo' } })}
+                                onClick={() => {
+                                    setRegisterPrefill(null);
+                                    setRegisterOpen(true);
+                                }}
                                 className="mt-4 block w-full text-center text-sm font-semibold text-white/70 hover:text-white font-jakarta"
                             >
                                 Book a live demo
@@ -184,13 +186,16 @@ function SubscriptionPage() {
         <div className="h-dvh overflow-hidden bg-[#F3F6FB] text-pf-navy">
             <div className="h-dvh flex">
                 <AccountSidebar profile={state.profile} />
-                <div className="flex-1 min-w-0 h-full overflow-y-auto">
-                    <div className="px-4 sm:px-6 lg:px-10 xl:px-12 py-5 sm:py-8">
-                        <AccountMobileNav />
-                        <main id="main-content" aria-label="Account" className="pt-5 lg:pt-0">
-                            <Outlet context={outletContext} />
-                        </main>
+                <div className="flex-1 min-w-0 h-full flex flex-col">
+                    <AccountMobileHeader />
+                    <div className="flex-1 min-h-0 overflow-y-auto">
+                        <div className="px-4 sm:px-6 lg:px-10 xl:px-12 py-5 sm:py-8">
+                            <main id="main-content" aria-label="Account">
+                                <Outlet context={outletContext} />
+                            </main>
+                        </div>
                     </div>
+                    <AccountMobileTabBar />
                 </div>
             </div>
         </div>

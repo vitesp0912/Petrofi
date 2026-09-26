@@ -11,9 +11,14 @@ function money(value) {
 function periodCopy(row) {
     const days = Number(row.duration_days);
     const months = Number(row.duration_months);
+    const showMonths = Number.isFinite(months) && months > 0 && days !== 30;
+    const monthBit = showMonths ? ` (${months} ${months === 1 ? 'month' : 'months'})` : '';
     return {
         billedAs: `${days} days`,
-        period: `Covers ${days} days (${months} ${months === 1 ? 'month' : 'months'}) after payment.`,
+        duration: showMonths
+            ? `${days} days (${months} ${months === 1 ? 'month' : 'months'})`
+            : `${days} days`,
+        period: `Covers ${days} days${monthBit} after payment.`,
         cta: `Continue with ${row.name}`,
     };
 }
@@ -27,6 +32,7 @@ function toQuote(row, featuredCode) {
         months: Number(row.duration_months),
         days: Number(row.duration_days),
         billedAs: copy.billedAs,
+        duration: copy.duration,
         period: copy.period,
         cta: copy.cta,
         featured: Boolean(featuredCode) && row.code === featuredCode,

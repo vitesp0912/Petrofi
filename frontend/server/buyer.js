@@ -35,6 +35,26 @@ function buyerFrom(user, profile, pump) {
     };
 }
 
+function applyBuyerOverrides(buyer, body) {
+    const name = String(body?.name || '').trim().slice(0, 80);
+    if (name) buyer.name = name;
+
+    const email = String(body?.email || '').trim().toLowerCase().slice(0, 120);
+    if (email) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'invalid_email';
+        buyer.email = email;
+    }
+
+    const pumpName = String(body?.pumpName || '').trim().slice(0, 80);
+    if (pumpName) buyer.pumpName = pumpName;
+
+    const address = String(body?.address || '').trim().slice(0, 200);
+    if (address) buyer.address = address;
+
+    buyer.phone = indianMobile(body?.phone) || buyer.phone;
+    return null;
+}
+
 function cashfreeCustomer(userId, buyer) {
     const customer = {
         customer_id: `u${String(userId || '').replace(/-/g, '')}`.slice(0, 50),

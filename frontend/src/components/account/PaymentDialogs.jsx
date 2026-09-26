@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Pencil } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -10,15 +11,8 @@ import {
 } from '../ui/dialog';
 import { formatMoney } from '../../lib/subscription';
 
-function Detail({ label, value }) {
-    if (!value) return null;
-    return (
-        <div className="flex items-start justify-between gap-4 py-2 border-b border-slate-100 last:border-b-0">
-            <dt className="text-slate-500 shrink-0">{label}</dt>
-            <dd className="font-semibold text-pf-navy text-right break-words">{value}</dd>
-        </div>
-    );
-}
+const FIELD_CLASS =
+    'w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-pf-navy font-jakarta placeholder-slate-400 focus:outline-none focus:border-pf-sky focus:ring-2 focus:ring-pf-sky/20 disabled:opacity-60';
 
 function displayPhone(phone) {
     const digits = String(phone || '').replace(/\D/g, '');
@@ -28,7 +22,71 @@ function displayPhone(phone) {
     return phone || '';
 }
 
+function draftFromBilling(billing) {
+    return {
+        name: billing?.name || '',
+        pumpName: billing?.pumpName || '',
+        email: billing?.email || '',
+        phone: displayPhone(billing?.phone) || '',
+        address: billing?.address || '',
+    };
+}
+
+function Detail({ label, value }) {
+    return (
+        <div className="flex items-start justify-between gap-4 py-2 border-b border-slate-100 last:border-b-0">
+            <dt className="text-slate-500 shrink-0">{label}</dt>
+            <dd className="font-semibold text-pf-navy text-right break-words">{value || 'Not set'}</dd>
+        </div>
+    );
+}
+
+function Field({ id, label, value, onChange, type = 'text', disabled, multiline = false }) {
+    return (
+        <label className="block" htmlFor={id}>
+            <span className="text-xs font-semibold text-slate-500 font-jakarta">{label}</span>
+            {multiline ? (
+                <textarea
+                    id={id}
+                    rows={2}
+                    disabled={disabled}
+                    value={value}
+                    onChange={(event) => onChange(event.target.value)}
+                    className={`${FIELD_CLASS} mt-1 resize-none`}
+                />
+            ) : (
+                <input
+                    id={id}
+                    type={type}
+                    disabled={disabled}
+                    value={value}
+                    onChange={(event) => onChange(event.target.value)}
+                    className={`${FIELD_CLASS} mt-1`}
+                />
+            )}
+        </label>
+    );
+}
+
 export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenChange, onConfirm }) {
+    const [draft, setDraft] = useState(() => draftFromBilling(billing));
+    const [editing, setEditing] = useState(false);
+    const billingKey = [
+        billing?.name,
+        billing?.pumpName,
+        billing?.email,
+        billing?.phone,
+        billing?.address,
+    ].join('|');
+
+    useEffect(() => {
+        if (!open) return;
+        setDraft(draftFromBilling(billing));
+        setEditing(false);
+    }, [open, billingKey]);
+
+    const setField = (key) => (value) => setDraft((prev) => ({ ...prev, [key]: value }));
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md rounded-2xl" data-testid="pay-confirm-dialog">
@@ -42,13 +100,37 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
                 </DialogHeader>
                 {plan ? (
                     <div className="space-y-3">
-                        <dl className="rounded-xl bg-slate-50 px-4 py-2 text-sm font-jakarta">
-                            <Detail label="Name" value={billing?.name} />
-                            <Detail label="Pump" value={billing?.pumpName} />
-                            <Detail label="Email" value={billing?.email} />
-                            <Detail label="Mobile" value={displayPhone(billing?.phone)} />
-                            <Detail label="Address" value={billing?.address} />
-                        </dl>
+                        <div className="flex justify-end -mb-1">
+                            <button
+                                type="button"
+                                onClick={() => setEditing((prev) => !prev)}
+                                disabled={paying}
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-[#3157D5] font-jakarta hover:text-[#2546b0] disabled:opacity-50"
+                                data-testid="pay-edit-details"
+                            >
+                                <Pencil size={12} strokeWidth={2.25} />
+                                {editing ? 'Done' : 'Edit'}
+                            </button>
+                        </div>
+                        <div className="rounded-xl bg-slate-50 px-4 py-2">
+                            {editing ? (
+                                <div className="space-y-2.5 py-1">
+                                    <Field id="pay-name" label="Name" value={draft.name} onChange={setField('name')} disabled={paying} />
+                                    <Field id="pay-pump" label="Pump" value={draft.pumpName} onChange={setField('pumpName')} disabled={paying} />
+                                    <Field id="pay-email" label="Email" type="email" value={draft.email} onChange={setField('email')} disabled={paying} />
+                                    <Field id="pay-mobile" label="Mobile" type="tel" value={draft.phone} onChange={setField('phone')} disabled={paying} />
+                                    <Field id="pay-address" label="Address" value={draft.address} onChange={setField('address')} disabled={paying} multiline />
+                                </div>
+                            ) : (
+                                <dl className="text-sm font-jakarta">
+                                    <Detail label="Name" value={draft.name} />
+                                    <Detail label="Pump" value={draft.pumpName} />
+                                    <Detail label="Email" value={draft.email} />
+                                    <Detail label="Mobile" value={draft.phone} />
+                                    <Detail label="Address" value={draft.address} />
+                                </dl>
+                            )}
+                        </div>
                         <dl className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-jakarta">
                             <div className="flex justify-between gap-4">
                                 <dt className="text-slate-500">Plan</dt>
@@ -73,7 +155,7 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
                     <button
                         type="button"
                         disabled={paying || !plan}
-                        onClick={onConfirm}
+                        onClick={() => onConfirm(draft)}
                         data-testid="pay-confirm-now"
                         className="inline-flex items-center justify-center rounded-full bg-pf-navy text-white px-5 py-2.5 text-sm font-bold font-jakarta hover:bg-pf-navy/90 disabled:opacity-50"
                     >
