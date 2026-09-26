@@ -110,7 +110,7 @@ export function paidCopy(subscription) {
             pill: 'Plan ended',
             status: remainingLabel(remaining),
             headline: plan,
-            detail: dateLabel ? `${plan} ended on ${dateLabel}.` : `${plan} has ended.`,
+            detail: dateLabel ? `This plan ended on ${dateLabel}.` : 'This plan has ended.',
             live: false,
         };
     }
@@ -119,7 +119,7 @@ export function paidCopy(subscription) {
             pill: 'Active plan',
             status: remainingLabel(remaining),
             headline: plan,
-            detail: `${plan} is active on this pump.`,
+            detail: 'This plan is running on your pump.',
             live: true,
         };
     }
@@ -128,7 +128,9 @@ export function paidCopy(subscription) {
             pill: `${remaining} days left`,
             status: remainingLabel(remaining),
             headline: plan,
-            detail: dateLabel ? `${plan} stays active until ${dateLabel}.` : `${plan} is active on this pump.`,
+            detail: dateLabel
+                ? `You can use PetroFI until ${dateLabel}.`
+                : `You have ${remaining} days left on this plan.`,
             live: true,
         };
     }
@@ -137,7 +139,7 @@ export function paidCopy(subscription) {
             pill: 'Ends tomorrow',
             status: '1 day left',
             headline: plan,
-            detail: dateLabel ? `${plan} stays active until ${dateLabel}.` : `${plan} ends tomorrow.`,
+            detail: dateLabel ? `You can use PetroFI until ${dateLabel}.` : 'This plan ends tomorrow.',
             live: true,
         };
     }
@@ -145,7 +147,7 @@ export function paidCopy(subscription) {
         pill: 'Ends today',
         status: 'Ends today',
         headline: plan,
-        detail: dateLabel ? `${plan} stays active until ${dateLabel}.` : `${plan} ends today.`,
+        detail: dateLabel ? `You can use PetroFI until ${dateLabel}.` : 'This plan ends today.',
         live: true,
     };
 }

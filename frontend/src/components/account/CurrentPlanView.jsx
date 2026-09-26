@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Check, FileText, Phone, Shield } from 'lucide-react';
 import {
     formatDate,
-    formatDateFull,
     formatMoney,
     paidCopy,
     periodProgress,
@@ -130,7 +129,7 @@ const CurrentPlanView = ({ pump, subscription }) => {
                     Your PetroFI plan
                 </h1>
                 <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-xl">
-                    {copy.detail} Your pump data, reports and PetroFI features stay on this plan.
+                    {copy.detail}
                 </p>
             </header>
 
@@ -154,9 +153,7 @@ const CurrentPlanView = ({ pump, subscription }) => {
                         </div>
                         <p className="mt-1.5 text-[13px] sm:text-sm text-white/70 font-jakarta leading-relaxed max-w-2xl">
                             {copy.live
-                                ? `This pump is on ${copy.headline}. Access stays open until ${
-                                      formatDateFull(subscription?.endDate) || 'the date on file'
-                                  }.`
+                                ? 'Your sales, reports and pump data stay with you.'
                                 : copy.detail}
                         </p>
                     </div>
