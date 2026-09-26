@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { isLoginAllowed } from '../lib/login-allowlist';
 import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext({
@@ -20,20 +19,10 @@ export function AuthProvider({ children }) {
         }
 
         let cancelled = false;
-        const applySession = async (nextSession) => {
-            const nextUser = nextSession?.user;
-            if (nextUser && !isLoginAllowed(nextUser)) {
-                await supabase.auth.signOut();
-                if (!cancelled) {
-                    setSession(null);
-                    setLoading(false);
-                }
-                return;
-            }
-            if (!cancelled) {
-                setSession(nextSession ?? null);
-                setLoading(false);
-            }
+        const applySession = (nextSession) => {
+            if (cancelled) return;
+            setSession(nextSession ?? null);
+            setLoading(false);
         };
 
         supabase.auth.getSession().then(({ data }) => {
