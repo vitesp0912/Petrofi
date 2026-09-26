@@ -189,7 +189,7 @@ function SubscriptionPage() {
                 <div className="flex-1 min-w-0 h-full flex flex-col">
                     <AccountMobileHeader />
                     <div className="flex-1 min-h-0 overflow-y-auto">
-                        <div className="px-4 sm:px-6 lg:px-10 xl:px-12 py-5 sm:py-8">
+                        <div className="px-4 sm:px-6 lg:px-10 xl:px-12 py-4 sm:py-8">
                             <main id="main-content" aria-label="Account">
                                 <Outlet context={outletContext} />
                             </main>

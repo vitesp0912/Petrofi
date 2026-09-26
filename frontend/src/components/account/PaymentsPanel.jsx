@@ -114,10 +114,10 @@ const PaymentsPanel = () => {
         <div className="max-w-5xl mx-auto space-y-6 sm:space-y-7" data-testid="account-payments">
             <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
                 <div>
-                    <p className="text-pf-sky text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-2">
+                    <p className="text-pf-sky text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-1.5 sm:mb-2">
                         Payments
                     </p>
-                    <h1 className="text-[28px] sm:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
+                    <h1 className="text-[22px] sm:text-[28px] lg:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
                         Transactions
                     </h1>
                 </div>
@@ -133,9 +133,9 @@ const PaymentsPanel = () => {
                     </div>
                 ) : orders.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[760px] text-sm font-jakarta">
+                        <table className="w-full min-w-[760px] text-[13px] sm:text-sm font-jakarta">
                             <thead>
-                                <tr className="bg-slate-50 text-sm uppercase tracking-wide text-slate-600">
+                                <tr className="bg-slate-50 text-[11px] sm:text-sm uppercase tracking-wide text-slate-600">
                                     <th className="text-left font-bold px-5 sm:px-6 py-3.5">Plan</th>
                                     <th className="text-left font-bold px-5 sm:px-6 py-3.5">Order ID</th>
                                     <th className="text-left font-bold px-5 sm:px-6 py-3.5">Status</th>

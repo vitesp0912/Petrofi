@@ -73,8 +73,8 @@ const ProfileSkeleton = () => (
 
 const Metric = ({ label, value, hint }) => (
     <div>
-        <p className="text-xs font-medium text-white/55 font-jakarta mb-1">{label}</p>
-        <p className="text-lg sm:text-xl font-bold font-outfit text-white leading-tight">{value}</p>
+        <p className="text-[10px] sm:text-xs font-medium text-white/55 font-jakarta mb-0.5 sm:mb-1">{label}</p>
+        <p className="text-[15px] sm:text-xl font-bold font-outfit text-white leading-tight">{value}</p>
         {hint ? <p className="mt-1 text-xs text-white/60 font-jakarta">{hint}</p> : null}
     </div>
 );
@@ -117,32 +117,32 @@ const ProfilePanel = () => {
                 text="This is the live status of this PetroFI login: plan, valid till, and pump details."
             />
 
-            <section className="relative overflow-hidden rounded-2xl bg-pf-navy text-white p-6 sm:p-8 shadow-[0_18px_50px_rgba(13,27,62,0.22)]">
+            <section className="relative overflow-hidden rounded-2xl bg-pf-navy text-white p-4 sm:p-8 shadow-[0_18px_50px_rgba(13,27,62,0.22)]">
                 <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-pf-sky/15 blur-2xl pointer-events-none" />
                 <div className="relative">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-7">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-5 sm:mb-7">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-pf-sky font-jakarta mb-2">
+                            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-pf-sky font-jakarta mb-1.5 sm:mb-2">
                                 {pump?.code || 'Pump'}
                             </p>
-                            <h2 className="text-2xl sm:text-3xl font-bold font-outfit leading-tight">
+                            <h2 className="text-xl sm:text-3xl font-bold font-outfit leading-tight">
                                 {pump?.name || 'No pump linked yet'}
                             </h2>
                             {location ? (
-                                <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-white/70 font-jakarta">
+                                <p className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 text-[13px] sm:text-sm text-white/70 font-jakarta">
                                     <MapPin size={14} />
                                     {location}
                                 </p>
                             ) : (
-                                <p className="mt-2 text-sm text-white/70 font-jakarta">
+                                <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-sm text-white/70 font-jakarta">
                                     {pump ? 'Location not set' : 'Wait for PetroFI to approve your pump, or pick a plan.'}
                                 </p>
                             )}
                         </div>
-                        {status ? <StatusPill value={status} /> : null}
+                        {status ? <StatusPill value={status} compact /> : null}
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 pt-6 border-t border-white/10">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 pt-4 sm:pt-6 border-t border-white/10">
                         <Metric label="Subscription" value={titleCase(status || 'None')} />
                         <Metric label="Plan" value={subscription?.planName || 'Not set'} />
                         <Metric label="Valid till" value={formatDate(subscription?.endDate)} />
@@ -164,8 +164,8 @@ const ProfilePanel = () => {
             </section>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-                <section className={`${cardClass} p-6 sm:p-7`}>
-                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-2">Account</h3>
+                <section className={`${cardClass} p-4 sm:p-7`}>
+                    <h3 className="text-base sm:text-lg font-bold font-outfit text-pf-navy mb-2">Account</h3>
                     <dl>
                         <FieldRow label="Name" value={profile?.name || displayName} />
                         <FieldRow label="Role" value={roleLabel(profile?.role)} />
@@ -218,8 +218,8 @@ const ProfilePanel = () => {
                     </div>
                 </section>
 
-                <section className={`${cardClass} p-6 sm:p-7`}>
-                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-2">Pump</h3>
+                <section className={`${cardClass} p-4 sm:p-7`}>
+                    <h3 className="text-base sm:text-lg font-bold font-outfit text-pf-navy mb-2">Pump</h3>
                     {pump ? (
                         <dl>
                             <FieldRow label="Name" value={pump.name} />

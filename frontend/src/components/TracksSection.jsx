@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     ArrowRight,
     Banknote,
+    ChevronDown,
     CreditCard,
     Droplets,
     Fuel,
@@ -67,6 +68,7 @@ const TRACKS = [
 
 const TracksSection = () => {
     const { ref, isVisible } = useScrollAnimation(0.08);
+    const [showMore, setShowMore] = useState(false);
 
     return (
         <section
@@ -92,7 +94,9 @@ const TracksSection = () => {
                     {TRACKS.map(({ icon: Icon, title, desc, details }, i) => (
                         <div
                             key={title}
-                            className={`track-reveal ${isVisible ? 'is-in' : ''} h-full`}
+                            className={`track-reveal ${isVisible ? 'is-in' : ''} h-full ${
+                                i >= 4 && !showMore ? 'hidden lg:block' : ''
+                            }`}
                             style={{ animationDelay: `${i * 90}ms` }}
                         >
                             <article
@@ -110,6 +114,21 @@ const TracksSection = () => {
                             </article>
                         </div>
                     ))}
+                </div>
+
+                <div className="mt-5 sm:mt-6 flex justify-center lg:hidden">
+                    <button
+                        type="button"
+                        onClick={() => setShowMore((open) => !open)}
+                        data-testid="tracks-view-more"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold font-jakarta text-pf-navy hover:border-pf-sky hover:text-pf-sky"
+                    >
+                        {showMore ? 'View less' : 'View more'}
+                        <ChevronDown
+                            size={16}
+                            className={`transition-transform duration-200 ${showMore ? 'rotate-180' : ''}`}
+                        />
+                    </button>
                 </div>
 
                 <div

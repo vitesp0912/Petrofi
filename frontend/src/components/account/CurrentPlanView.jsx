@@ -32,8 +32,8 @@ function methodLabel(value) {
 
 const Metric = ({ label, value }) => (
     <div>
-        <p className="text-xs font-medium text-white/55 font-jakarta mb-1">{label}</p>
-        <p className="text-lg sm:text-xl font-bold font-outfit text-white leading-tight">{value}</p>
+        <p className="text-[10px] sm:text-xs font-medium text-white/55 font-jakarta mb-0.5 sm:mb-1">{label}</p>
+        <p className="text-[13px] sm:text-xl font-bold font-outfit text-white leading-tight">{value}</p>
     </div>
 );
 
@@ -123,13 +123,13 @@ const CurrentPlanView = ({ pump, subscription }) => {
     return (
         <div className="max-w-7xl mx-auto min-w-0 space-y-6 sm:space-y-7" data-testid="account-current-plan">
             <header>
-                <p className="text-pf-sky text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-2">
+                <p className="text-pf-sky text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-1.5 sm:mb-2">
                     Subscriptions
                 </p>
-                <h1 className="text-[28px] sm:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
+                <h1 className="text-[22px] sm:text-[28px] lg:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
                     Your PetroFI plan
                 </h1>
-                <p className="mt-2 text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-xl">
+                <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-xl">
                     {copy.detail} Your pump data, reports and PetroFI features stay on this plan.
                 </p>
             </header>
@@ -147,12 +147,12 @@ const CurrentPlanView = ({ pump, subscription }) => {
                             ) : null}
                         </div>
                         <div className="mt-2 flex items-center justify-between gap-3">
-                            <h2 className="text-[clamp(1.85rem,3.6vw,2.5rem)] font-bold font-outfit leading-none">
+                            <h2 className="text-[1.5rem] sm:text-[clamp(1.85rem,3.6vw,2.5rem)] font-bold font-outfit leading-none">
                                 {copy.headline}
                             </h2>
                             <PlanStamp />
                         </div>
-                        <p className="mt-1.5 text-sm text-white/70 font-jakarta leading-relaxed max-w-2xl">
+                        <p className="mt-1.5 text-[13px] sm:text-sm text-white/70 font-jakarta leading-relaxed max-w-2xl">
                             {copy.live
                                 ? `This pump is on ${copy.headline}. Access stays open until ${
                                       formatDateFull(subscription?.endDate) || 'the date on file'
@@ -161,7 +161,7 @@ const CurrentPlanView = ({ pump, subscription }) => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-white/10">
+                    <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-4 sm:pt-6 border-t border-white/10">
                         <Metric label="Started" value={formatDate(subscription?.startDate)} />
                         <Metric label="Valid till" value={formatDate(subscription?.endDate)} />
                         <Metric label="Time left" value={subscription?.timeLeft || copy.status} />
@@ -182,16 +182,16 @@ const CurrentPlanView = ({ pump, subscription }) => {
             </section>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-                <section className={`${cardClass} p-6 sm:p-7`}>
-                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-1">What this plan includes</h3>
-                    <p className="text-sm text-slate-500 font-jakarta mb-5">
+                <section className={`${cardClass} p-4 sm:p-7`}>
+                    <h3 className="text-base sm:text-lg font-bold font-outfit text-pf-navy mb-1">What this plan includes</h3>
+                    <p className="text-[13px] sm:text-sm text-slate-500 font-jakarta mb-4 sm:mb-5">
                         The same PetroFI access this pump already uses.
                     </p>
-                    <ul className="space-y-2.5">
+                    <ul className="space-y-2 sm:space-y-2.5">
                         {INCLUDED.map((item) => (
                             <li
                                 key={item}
-                                className="grid grid-cols-[16px_minmax(0,1fr)] gap-x-2 items-center text-sm leading-5 text-slate-600 font-jakarta"
+                                className="grid grid-cols-[16px_minmax(0,1fr)] gap-x-2 items-center text-[13px] sm:text-sm leading-5 text-slate-600 font-jakarta"
                             >
                                 <span className="h-4 w-4 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                                     <Check size={10} strokeWidth={2.75} />
@@ -202,9 +202,9 @@ const CurrentPlanView = ({ pump, subscription }) => {
                     </ul>
                 </section>
 
-                <section className={`${cardClass} p-6 sm:p-7`}>
-                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-1">Plan details</h3>
-                    <p className="text-sm text-slate-500 font-jakarta mb-2">
+                <section className={`${cardClass} p-4 sm:p-7`}>
+                    <h3 className="text-base sm:text-lg font-bold font-outfit text-pf-navy mb-1">Plan details</h3>
+                    <p className="text-[13px] sm:text-sm text-slate-500 font-jakarta mb-2">
                         What is already bought for this pump.
                     </p>
                     <dl>

@@ -225,13 +225,13 @@ const PlansPanel = () => {
         <div className="max-w-7xl mx-auto min-w-0 space-y-6 sm:space-y-7" data-testid="account-plans">
             <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
                 <div>
-                    <p className="text-pf-sky text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-2">
+                    <p className="text-pf-sky text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-1.5 sm:mb-2">
                         Subscriptions
                     </p>
-                    <h1 className="text-[28px] sm:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
+                    <h1 className="text-[22px] sm:text-[28px] lg:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
                         Choose your PetroFI plan
                     </h1>
-                    <p className="mt-2 text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-xl">
+                    <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-xl">
                         Your free trial is ending soon. Choose a plan to keep using PetroFI without interruption.
                     </p>
                 </div>
@@ -349,7 +349,7 @@ const PlansPanel = () => {
                                         <p className="pf-list-fly">{formatMoney(listPrice, plan.currency)}</p>
                                     ) : null}
                                     <div className={`${listPrice ? 'pf-sale-woosh ' : ''}relative inline-flex items-end gap-2 pr-2 flex-wrap`}>
-                                        <p className="text-[32px] leading-none font-bold font-outfit text-pf-navy">
+                                        <p className="text-[26px] sm:text-[32px] leading-none font-bold font-outfit text-pf-navy">
                                             {formatMoney(plan.base, plan.currency)}
                                         </p>
                                         {plan.billedAs ? (
@@ -371,14 +371,14 @@ const PlansPanel = () => {
                                 </p>
                             </div>
 
-                            <p className="mt-6 text-sm font-bold font-outfit text-pf-navy">+{plan.gstPct}% GST</p>
-                            <p className="mt-2 text-sm text-slate-600 font-jakarta leading-snug">{plan.period}</p>
+                            <p className="mt-6 text-[13px] sm:text-sm font-bold font-outfit text-pf-navy">+{plan.gstPct}% GST</p>
+                            <p className="mt-2 text-[13px] sm:text-sm text-slate-600 font-jakarta leading-snug">{plan.period}</p>
 
                             <ul className="mt-auto pt-5 space-y-1.5">
                                 {BENEFITS.map((item) => (
                                     <li
                                         key={item}
-                                        className="grid grid-cols-[16px_minmax(0,1fr)] gap-x-2 items-center text-sm leading-5 text-slate-600 font-jakarta"
+                                        className="grid grid-cols-[16px_minmax(0,1fr)] gap-x-2 items-center text-[13px] sm:text-sm leading-5 text-slate-600 font-jakarta"
                                     >
                                         <span className="h-4 w-4 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                                             <Check size={10} strokeWidth={2.75} />
@@ -414,9 +414,9 @@ const PlansPanel = () => {
                     <p className="absolute top-3 right-4 sm:top-5 sm:right-6 max-w-[46%] text-right text-[10px] sm:text-[11px] leading-snug text-slate-500 font-jakarta">
                         All prices are exclusive of 18% GST*
                     </p>
-                    <h2 className="text-2xl sm:text-3xl font-bold font-outfit leading-tight pr-[42%]">Plan prices</h2>
+                    <h2 className="text-xl sm:text-3xl font-bold font-outfit leading-tight pr-[42%]">Plan prices</h2>
                     <div className="mt-6 overflow-x-auto">
-                        <table className="w-full min-w-[600px] text-left text-sm font-jakarta">
+                        <table className="w-full min-w-[600px] text-left text-[13px] sm:text-sm font-jakarta">
                             <thead>
                                 <tr className="text-xs text-slate-500">
                                     <th className="pb-3 font-semibold">Plan</th>
