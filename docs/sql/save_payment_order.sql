@@ -204,7 +204,7 @@ begin
     end if;
 
     p_order_id := nullif(btrim(p_order_id), '');
-    if p_order_id is null or char_length(p_order_id) > 50 or p_order_id !~ '^pf_[a-zA-Z0-9_]+$' then
+    if p_order_id is null or char_length(p_order_id) > 50 or p_order_id !~ '^(PF-[0-9A-F]{8}|pf_[a-zA-Z0-9_]+)$' then
         raise exception 'invalid order_id' using errcode = '22023';
     end if;
 
