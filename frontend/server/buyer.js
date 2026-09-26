@@ -70,5 +70,6 @@ module.exports = {
     indianMobile,
     normalizeGstin,
     buyerFrom,
+    applyBuyerOverrides,
     cashfreeCustomer,
 };
