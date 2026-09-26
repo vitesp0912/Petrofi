@@ -71,19 +71,17 @@ function Field({ id, label, value, onChange, type = 'text', disabled, multiline 
 export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenChange, onConfirm }) {
     const [draft, setDraft] = useState(() => draftFromBilling(billing));
     const [editing, setEditing] = useState(false);
-    const billingKey = [
-        billing?.name,
-        billing?.pumpName,
-        billing?.email,
-        billing?.phone,
-        billing?.address,
-    ].join('|');
+    const name = billing?.name;
+    const pumpName = billing?.pumpName;
+    const email = billing?.email;
+    const phone = billing?.phone;
+    const address = billing?.address;
 
     useEffect(() => {
         if (!open) return;
-        setDraft(draftFromBilling(billing));
+        setDraft(draftFromBilling({ name, pumpName, email, phone, address }));
         setEditing(false);
-    }, [open, billingKey]);
+    }, [open, name, pumpName, email, phone, address]);
 
     const setField = (key) => (value) => setDraft((prev) => ({ ...prev, [key]: value }));
 
