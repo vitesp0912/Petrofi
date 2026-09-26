@@ -303,7 +303,9 @@ const PlansPanel = () => {
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-3 min-[1200px]:gap-4 pt-1">
                 {quotes.map((plan) => {
                     const monthly = Number(plan.days) === 30 || Number(plan.months) === 1;
-                    const perMonth = Math.round(plan.months > 0 ? plan.base / plan.months : plan.base);
+                    const perMonth = monthly
+                        ? Math.round(Number(plan.base))
+                        : Math.round(plan.months > 0 ? plan.base / plan.months : plan.base);
                     const listPrice = listPriceFor(plan);
                     const off = offPercent(listPrice, plan.base);
                     const saved = savedAmount(listPrice, plan.base);
@@ -362,11 +364,7 @@ const PlansPanel = () => {
                                 <p className="mt-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-rose-500 font-jakarta">
                                     Early launch price
                                 </p>
-                                <p
-                                    className={`mt-2 text-sm font-semibold font-jakarta ${
-                                        monthly ? 'invisible' : 'text-pf-navy'
-                                    }`}
-                                >
+                                <p className="mt-2 text-sm font-semibold font-jakarta text-pf-navy">
                                     {formatMoney(perMonth, plan.currency)} per month
                                 </p>
                             </div>
