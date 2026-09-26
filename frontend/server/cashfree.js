@@ -55,11 +55,8 @@ async function cashfreeRequest(path, { method = 'GET', body } = {}) {
     return data;
 }
 
-function createOrderId(planId) {
-    const rand = crypto.randomBytes(4).toString('hex');
-    const stamp = Date.now().toString(36);
-    const plan = String(planId || 'plan').replace(/[^a-z0-9]/gi, '').slice(0, 12);
-    return `pf_${plan}_${stamp}_${rand}`.slice(0, 45);
+function createOrderId() {
+    return `PF-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 }
 
 async function createCashfreeOrder({ orderId, amount, customer, returnUrl, notifyUrl, tags, currency, cart, note }) {

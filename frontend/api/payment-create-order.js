@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const orderId = createOrderId(quote.id);
+        const orderId = createOrderId();
         const cfg = cashfreeConfig();
         let site = publicSiteUrl();
         if (cfg.production && (!site.startsWith('https://') || /localhost|127\.0\.0\.1/i.test(site))) {

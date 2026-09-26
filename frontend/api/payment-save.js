@@ -2,7 +2,7 @@ const { send, requireUser, adminClient, readJsonBody } = require('../server/http
 const { savePaymentOrder } = require('../server/save-payment-order');
 
 const CLIENT_STATUSES = new Set(['failed', 'expired', 'user_dropped']);
-const ORDER_ID_RE = /^pf_[a-z0-9_]+$/i;
+const ORDER_ID_RE = /^(PF-[0-9A-F]{8}|pf_[a-z0-9_]+)$/i;
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {

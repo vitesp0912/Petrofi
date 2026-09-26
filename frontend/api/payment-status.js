@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
 
         const url = new URL(req.url, 'http://localhost');
         const orderId = String(url.searchParams.get('order_id') || '').trim();
-        if (!orderId || orderId.length > 50 || !/^pf_[a-z0-9_]+$/i.test(orderId)) {
+        if (!orderId || orderId.length > 50 || !/^(PF-[0-9A-F]{8}|pf_[a-z0-9_]+)$/i.test(orderId)) {
             send(res, 400, { ok: false, reason: 'bad_request' });
             return;
         }

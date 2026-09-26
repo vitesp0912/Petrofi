@@ -68,9 +68,10 @@ const PaymentsPanel = () => {
                     <p className="text-sm text-slate-500 font-jakarta">{loadError}</p>
                 ) : orders.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[520px] text-left text-sm font-jakarta">
+                        <table className="w-full min-w-[720px] text-left text-sm font-jakarta">
                             <thead>
                                 <tr className="text-xs text-slate-400">
+                                    <th className="pb-3 font-semibold">Order ID</th>
                                     <th className="pb-3 font-semibold">Plan</th>
                                     <th className="pb-3 font-semibold">Status</th>
                                     <th className="pb-3 font-semibold">Date</th>
@@ -80,9 +81,10 @@ const PaymentsPanel = () => {
                             <tbody>
                                 {orders.map((row) => (
                                     <tr key={row.orderId} className="border-t border-slate-100">
+                                        <td className="py-3.5 font-mono text-pf-navy">{row.orderId}</td>
                                         <td className="py-3.5 font-semibold text-pf-navy">{row.planName || 'Not set'}</td>
                                         <td className="py-3.5"><StatusPill value={row.status} /></td>
-                                        <td className="py-3.5 text-slate-600">{formatDate(row.paidAt || row.createdAt)}</td>
+                                        <td className="py-3.5 text-slate-600">{formatDate(row.createdAt)}</td>
                                         <td className="py-3.5 font-semibold text-pf-navy">
                                             {formatMoney(row.amount, row.currency)}
                                         </td>
