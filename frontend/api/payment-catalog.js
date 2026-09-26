@@ -13,6 +13,7 @@ function mapOrder(row, planName) {
         status: row.status || null,
         paidAt: row.paid_at || null,
         createdAt: row.created_at || null,
+        paymentMethod: row.payment_method || null,
     };
 }
 

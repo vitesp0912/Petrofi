@@ -9,23 +9,33 @@ const PETROFI_MARK =
 export const BrandLink = ({ compact = false }) => (
     <Link to="/" className="inline-flex items-center gap-2 min-w-0" data-testid="account-brand">
         <img src={PETROFI_MARK} alt="PetroFI" className={`${compact ? 'w-8 h-8' : 'w-9 h-9'} object-contain shrink-0`} />
-        <span className={`font-bold font-outfit text-pf-navy ${compact ? 'text-lg' : 'text-xl'}`}>PetroFI</span>
+        <span className={`font-bold font-outfit text-pf-navy ${compact ? 'text-base sm:text-lg' : 'text-xl'}`}>PetroFI</span>
     </Link>
 );
 
 export const cardClass =
     'bg-white rounded-2xl border border-slate-200/80 shadow-[0_10px_32px_rgba(13,27,62,0.06)]';
 
-export const StatusPill = ({ value }) => (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold font-jakarta ${statusTone(value)}`}>
+export const Bone = ({ className = '' }) => (
+    <div className={`animate-pulse rounded-md bg-slate-200/90 ${className}`} />
+);
+
+export const StatusPill = ({ value, compact = false, className = '' }) => (
+    <span
+        className={`inline-flex items-center justify-center rounded-full border font-semibold font-jakarta ${
+            compact
+                ? 'min-h-8 px-3 py-1.5 text-[10px] sm:min-h-7 sm:px-2.5 sm:py-1'
+                : 'min-h-10 sm:min-h-9 px-3.5 py-2 text-xs'
+        } ${statusTone(value)} ${className}`}
+    >
         {titleCase(value)}
     </span>
 );
 
 export const FieldRow = ({ label, value }) => (
-    <div className="flex items-start justify-between gap-6 py-3.5 border-b border-slate-100 last:border-b-0">
-        <dt className="text-sm text-slate-500 font-jakarta shrink-0">{label}</dt>
-        <dd className="text-sm font-semibold text-pf-navy font-jakarta text-right break-words">{value || 'Not set'}</dd>
+    <div className="flex items-start justify-between gap-4 sm:gap-6 py-2.5 sm:py-3.5 border-b border-slate-100 last:border-b-0">
+        <dt className="text-[13px] sm:text-sm text-slate-500 font-jakarta shrink-0">{label}</dt>
+        <dd className="text-[13px] sm:text-sm font-semibold text-pf-navy font-jakarta text-right break-words">{value || 'Not set'}</dd>
     </div>
 );
 
@@ -67,9 +77,9 @@ export const LoadingState = () => (
 );
 
 export const PageIntro = ({ kicker, title, text }) => (
-    <header className="mb-6 sm:mb-8">
-        <p className="text-pf-sky text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-2">{kicker}</p>
-        <h1 className="text-[28px] sm:text-[34px] font-bold font-outfit text-pf-navy leading-[1.15] text-balance">{title}</h1>
-        {text ? <p className="mt-2 text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-2xl">{text}</p> : null}
+    <header className="mb-4 sm:mb-8">
+        <p className="text-pf-sky text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-1.5 sm:mb-2">{kicker}</p>
+        <h1 className="text-[22px] sm:text-[28px] lg:text-[34px] font-bold font-outfit text-pf-navy leading-[1.15] text-balance">{title}</h1>
+        {text ? <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-2xl">{text}</p> : null}
     </header>
 );

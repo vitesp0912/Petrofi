@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import './App.css';
 import { AuthProvider } from './context/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
+import { useVisualKeyboard } from './hooks/useVisualKeyboard';
 import HomePage from './pages/HomePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PaymentsPanel from './components/account/PaymentsPanel';
@@ -13,6 +14,8 @@ import SubscriptionPage from './pages/SubscriptionPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 
 function App() {
+    useVisualKeyboard();
+
     return (
         <BrowserRouter>
             <AuthProvider>

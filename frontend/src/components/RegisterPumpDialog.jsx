@@ -78,7 +78,7 @@ const RegisterPumpDialog = ({ open, onOpenChange, onSuccess, source = 'screensho
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl border-0 p-0 bg-white shadow-[0_24px_80px_rgba(13,27,62,0.28)] gap-0 sm:rounded-2xl">
+            <DialogContent className="w-[calc(100%-2rem)] max-w-[420px] rounded-2xl border-0 p-0 bg-white shadow-[0_24px_80px_rgba(13,27,62,0.28)] gap-0 sm:rounded-2xl">
                 {status === 'success' ? (
                     <div className="px-6 py-10 sm:px-8 text-center" data-testid="register-pump-success">
                         <DialogTitle className="sr-only">{isAccount ? 'Thank you' : 'Pump registered'}</DialogTitle>
