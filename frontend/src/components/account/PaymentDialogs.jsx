@@ -167,6 +167,8 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
 
 function resultCopy(status, planName) {
     const plan = String(planName || '').trim();
+    const value = String(status || '').toLowerCase();
+    if (!value) return null;
     if (status === 'paid') {
         return {
             title: 'Payment successful',
@@ -232,12 +234,16 @@ function ResultMark({ tone }) {
 
 export function PaymentResultDialog({ status, planName, onClose }) {
     const navigate = useNavigate();
-    const copy = resultCopy(status, planName);
+    const shown = React.useRef({ status: '', planName: '' });
+    if (status) shown.current = { status, planName };
+    const copy = resultCopy(shown.current.status, shown.current.planName);
     const handleAction = () => {
         onClose();
-        if (copy.tone === 'failed') navigate('/subscription/plans');
+        if (copy?.tone === 'failed') navigate('/subscription/plans');
         else navigate('/subscription');
     };
+
+    if (!copy) return null;
 
     return (
         <Dialog open={Boolean(status)} onOpenChange={(next) => { if (!next) onClose(); }}>
