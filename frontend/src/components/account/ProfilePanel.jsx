@@ -165,8 +165,7 @@ const ProfilePanel = () => {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                 <section className={`${cardClass} p-6 sm:p-7`}>
-                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-1">Account</h3>
-                    <p className="text-sm text-slate-500 font-jakarta mb-2">Who is signed in on this login.</p>
+                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-2">Account</h3>
                     <dl>
                         <FieldRow label="Name" value={profile?.name || displayName} />
                         <FieldRow label="Role" value={roleLabel(profile?.role)} />
@@ -220,8 +219,7 @@ const ProfilePanel = () => {
                 </section>
 
                 <section className={`${cardClass} p-6 sm:p-7`}>
-                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-1">Pump</h3>
-                    <p className="text-sm text-slate-500 font-jakarta mb-2">The petrol pump tied to this account.</p>
+                    <h3 className="text-lg font-bold font-outfit text-pf-navy mb-2">Pump</h3>
                     {pump ? (
                         <dl>
                             <FieldRow label="Name" value={pump.name} />

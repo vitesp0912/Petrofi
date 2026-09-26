@@ -38,16 +38,14 @@ const Metric = ({ label, value }) => (
 );
 
 const PlanStamp = ({ className = '' }) => (
-    <span
-        className={`pf-plan-stamp flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-full bg-[#00A63E] text-white ${className}`}
-        aria-hidden="true"
-    >
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+    <span className={`pf-plan-stamp relative inline-flex h-16 w-[4.5rem] shrink-0 items-center justify-center overflow-visible ${className}`} aria-hidden="true">
+        <svg width="72" height="64" viewBox="0 0 72 64" fill="none" className="overflow-visible">
+            <circle cx="28" cy="32" r="26" fill="#00A63E" />
             <path
                 className="pf-result-check"
-                d="M6.5 12.5 10 16l7.5-8"
-                stroke="currentColor"
-                strokeWidth="3.2"
+                d="M14 33 28 48 65 7"
+                stroke="#F0FFF4"
+                strokeWidth="6"
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
@@ -69,7 +67,7 @@ export const CurrentPlanSkeleton = () => (
             <Bone className="h-5 w-24 rounded-full bg-white/20" />
             <Bone className="mt-4 h-9 w-48 bg-white/25" />
             <Bone className="mt-3 h-4 w-72 max-w-full bg-white/15" />
-            <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-5 pt-6 border-t border-white/10">
+            <div className="mt-8 grid grid-cols-3 gap-5 pt-6 border-t border-white/10">
                 {[0, 1, 2, 3].map((item) => (
                     <div key={item}>
                         <Bone className="h-3 w-16 bg-white/15" />
@@ -136,37 +134,37 @@ const CurrentPlanView = ({ pump, subscription }) => {
                 </p>
             </header>
 
-            <section className="relative overflow-hidden rounded-2xl bg-pf-navy text-white p-6 sm:p-8 shadow-[0_18px_50px_rgba(13,27,62,0.22)]">
+            <section className="relative overflow-hidden rounded-2xl bg-pf-navy text-white px-5 py-4 sm:px-6 sm:py-5 shadow-[0_18px_50px_rgba(13,27,62,0.22)]">
                 <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-pf-sky/15 blur-2xl pointer-events-none" />
-                <PlanStamp className="absolute top-4 right-4 sm:hidden" />
                 <div className="relative">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
-                        <div className="min-w-0 pr-[5.25rem] sm:pr-0">
-                            <p className="inline-flex items-center min-h-8 rounded-full bg-pf-sky text-pf-navy px-3 py-1.5 text-[10px] font-bold tracking-wide font-jakarta">
+                    <div className="mb-4">
+                        <div className="flex items-center gap-2">
+                            <p className="inline-flex w-[7.5rem] items-center justify-center min-h-8 px-3 py-1.5 text-[10px] sm:min-h-7 sm:px-2.5 sm:py-1 rounded-full bg-pf-sky text-pf-navy font-bold tracking-wide font-jakarta">
                                 {copy.live ? 'Current plan' : 'Last plan'}
                             </p>
-                            <div className="mt-3 flex items-center gap-3 sm:gap-3.5">
-                                <h2 className="text-[clamp(1.6rem,3vw,2.1rem)] font-bold font-outfit leading-tight">
-                                    {copy.headline}
-                                </h2>
-                                <PlanStamp className="hidden sm:flex" />
-                            </div>
-                            <p className="mt-2 text-sm text-white/70 font-jakarta leading-relaxed max-w-2xl">
-                                {copy.live
-                                    ? `This pump is on ${copy.headline}. Access stays open until ${
-                                          formatDateFull(subscription?.endDate) || 'the date on file'
-                                      }.`
-                                    : copy.detail}
-                            </p>
+                            {subscription?.status ? (
+                                <StatusPill value={subscription.status} compact className="w-[7.5rem]" />
+                            ) : null}
                         </div>
-                        {subscription?.status ? <StatusPill value={subscription.status} /> : null}
+                        <div className="mt-2 flex items-center justify-between gap-3">
+                            <h2 className="text-[clamp(1.85rem,3.6vw,2.5rem)] font-bold font-outfit leading-none">
+                                {copy.headline}
+                            </h2>
+                            <PlanStamp />
+                        </div>
+                        <p className="mt-1.5 text-sm text-white/70 font-jakarta leading-relaxed max-w-2xl">
+                            {copy.live
+                                ? `This pump is on ${copy.headline}. Access stays open until ${
+                                      formatDateFull(subscription?.endDate) || 'the date on file'
+                                  }.`
+                                : copy.detail}
+                        </p>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 pt-6 border-t border-white/10">
+                    <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-white/10">
                         <Metric label="Started" value={formatDate(subscription?.startDate)} />
                         <Metric label="Valid till" value={formatDate(subscription?.endDate)} />
                         <Metric label="Time left" value={subscription?.timeLeft || copy.status} />
-                        <Metric label="Duration" value={duration || 'Not set'} />
                     </div>
 
                     {progress != null ? (

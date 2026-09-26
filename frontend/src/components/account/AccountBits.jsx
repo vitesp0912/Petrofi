@@ -20,8 +20,14 @@ export const Bone = ({ className = '' }) => (
     <div className={`animate-pulse rounded-md bg-slate-200/90 ${className}`} />
 );
 
-export const StatusPill = ({ value }) => (
-    <span className={`inline-flex items-center justify-center min-h-10 sm:min-h-9 rounded-full border px-3.5 py-2 text-xs font-semibold font-jakarta ${statusTone(value)}`}>
+export const StatusPill = ({ value, compact = false, className = '' }) => (
+    <span
+        className={`inline-flex items-center justify-center rounded-full border font-semibold font-jakarta ${
+            compact
+                ? 'min-h-8 px-3 py-1.5 text-[10px] sm:min-h-7 sm:px-2.5 sm:py-1'
+                : 'min-h-10 sm:min-h-9 px-3.5 py-2 text-xs'
+        } ${statusTone(value)} ${className}`}
+    >
         {titleCase(value)}
     </span>
 );

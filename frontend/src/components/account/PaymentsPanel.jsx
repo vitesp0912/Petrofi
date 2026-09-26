@@ -27,9 +27,10 @@ const PaymentsSkeleton = () => (
         </header>
         <section className={`${cardClass} overflow-hidden`}>
             <div className="overflow-x-auto">
-                <div className="min-w-[640px]">
-                    <div className="grid grid-cols-[1.4fr_0.9fr_1fr_0.9fr] gap-4 items-center px-5 sm:px-6 py-3 bg-slate-50 border-b border-slate-100">
+                <div className="min-w-[760px]">
+                    <div className="grid grid-cols-[1.2fr_1.3fr_0.8fr_0.9fr_0.8fr] gap-4 items-center px-5 sm:px-6 py-3 bg-slate-50 border-b border-slate-100">
                         <Bone className="h-3 w-10" />
+                        <Bone className="h-3 w-16" />
                         <Bone className="h-3 w-12" />
                         <Bone className="h-3 w-10" />
                         <Bone className="h-3 w-14 justify-self-end" />
@@ -37,12 +38,13 @@ const PaymentsSkeleton = () => (
                     {[0, 1, 2, 3, 4].map((row) => (
                         <div
                             key={row}
-                            className="grid grid-cols-[1.4fr_0.9fr_1fr_0.9fr] gap-4 items-center px-5 sm:px-6 py-4 border-t border-slate-100 first:border-t-0"
+                            className="grid grid-cols-[1.2fr_1.3fr_0.8fr_0.9fr_0.8fr] gap-4 items-center px-5 sm:px-6 py-4 border-t border-slate-100 first:border-t-0"
                         >
                             <div>
                                 <Bone className="h-4 w-24" />
                                 <Bone className="mt-1.5 h-3 w-20" />
                             </div>
+                            <Bone className="h-4 w-28" />
                             <Bone className="h-6 w-16 rounded-full" />
                             <Bone className="h-4 w-24" />
                             <Bone className="h-4 w-16 justify-self-end" />
@@ -131,10 +133,11 @@ const PaymentsPanel = () => {
                     </div>
                 ) : orders.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[640px] text-sm font-jakarta">
+                        <table className="w-full min-w-[760px] text-sm font-jakarta">
                             <thead>
                                 <tr className="bg-slate-50 text-sm uppercase tracking-wide text-slate-600">
                                     <th className="text-left font-bold px-5 sm:px-6 py-3.5">Plan</th>
+                                    <th className="text-left font-bold px-5 sm:px-6 py-3.5">Order ID</th>
                                     <th className="text-left font-bold px-5 sm:px-6 py-3.5">Status</th>
                                     <th className="text-left font-bold px-5 sm:px-6 py-3.5">Date</th>
                                     <th className="text-right font-bold px-5 sm:px-6 py-3.5">Amount</th>
@@ -154,6 +157,9 @@ const PaymentsPanel = () => {
                                                         {method}
                                                     </p>
                                                 ) : null}
+                                            </td>
+                                            <td className="px-5 sm:px-6 py-4 align-middle text-slate-600 font-outfit tabular-nums break-all">
+                                                {row.orderId || 'Not set'}
                                             </td>
                                             <td className="px-5 sm:px-6 py-4 align-middle">
                                                 <StatusPill value={row.status} />
