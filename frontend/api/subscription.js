@@ -1,7 +1,7 @@
 const { send, requireUser, isUuid, adminClient } = require('../server/http');
 
 const PUMP_COLUMNS =
-    'id, pump_code, name, city, state, address, pincode, owner_name, phone, email, registration_status, is_active';
+    'id, pump_code, name, city, state, address, pincode, owner_name, phone, email, registration_status';
 const SUB_COLUMNS = 'id, plan_id, status, start_date, end_date, created_at';
 
 function emptyPayload(profile) {
@@ -10,7 +10,6 @@ function emptyPayload(profile) {
         profile: profile ? { name: profile.name || null, role: profile.role || null } : null,
         pump: null,
         subscription: null,
-        history: [],
     };
 }
 
@@ -26,7 +25,6 @@ function mapPump(row) {
         phone: row.phone || null,
         email: row.email || null,
         registrationStatus: row.registration_status || null,
-        active: row.is_active === true,
     };
 }
 
@@ -144,16 +142,14 @@ module.exports = async (req, res) => {
 
         const pump = pumpRow && pumpRow.id === pumpId ? mapPump(pumpRow) : null;
         const rows = pump ? subRows || [] : [];
-        const names = await planNameMap(rows.map((row) => row.plan_id));
         const current = pickCurrent(rows);
-        const history = rows.map((row) => mapSubscription(row, names[row.plan_id]));
+        const names = await planNameMap(current?.plan_id ? [current.plan_id] : []);
 
         send(res, 200, {
             ok: true,
             profile: profile ? { name: profile.name || null, role: profile.role || null } : null,
             pump,
             subscription: current ? mapSubscription(current, names[current.plan_id]) : null,
-            history,
         });
     } catch {
         send(res, 500, { ok: false, reason: 'load_failed' });

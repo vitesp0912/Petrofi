@@ -25,7 +25,6 @@ function SubscriptionPage() {
         profile: null,
         pump: null,
         subscription: null,
-        history: [],
     });
 
     usePageMeta({
@@ -44,7 +43,6 @@ function SubscriptionPage() {
                 profile: null,
                 pump: null,
                 subscription: null,
-                history: [],
             });
             return undefined;
         }
@@ -59,7 +57,6 @@ function SubscriptionPage() {
                     profile: null,
                     pump: null,
                     subscription: null,
-                    history: [],
                 });
                 return;
             }
@@ -69,7 +66,6 @@ function SubscriptionPage() {
                 profile: result.profile,
                 pump: result.pump,
                 subscription: result.subscription,
-                history: result.history,
             });
         });
 
@@ -85,7 +81,6 @@ function SubscriptionPage() {
         profile: state.profile,
         pump: state.pump,
         subscription: state.subscription,
-        history: state.history,
     }), [user, authLoading, state]);
 
     if (authLoading) {
