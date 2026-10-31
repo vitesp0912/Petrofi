@@ -45,7 +45,7 @@ const TermsOfServicePage = () => {
             intro=""
             version="v1.0"
             effectiveDate="6 September 2026"
-            lastUpdated="6 September 2026"
+            lastUpdated="31 October 2026"
             controller="Vitespace Private Limited"
             sections={SECTIONS}
         >
@@ -93,8 +93,9 @@ const TermsOfServicePage = () => {
 
             <LegalSection id="eligibility" number="2" title="Eligibility and accounts">
                 <LegalP>
-                    2.1. The Service is intended for <strong className="text-pf-navy font-semibold">business users</strong> operating
-                    or working at a fuel retail outlet (owners/dealers, managers, field staff, and similar authorised roles).
+                    2.1. You must be at least 18 years old to use the Service. The Service is intended for{' '}
+                    <strong className="text-pf-navy font-semibold">business users</strong> operating or working at a
+                    fuel retail outlet (owners/dealers, managers, and similar authorised roles).
                 </LegalP>
                 <LegalP>
                     2.2. You must provide accurate registration information (such as name, phone number, optional email,
@@ -111,7 +112,7 @@ const TermsOfServicePage = () => {
                     ]}
                 />
                 <LegalP>
-                    2.4. Account roles (for example dealer, manager, FSM) determine what features and data you can access.
+                    2.4. Account roles (for example dealer, manager) determine what features and data you can access.
                     Dealers or owners who invite staff are responsible for assigning appropriate roles and deactivating
                     access when staff leave.
                 </LegalP>
@@ -360,17 +361,15 @@ const TermsOfServicePage = () => {
                 </LegalContactCard>
                 <LegalH3>Grievance Officer</LegalH3>
                 <LegalP>
-                    In accordance with the Information Technology Act, 2000 and rules made thereunder, the name and
-                    contact details of the Grievance Officer are provided below:
-                </LegalP>
-                <LegalList
-                    items={[
-                        { key: 'go-name', content: <><strong className="text-pf-navy font-semibold">Name:</strong> Abhinandan Srivastava</> },
-                        { key: 'go-email', content: <><strong className="text-pf-navy font-semibold">Email:</strong> <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a></> },
-                    ]}
-                />
-                <LegalP>
-                    We will acknowledge your grievance within 24 hours and aim to resolve it within 15 days.
+                    If you have a complaint about a subscription or payment, or about how we have handled your account
+                    or data, write to our Grievance Officer at{' '}
+                    <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a> with
+                    the subject line <strong className="text-pf-navy">“Grievance”</strong>, or call{' '}
+                    <a className="text-pf-sky hover:underline" href="tel:+917398621812">+91 7398621812</a>
+                    {' or '}
+                    <a className="text-pf-sky hover:underline" href="tel:+918700117495">+91 8700117495</a>.
+                    We acknowledge every complaint within 48 hours and aim to resolve it within 30 days of receiving it,
+                    as required under the Consumer Protection (E-Commerce) Rules, 2020 and the Information Technology Act, 2000.
                 </LegalP>
             </LegalSection>
         </LegalPageLayout>

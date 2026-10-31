@@ -4,15 +4,23 @@
 **Version:** v1.0  
 **Data controller / company:** Vitespace Private Limited (“Vitespace”, “we”, “us”, or “our”)  
 **Effective date:** 6 September 2026  
-**Last updated:** 6 September 2026  
+**Last updated:** 31 October 2026  
 
-This Privacy Policy explains how we collect, use, store, share, and protect information when you use the PetroFI applications (Android, iOS, and web) and related services (the “Service”).
+This policy covers the PetroFI app for iOS, the PetroFI app for Android, and the PetroFI web app at app.petrofi.in.
 
 ---
 
 ## 1. Who we are
 
 PetroFI is a fuel retail outlet operations and finance product of **Vitespace Private Limited**. It helps authorised users manage pump setup, daily entries, inventory, treasury, credit ledger, and reports.
+
+PetroFI is available on three platforms, which together with related services are the “Service”:
+
+- the PetroFI app for iOS  
+- the PetroFI app for Android  
+- the PetroFI web app at [app.petrofi.in](https://app.petrofi.in)  
+
+This Privacy Policy explains how we collect, use, store, share, and protect information when you use any of these platforms. The same practices apply on iOS, Android, and the web app. Information you enter on one platform is available on the others for the same account, subject to your role.
 
 Registered office: S-4/783, Shalimar Garden, Extension -1, Sahibabad, Ghaziabad
 
@@ -32,10 +40,14 @@ For privacy requests, email us with subject: **“PetroFI Privacy Request”**.
 This Policy applies to:
 
 - Dealers / owners registering an outlet  
-- Managers, FSM/field staff, and other invited users  
-- Use of PetroFI on mobile and web  
+- Managers and other invited users  
+- Use of the PetroFI app for iOS  
+- Use of the PetroFI app for Android  
+- Use of the PetroFI web app at [app.petrofi.in](https://app.petrofi.in)  
+- Account registration, sign-in, outlet setup, and day-to-day use on any of those platforms  
+- Support requests and other communications with us  
 
-It does not govern third-party websites or services that we do not control, even if linked from the app.
+It does not govern third-party websites or services that we do not control, even if linked from the Service. Apple’s App Store and Google Play are covered only to the extent they distribute the iOS and Android apps.
 
 ---
 
@@ -48,7 +60,7 @@ Depending on how you register or sign in, we may collect:
 - Full name  
 - Mobile phone number  
 - Email address (optional at signup; may be used for email OTP login)  
-- Role (e.g. dealer, manager, FSM)  
+- Role (e.g. dealer, manager)  
 - Authentication identifiers linked to your account  
 
 Phone and/or email OTPs are used to verify sign-in. OTP delivery may involve SMS and email service providers.
@@ -79,11 +91,18 @@ This is primarily **business operational data**. Where it includes information a
 
 ### 3.4 Device, app, and technical data
 
+On the iOS app, the Android app, and the web app, we may collect:
+
+- App or browser version and basic platform information (iOS, Android, or web browser) as needed for updates and support  
+- Security session data (authentication tokens used to keep you signed in). On the web app, this may be stored in your browser.  
+- Local preferences stored on your device or in your browser for settings and display continuity  
+
+On the iOS and Android apps, we may also collect:
+
 - Device push notification tokens used to deliver alerts  
-- App version and basic device/platform information as needed for updates and support  
-- Connectivity-related signals used for offline/online handling  
-- Local preferences stored on your device for settings and display continuity  
-- Security session data (authentication tokens used to keep you signed in)  
+- Connectivity-related signals used for offline and online handling  
+
+On the web app at app.petrofi.in, we may also collect browser type and basic technical information needed to load and secure the site.  
 
 ### 3.5 Audit and diagnostics
 
@@ -100,7 +119,7 @@ We do not require government ID scans, precise continuous GPS tracking, or payme
 
 - **Directly from you** — signup, profile, settings, and day-to-day entries  
 - **From invited users** — when a dealer invites staff  
-- **Automatically** — auth sessions, device tokens, logs, and app diagnostics  
+- **Automatically** — sign-in sessions, logs, and diagnostics on iOS, Android, and the web app, plus device tokens on the mobile apps  
 - **From service providers** — e.g. delivery status of SMS/email OTP where provided to us  
 
 ---
@@ -114,7 +133,7 @@ We process information to:
 | Provide the Service | Login, pump-scoped dashboards, entries, stock, treasury, reports |
 | Account administration | Registration approval, roles, invites, access control |
 | Security | Authentication, session management, abuse prevention, audit trails |
-| Notifications | Operational push notifications where enabled |
+| Notifications | Operational alerts on the iOS and Android apps, and in the browser where enabled |
 | Support | Responding to contact requests and troubleshooting |
 | Improvement | Reliability, bug fixes, performance (using aggregated or diagnostic data where practicable) |
 | Legal and compliance | Complying with law, enforcing Terms, resolving disputes |
@@ -177,14 +196,11 @@ Data is stored and processed on cloud infrastructure operated by our providers. 
 
 ## 10. Data retention
 
-We retain information for as long as:
+We retain information for one year, until you explicitly request that we delete it.
 
-- Your account / outlet subscription remains active, and  
-- Needed to provide the Service, resolve disputes, enforce agreements, and meet legal, tax, or audit requirements  
+Pending or rejected registrations may be retained for review and fraud prevention. On the iOS and Android apps, device tokens are updated or removed when you sign out, uninstall, or tokens are invalidated, and local data may remain until cleared by the operating system or an app data reset. On the web app, session data in your browser remains until you sign out or clear site data for app.petrofi.in.
 
-Pending or rejected registrations may be retained for review and fraud prevention. Device tokens are updated or removed when you sign out, uninstall, or tokens are invalidated. Local device caches may remain until cleared by the OS or app data reset.
-
-On verified account closure requests, we will delete or anonymise personal data we control, except where retention is required or permitted by law.
+When you explicitly request deletion, we will delete or anonymise personal data we control, except where retention is required or permitted by law.
 
 ---
 
@@ -210,7 +226,7 @@ Subject to applicable law, you may request to:
 - **Correct** inaccurate account information  
 - **Delete** or withdraw consent where processing is consent-based  
 - **Export** certain business data (where features or support can provide it)  
-- **Opt out** of non-essential notifications via device settings  
+- **Opt out** of non-essential notifications in iOS or Android settings, or in your browser for the web app  
 
 Outlet owners may manage staff access through invite/deactivate flows in the product where available.
 
@@ -226,12 +242,14 @@ PetroFI is a **business** application for fuel retail operations. It is not dire
 
 ## 14. Permissions
 
-Depending on platform and features, the app may request permissions such as:
+On the iOS and Android apps, depending on features, the app may request:
 
 - **Notifications** — operational alerts  
 - **Network access** — sync and authentication  
 - **Storage / files** — saving or sharing reports (PDF/Excel)  
-- Other OS permissions required for sharing or opening files  
+- Other operating-system permissions required for sharing or opening files  
+
+On the web app at app.petrofi.in, your browser may ask permission for notifications or file downloads when you use those features. The web app does not request iOS or Android operating-system permissions.
 
 You can deny optional permissions; some features may not work without them.
 
@@ -239,13 +257,13 @@ You can deny optional permissions; some features may not work without them.
 
 ## 15. Third-party links and stores
 
-App Store / Play Store distribution and payment (if any) are also governed by Apple/Google terms. Third-party links open external services with their own privacy practices.
+The iOS app is distributed through Apple’s App Store, and the Android app is distributed through Google Play. Distribution, and any payment made in those stores, is also governed by Apple’s or Google’s terms. The web app is used in your browser at app.petrofi.in and is not distributed through those stores. Third-party links open external services with their own privacy practices.
 
 ---
 
 ## 16. Changes to this Policy
 
-We may update this Privacy Policy from time to time. The “Last updated” date will change, and material updates may be communicated in-app or by email where appropriate. Continued use after the effective date of changes means you acknowledge the updated Policy.
+We may update this Privacy Policy from time to time. The “Last updated” date will change, and material updates may be communicated in the iOS app, the Android app, the web app, or by email where appropriate. Continued use after the effective date of changes means you acknowledge the updated Policy.
 
 ---
 
@@ -262,14 +280,7 @@ Registered office: S-4/783, Shalimar Garden, Extension -1, Sahibabad, Ghaziabad
 
 For privacy requests, prefer email with subject line: **“PetroFI Privacy Request”**.
 
-**Grievance Officer:** In accordance with the Information Technology Act, 2000 and rules made thereunder (including the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021), the name and contact details of the Grievance Officer are provided below:
-
-- **Name:** Abhinandan Srivastava  
-- **Email:** admin@petrofi.in  
-
-We will acknowledge your grievance within 24 hours and aim to resolve it within 15 days.
-
-If you have an unresolved privacy concern, contact us first. You may also have the right to approach the relevant data protection authority under applicable Indian law once fully operational for your category of processing.
+**Grievance Officer:** If you have a complaint about a subscription or payment, or about how we have handled your account or data, write to our Grievance Officer at admin@petrofi.in with the subject line “Grievance”, or call +91 7398621812 or +91 8700117495. We acknowledge every complaint within 48 hours and aim to resolve it within 30 days of receiving it, as required under the Consumer Protection (E-Commerce) Rules, 2020 and the Information Technology Act, 2000.
 
 ---
 
@@ -282,7 +293,7 @@ If you have an unresolved privacy concern, contact us first. You may also have t
 | Operations | Readings, sales, expenses, stock | Core product features |
 | Credit customers | Name/phone/balances you enter | Udhar ledger |
 | Money movement | Treasury, banks, transfers | Funds tracking |
-| Device | Push notification tokens, local preferences | Notifications, settings |
+| Device and browser | Push tokens on iOS and Android; browser session and local preferences on the web app | Notifications, sign-in, settings |
 | Logs | Audit / error logs | Security and support |
 
 ---

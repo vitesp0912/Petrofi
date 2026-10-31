@@ -65,23 +65,21 @@ const LegalPageLayout = ({
     const activeSection = toc.find((item) => item.id === activeId) || toc[0];
 
     return (
-        <div className="font-jakarta bg-pf-deep text-white min-h-screen">
+        <div className="font-jakarta bg-[#F3F6FB] text-pf-navy min-h-screen">
             <Navbar forceSolid />
             <main id="main-content" aria-label={title}>
-                <header className="relative bg-pf-navy pt-24 pb-12 sm:pt-28 sm:pb-16 overflow-hidden">
-                    <div className="absolute inset-0 dot-pattern opacity-20 pointer-events-none" />
+                <header className="relative bg-white pt-24 pb-12 sm:pt-28 sm:pb-16 overflow-hidden border-b border-slate-200">
                     <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-pf-sky/10 rounded-full blur-3xl pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-pf-sky/5 rounded-full blur-3xl pointer-events-none" />
 
                     <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm font-jakarta text-slate-400 mb-6">
-                            <Link to="/" className="hover:text-white" style={{ transition: 'color 0.2s ease' }}>
+                        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm font-jakarta text-slate-500 mb-6">
+                            <Link to="/" className="hover:text-pf-navy" style={{ transition: 'color 0.2s ease' }}>
                                 Home
                             </Link>
-                            <ChevronRight size={12} className="text-slate-600" />
+                            <ChevronRight size={12} className="text-slate-300" />
                             <span className="text-slate-500">Legal</span>
-                            <ChevronRight size={12} className="text-slate-600" />
-                            <span className="text-white">{title}</span>
+                            <ChevronRight size={12} className="text-slate-300" />
+                            <span className="text-pf-navy">{title}</span>
                         </nav>
 
                         <div className="inline-flex items-center gap-2 bg-pf-sky/10 text-pf-sky text-xs font-semibold px-3 py-1.5 rounded-full font-jakarta mb-4 border border-pf-sky/20">
@@ -89,11 +87,11 @@ const LegalPageLayout = ({
                             {eyebrow}
                         </div>
 
-                        <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-bold font-outfit text-white leading-tight max-w-3xl ${intro ? 'mb-4' : 'mb-8'}`}>
+                        <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-bold font-outfit text-pf-navy leading-tight max-w-3xl ${intro ? 'mb-4' : 'mb-8'}`}>
                             {title}
                         </h1>
                         {intro ? (
-                            <p className="text-slate-300 font-jakarta text-sm sm:text-base leading-relaxed max-w-2xl mb-8">
+                            <p className="text-slate-500 font-jakarta text-sm sm:text-base leading-relaxed max-w-2xl mb-8">
                                 {intro}
                             </p>
                         ) : null}
@@ -107,7 +105,7 @@ const LegalPageLayout = ({
                     </div>
                 </header>
 
-                <div className="lg:hidden sticky top-16 z-30 bg-pf-deep/95 backdrop-blur-md border-b border-white/10">
+                <div className="lg:hidden sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200">
                     <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
                         <button
                             type="button"
@@ -120,13 +118,13 @@ const LegalPageLayout = ({
                                 <span className="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 font-jakarta">
                                     On this page
                                 </span>
-                                <span className="block text-sm font-semibold font-outfit text-white truncate">
+                                <span className="block text-sm font-semibold font-outfit text-pf-navy truncate">
                                     {activeSection?.number}. {activeSection?.title}
                                 </span>
                             </span>
                             <ChevronDown
                                 size={18}
-                                className={`text-white shrink-0 ${tocOpen ? 'rotate-180' : ''}`}
+                                className={`text-pf-navy shrink-0 ${tocOpen ? 'rotate-180' : ''}`}
                                 style={{ transition: 'transform 0.2s ease' }}
                             />
                         </button>
@@ -134,7 +132,7 @@ const LegalPageLayout = ({
                             <nav
                                 id="mobile-legal-toc"
                                 aria-label="On this page"
-                                className="absolute left-0 right-0 top-full bg-pf-navy border-b border-white/10 shadow-lg max-h-[min(60vh,420px)] overflow-y-auto"
+                                className="absolute left-0 right-0 top-full bg-white border-b border-slate-200 shadow-lg max-h-[min(60vh,420px)] overflow-y-auto"
                             >
                                 <ol className="py-2 px-4 sm:px-6">
                                     {toc.map((item) => (
@@ -144,8 +142,8 @@ const LegalPageLayout = ({
                                                 onClick={() => scrollToSection(item.id)}
                                                 className={`w-full text-left flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-sm font-jakarta ${
                                                     activeId === item.id
-                                                        ? 'bg-pf-sky/10 text-white font-semibold'
-                                                        : 'text-slate-400'
+                                                        ? 'bg-pf-sky/10 text-pf-navy font-semibold'
+                                                        : 'text-slate-500'
                                                 }`}
                                                 style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                                             >
@@ -162,11 +160,11 @@ const LegalPageLayout = ({
                     </div>
                 </div>
 
-                <div className="bg-pf-deep">
+                <div>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
                         <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)] gap-10 xl:gap-14 items-start">
                             <aside className="hidden lg:block sticky top-24 self-start">
-                                <div className="bg-pf-card rounded-2xl border border-white/10 p-5">
+                                <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-[0_10px_32px_rgba(13,27,62,0.06)]">
                                     <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 font-jakarta mb-4">
                                         On this page
                                     </p>
@@ -179,8 +177,8 @@ const LegalPageLayout = ({
                                                         onClick={() => scrollToSection(item.id)}
                                                         className={`w-full text-left flex gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-jakarta leading-snug ${
                                                             activeId === item.id
-                                                                ? 'bg-pf-sky/10 text-white font-semibold'
-                                                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                                                ? 'bg-pf-sky/10 text-pf-navy font-semibold'
+                                                                : 'text-slate-500 hover:text-pf-navy hover:bg-slate-50'
                                                         }`}
                                                         style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
                                                     >
@@ -197,24 +195,23 @@ const LegalPageLayout = ({
                             </aside>
 
                             <div className="min-w-0">
-                                <article className="bg-pf-card rounded-2xl sm:rounded-3xl border border-white/10 p-5 sm:p-8 lg:p-12 text-slate-200">
+                                <article className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 lg:p-12 text-slate-700 shadow-[0_10px_32px_rgba(13,27,62,0.06)]">
                                     {children}
                                 </article>
 
                                 {related ? (
-                                    <div className="mt-6 sm:mt-8 bg-pf-navy rounded-2xl p-6 sm:p-8 relative overflow-hidden">
-                                        <div className="absolute inset-0 dot-pattern opacity-15 pointer-events-none" />
-                                        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div className="mt-6 sm:mt-8 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-[0_10px_32px_rgba(13,27,62,0.06)]">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                             <div>
                                                 <p className="text-pf-sky text-xs font-semibold uppercase tracking-widest font-jakarta mb-2">
                                                     Related document
                                                 </p>
-                                                <p className="text-white font-outfit font-bold text-lg">{related.title}</p>
-                                                <p className="text-slate-400 font-jakarta text-sm mt-1 max-w-md">{related.description}</p>
+                                                <p className="text-pf-navy font-outfit font-bold text-lg">{related.title}</p>
+                                                <p className="text-slate-500 font-jakarta text-sm mt-1 max-w-md">{related.description}</p>
                                             </div>
                                             <Link
                                                 to={related.to}
-                                                className="inline-flex items-center justify-center gap-2 bg-pf-sky text-white px-5 py-2.5 rounded-full text-sm font-semibold font-jakarta hover:bg-[#2aa5f0] shrink-0"
+                                                className="inline-flex items-center justify-center gap-2 bg-pf-navy text-white px-5 py-2.5 rounded-full text-sm font-semibold font-jakarta hover:bg-pf-navy/90 shrink-0"
                                                 style={{ transition: 'background-color 0.2s ease' }}
                                             >
                                                 {related.cta} <ChevronRight size={16} />
@@ -258,10 +255,10 @@ const LegalPageLayout = ({
 };
 
 const MetaChip = ({ icon: Icon, label, value }) => (
-    <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1.5">
+    <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5">
         {Icon ? <Icon size={12} className="text-pf-sky shrink-0" /> : null}
-        <span className="text-[11px] sm:text-xs text-slate-400 font-jakarta">
-            {label}: <span className="text-white font-medium">{value}</span>
+        <span className="text-[11px] sm:text-xs text-slate-500 font-jakarta">
+            {label}: <span className="text-pf-navy font-medium">{value}</span>
         </span>
     </div>
 );
@@ -272,7 +269,7 @@ export const LegalSection = ({ id, number, title, children }) => (
             <span className="shrink-0 mt-0.5 w-8 h-8 rounded-lg bg-pf-sky/10 text-pf-sky text-xs font-bold font-outfit flex items-center justify-center">
                 {number}
             </span>
-            <h2 className="text-xl sm:text-2xl font-bold font-outfit text-white leading-snug">{title}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold font-outfit text-pf-navy leading-snug">{title}</h2>
         </div>
         <div className="lg:pl-11 space-y-4">{children}</div>
     </section>
@@ -283,7 +280,7 @@ export const LegalP = ({ children }) => (
 );
 
 export const LegalH3 = ({ children }) => (
-    <h3 className="text-base sm:text-lg font-bold font-outfit text-white pt-2">{children}</h3>
+    <h3 className="text-base sm:text-lg font-bold font-outfit text-pf-navy pt-2">{children}</h3>
 );
 
 export const LegalList = ({ items }) => (
@@ -301,7 +298,7 @@ export const LegalTable = ({ headers, rows }) => (
     <div className="overflow-x-auto -mx-1 sm:mx-0 rounded-xl border border-slate-200">
         <table className="w-full min-w-[520px] text-left text-sm font-jakarta">
             <thead>
-                <tr className="bg-pf-navy text-white">
+                <tr className="bg-slate-50 text-pf-navy">
                     {headers.map((h) => (
                         <th key={h} className="px-4 py-3 font-outfit font-semibold text-xs uppercase tracking-wide">
                             {h}

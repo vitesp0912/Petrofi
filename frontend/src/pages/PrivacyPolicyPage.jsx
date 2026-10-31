@@ -43,10 +43,10 @@ const PrivacyPolicyPage = () => {
         <LegalPageLayout
             eyebrow="Privacy Policy · v1.0"
             title="Privacy Policy"
-            intro=""
+            intro="This policy covers the PetroFI app for iOS, the PetroFI app for Android, and the PetroFI web app at app.petrofi.in."
             version="v1.0"
             effectiveDate="6 September 2026"
-            lastUpdated="6 September 2026"
+            lastUpdated="31 October 2026"
             controller="Vitespace Private Limited"
             sections={SECTIONS}
         >
@@ -56,6 +56,29 @@ const PrivacyPolicyPage = () => {
                     <strong className="text-pf-navy font-semibold">Vitespace Private Limited</strong> (“Vitespace”, “we”,
                     “us”, or “our”). It helps authorised users manage pump setup, daily entries, inventory, treasury,
                     credit ledger, and reports.
+                </LegalP>
+                <LegalP>
+                    PetroFI is available on three platforms, which together with related services are the “Service”:
+                </LegalP>
+                <LegalList
+                    items={[
+                        'the PetroFI app for iOS',
+                        'the PetroFI app for Android',
+                        {
+                            key: 'web',
+                            content: (
+                                <>
+                                    the PetroFI web app at{' '}
+                                    <a className="text-pf-sky hover:underline" href="https://app.petrofi.in">app.petrofi.in</a>
+                                </>
+                            ),
+                        },
+                    ]}
+                />
+                <LegalP>
+                    This Privacy Policy explains how we collect, use, store, share, and protect information when you use
+                    any of these platforms. The same practices apply on iOS, Android, and the web app. Information you
+                    enter on one platform is available on the others for the same account, subject to your role.
                 </LegalP>
                 <LegalP>
                     Registered office: S-4/783, Shalimar Garden, Extension -1, Sahibabad, Ghaziabad
@@ -91,12 +114,26 @@ const PrivacyPolicyPage = () => {
                 <LegalList
                     items={[
                         'Dealers / owners registering an outlet',
-                        'Managers, FSM/field staff, and other invited users',
-                        'Use of PetroFI on mobile and web',
+                        'Managers and other invited users',
+                        'Use of the PetroFI app for iOS',
+                        'Use of the PetroFI app for Android',
+                        {
+                            key: 'web-app',
+                            content: (
+                                <>
+                                    Use of the PetroFI web app at{' '}
+                                    <a className="text-pf-sky hover:underline" href="https://app.petrofi.in">app.petrofi.in</a>
+                                </>
+                            ),
+                        },
+                        'Account registration, sign-in, outlet setup, and day-to-day use on any of those platforms',
+                        'Support requests and other communications with us',
                     ]}
                 />
                 <LegalP>
-                    It does not govern third-party websites or services that we do not control, even if linked from the app.
+                    It does not govern third-party websites or services that we do not control, even if linked from the
+                    Service. Apple’s App Store and Google Play are covered only to the extent they distribute the iOS
+                    and Android apps.
                 </LegalP>
             </LegalSection>
 
@@ -108,7 +145,7 @@ const PrivacyPolicyPage = () => {
                         'Full name',
                         'Mobile phone number',
                         'Email address (optional at signup; may be used for email OTP login)',
-                        'Role (e.g. dealer, manager, FSM)',
+                        'Role (e.g. dealer, manager)',
                         'Authentication identifiers linked to your account',
                     ]}
                 />
@@ -149,15 +186,25 @@ const PrivacyPolicyPage = () => {
                 </LegalP>
 
                 <LegalH3>3.4 Device, app, and technical data</LegalH3>
+                <LegalP>On the iOS app, the Android app, and the web app, we may collect:</LegalP>
+                <LegalList
+                    items={[
+                        'App or browser version and basic platform information (iOS, Android, or web browser) as needed for updates and support',
+                        'Security session data (authentication tokens used to keep you signed in). On the web app, this may be stored in your browser.',
+                        'Local preferences stored on your device or in your browser for settings and display continuity',
+                    ]}
+                />
+                <LegalP>On the iOS and Android apps, we may also collect:</LegalP>
                 <LegalList
                     items={[
                         'Device push notification tokens used to deliver alerts',
-                        'App version and basic device/platform information as needed for updates and support',
-                        'Connectivity-related signals used for offline/online handling',
-                        'Local preferences stored on your device for settings and display continuity',
-                        'Security session data (authentication tokens used to keep you signed in)',
+                        'Connectivity-related signals used for offline and online handling',
                     ]}
                 />
+                <LegalP>
+                    On the web app at app.petrofi.in, we may also collect browser type and basic technical information
+                    needed to load and secure the site.
+                </LegalP>
 
                 <LegalH3>3.5 Audit and diagnostics</LegalH3>
                 <LegalList
@@ -180,7 +227,7 @@ const PrivacyPolicyPage = () => {
                     items={[
                         { key: 'direct', content: <><strong className="text-pf-navy font-semibold">Directly from you</strong> — signup, profile, settings, and day-to-day entries</> },
                         { key: 'invited', content: <><strong className="text-pf-navy font-semibold">From invited users</strong> — when a dealer invites staff</> },
-                        { key: 'auto', content: <><strong className="text-pf-navy font-semibold">Automatically</strong> — auth sessions, device tokens, logs, and app diagnostics</> },
+                        { key: 'auto', content: <><strong className="text-pf-navy font-semibold">Automatically</strong> — sign-in sessions, logs, and diagnostics on iOS, Android, and the web app, plus device tokens on the mobile apps</> },
                         { key: 'providers', content: <><strong className="text-pf-navy font-semibold">From service providers</strong> — e.g. delivery status of SMS/email OTP where provided to us</> },
                     ]}
                 />
@@ -194,7 +241,7 @@ const PrivacyPolicyPage = () => {
                         ['Provide the Service', 'Login, pump-scoped dashboards, entries, stock, treasury, reports'],
                         ['Account administration', 'Registration approval, roles, invites, access control'],
                         ['Security', 'Authentication, session management, abuse prevention, audit trails'],
-                        ['Notifications', 'Operational push notifications where enabled'],
+                        ['Notifications', 'Operational alerts on the iOS and Android apps, and in the browser where enabled'],
                         ['Support', 'Responding to contact requests and troubleshooting'],
                         ['Improvement', 'Reliability, bug fixes, performance (using aggregated or diagnostic data where practicable)'],
                         ['Legal and compliance', 'Complying with law, enforcing Terms, resolving disputes'],
@@ -277,20 +324,18 @@ const PrivacyPolicyPage = () => {
             </LegalSection>
 
             <LegalSection id="retention" number="10" title="Data retention">
-                <LegalP>We retain information for as long as:</LegalP>
-                <LegalList
-                    items={[
-                        'Your account / outlet subscription remains active, and',
-                        'Needed to provide the Service, resolve disputes, enforce agreements, and meet legal, tax, or audit requirements',
-                    ]}
-                />
                 <LegalP>
-                    Pending or rejected registrations may be retained for review and fraud prevention. Device tokens are
-                    updated or removed when you sign out, uninstall, or tokens are invalidated. Local device caches may
-                    remain until cleared by the OS or app data reset.
+                    We retain information for one year, until you explicitly request that we delete it.
                 </LegalP>
                 <LegalP>
-                    On verified account closure requests, we will delete or anonymise personal data we control, except
+                    Pending or rejected registrations may be retained for review and fraud prevention. On the iOS and
+                    Android apps, device tokens are updated or removed when you sign out, uninstall, or tokens are
+                    invalidated, and local data may remain until cleared by the operating system or an app data reset.
+                    On the web app, session data in your browser remains until you sign out or clear site data for
+                    app.petrofi.in.
+                </LegalP>
+                <LegalP>
+                    When you explicitly request deletion, we will delete or anonymise personal data we control, except
                     where retention is required or permitted by law.
                 </LegalP>
             </LegalSection>
@@ -321,7 +366,7 @@ const PrivacyPolicyPage = () => {
                         { key: 'correct', content: <><strong className="text-pf-navy font-semibold">Correct</strong> inaccurate account information</> },
                         { key: 'delete', content: <><strong className="text-pf-navy font-semibold">Delete</strong> or withdraw consent where processing is consent-based</> },
                         { key: 'export', content: <><strong className="text-pf-navy font-semibold">Export</strong> certain business data (where features or support can provide it)</> },
-                        { key: 'optout', content: <><strong className="text-pf-navy font-semibold">Opt out</strong> of non-essential notifications via device settings</> },
+                        { key: 'optout', content: <><strong className="text-pf-navy font-semibold">Opt out</strong> of non-essential notifications in iOS or Android settings, or in your browser for the web app</> },
                     ]}
                 />
                 <LegalP>
@@ -342,30 +387,36 @@ const PrivacyPolicyPage = () => {
             </LegalSection>
 
             <LegalSection id="permissions" number="14" title="Permissions">
-                <LegalP>Depending on platform and features, the app may request permissions such as:</LegalP>
+                <LegalP>On the iOS and Android apps, depending on features, the app may request:</LegalP>
                 <LegalList
                     items={[
                         { key: 'notif', content: <><strong className="text-pf-navy font-semibold">Notifications</strong> — operational alerts</> },
                         { key: 'net', content: <><strong className="text-pf-navy font-semibold">Network access</strong> — sync and authentication</> },
                         { key: 'storage', content: <><strong className="text-pf-navy font-semibold">Storage / files</strong> — saving or sharing reports (PDF/Excel)</> },
-                        'Other OS permissions required for sharing or opening files',
+                        'Other operating-system permissions required for sharing or opening files',
                     ]}
                 />
+                <LegalP>
+                    On the web app at app.petrofi.in, your browser may ask permission for notifications or file downloads
+                    when you use those features. The web app does not request iOS or Android operating-system permissions.
+                </LegalP>
                 <LegalP>You can deny optional permissions; some features may not work without them.</LegalP>
             </LegalSection>
 
             <LegalSection id="third-parties" number="15" title="Third-party links and stores">
                 <LegalP>
-                    App Store / Play Store distribution and payment (if any) are also governed by Apple/Google terms.
-                    Third-party links open external services with their own privacy practices.
+                    The iOS app is distributed through Apple’s App Store, and the Android app is distributed through
+                    Google Play. Distribution, and any payment made in those stores, is also governed by Apple’s or
+                    Google’s terms. The web app is used in your browser at app.petrofi.in and is not distributed through
+                    those stores. Third-party links open external services with their own privacy practices.
                 </LegalP>
             </LegalSection>
 
             <LegalSection id="changes" number="16" title="Changes to this Policy">
                 <LegalP>
                     We may update this Privacy Policy from time to time. The “Last updated” date will change, and material
-                    updates may be communicated in-app or by email where appropriate. Continued use after the effective
-                    date of changes means you acknowledge the updated Policy.
+                    updates may be communicated in the iOS app, the Android app, the web app, or by email where
+                    appropriate. Continued use after the effective date of changes means you acknowledge the updated Policy.
                 </LegalP>
             </LegalSection>
 
@@ -394,24 +445,16 @@ const PrivacyPolicyPage = () => {
                     </p>
                 </LegalContactCard>
                 <LegalP>
-                    <strong className="text-pf-navy font-semibold">Grievance Officer:</strong> In accordance with the
-                    Information Technology Act, 2000 and rules made thereunder (including the Information Technology
-                    (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021), the name and contact details of
-                    the Grievance Officer are provided below:
-                </LegalP>
-                <LegalList
-                    items={[
-                        { key: 'go-name', content: <><strong className="text-pf-navy font-semibold">Name:</strong> Abhinandan Srivastava</> },
-                        { key: 'go-email', content: <><strong className="text-pf-navy font-semibold">Email:</strong> <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a></> },
-                    ]}
-                />
-                <LegalP>
-                    We will acknowledge your grievance within 24 hours and aim to resolve it within 15 days.
-                </LegalP>
-                <LegalP>
-                    If you have an unresolved privacy concern, contact us first. You may also have the right to approach
-                    the relevant data protection authority under applicable Indian law once fully operational for your
-                    category of processing.
+                    <strong className="text-pf-navy font-semibold">Grievance Officer:</strong> If you have a complaint
+                    about a subscription or payment, or about how we have handled your account or data, write to our
+                    Grievance Officer at{' '}
+                    <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a> with
+                    the subject line <strong className="text-pf-navy">“Grievance”</strong>, or call{' '}
+                    <a className="text-pf-sky hover:underline" href="tel:+917398621812">+91 7398621812</a>
+                    {' or '}
+                    <a className="text-pf-sky hover:underline" href="tel:+918700117495">+91 8700117495</a>.
+                    We acknowledge every complaint within 48 hours and aim to resolve it within 30 days of receiving it,
+                    as required under the Consumer Protection (E-Commerce) Rules, 2020 and the Information Technology Act, 2000.
                 </LegalP>
             </LegalSection>
 
@@ -424,7 +467,7 @@ const PrivacyPolicyPage = () => {
                         ['Operations', 'Readings, sales, expenses, stock', 'Core product features'],
                         ['Credit customers', 'Name/phone/balances you enter', 'Udhar ledger'],
                         ['Money movement', 'Treasury, banks, transfers', 'Funds tracking'],
-                        ['Device', 'Push notification tokens, local preferences', 'Notifications, settings'],
+                        ['Device and browser', 'Push tokens on iOS and Android; browser session and local preferences on the web app', 'Notifications, sign-in, settings'],
                         ['Logs', 'Audit / error logs', 'Security and support'],
                     ]}
                 />

@@ -4,7 +4,7 @@
 **Version:** v1.0  
 **Provider:** Vitespace Private Limited (“Vitespace”, “we”, “us”, or “our”)  
 **Effective date:** 6 September 2026  
-**Last updated:** 6 September 2026  
+**Last updated:** 31 October 2026  
 
 These Terms of Service (“Terms”) govern your access to and use of the PetroFI mobile and web applications, related APIs, and services (collectively, the “Service”). By creating an account, signing in, or using the Service, you agree to these Terms. If you do not agree, do not use the Service.
 
@@ -25,7 +25,7 @@ Registered office: S-4/783, Shalimar Garden, Extension -1, Sahibabad, Ghaziabad
 
 ## 2. Eligibility and accounts
 
-2.1. The Service is intended for **business users** operating or working at a fuel retail outlet (owners/dealers, managers, field staff, and similar authorised roles).
+2.1. You must be at least 18 years old to use the Service. The Service is intended for **business users** operating or working at a fuel retail outlet (owners/dealers, managers, and similar authorised roles).
 
 2.2. You must provide accurate registration information (such as name, phone number, optional email, outlet name, and address). Dealer self-registration may remain **pending** until Vitespace or an authorised administrator approves the outlet.
 
@@ -35,7 +35,7 @@ Registered office: S-4/783, Shalimar Garden, Extension -1, Sahibabad, Ghaziabad
 - All activity under your account  
 - Ensuring only authorised staff access your outlet’s data  
 
-2.4. Account roles (for example dealer, manager, FSM) determine what features and data you can access. Dealers or owners who invite staff are responsible for assigning appropriate roles and deactivating access when staff leave.
+2.4. Account roles (for example dealer, manager) determine what features and data you can access. Dealers or owners who invite staff are responsible for assigning appropriate roles and deactivating access when staff leave.
 
 ---
 
@@ -198,9 +198,4 @@ Registered office: S-4/783, Shalimar Garden, Extension -1, Sahibabad, Ghaziabad
 
 For notices regarding these Terms, prefer email with subject line: **“PetroFI Terms of Service”**.
 
-**Grievance Officer:** In accordance with the Information Technology Act, 2000 and rules made thereunder, the name and contact details of the Grievance Officer are provided below:
-
-- **Name:** Abhinandan Srivastava  
-- **Email:** admin@petrofi.in  
-
-We will acknowledge your grievance within 24 hours and aim to resolve it within 15 days.
+**Grievance Officer:** If you have a complaint about a subscription or payment, or about how we have handled your account or data, write to our Grievance Officer at admin@petrofi.in with the subject line “Grievance”, or call +91 7398621812 or +91 8700117495. We acknowledge every complaint within 48 hours and aim to resolve it within 30 days of receiving it, as required under the Consumer Protection (E-Commerce) Rules, 2020 and the Information Technology Act, 2000.
