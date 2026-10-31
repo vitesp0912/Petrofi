@@ -3,6 +3,7 @@ const { quoteById } = require('../server/catalog');
 const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = require('../server/cashfree');
 const { buyerFrom, applyBuyerOverrides, cashfreeCustomer, normalizeGstin } = require('../server/buyer');
 const { savePaymentOrder } = require('../server/save-payment-order');
+const { recordRefundConsent } = require('../server/legal-consent');
 
 const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, address, city, state, pincode';
 const RATE_LIMIT_MS = 20 * 1000;
@@ -30,6 +31,11 @@ module.exports = async (req, res) => {
             return;
         }
 
+        if (body?.acceptRefundPolicy !== true) {
+            send(res, 400, { ok: false, reason: 'refund_policy_required' });
+            return;
+        }
+
         const planId = String(body?.planId || '').trim();
         let quote;
         try {
@@ -43,10 +49,13 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const gstin = normalizeGstin(body?.gstin);
-        if (gstin === null) {
-            send(res, 400, { ok: false, reason: 'invalid_gstin' });
-            return;
+        let gstin = null;
+        if (body?.hasGst === true) {
+            gstin = normalizeGstin(body?.gstin);
+            if (!gstin) {
+                send(res, 400, { ok: false, reason: 'invalid_gstin' });
+                return;
+            }
         }
 
         const admin = adminClient();
@@ -133,6 +142,14 @@ module.exports = async (req, res) => {
             });
         } catch (err) {
             send(res, 500, { ok: false, reason: err.reason || 'create_failed' });
+            return;
+        }
+
+        try {
+            await recordRefundConsent(admin, { userId: auth.user.id, pumpId, req });
+        } catch (err) {
+            await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
+            send(res, 500, { ok: false, reason: err.reason || 'consent_failed' });
             return;
         }
 

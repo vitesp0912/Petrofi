@@ -197,6 +197,9 @@ const PlansPanel = () => {
             email: draft?.email,
             phone: draft?.phone,
             address: draft?.address,
+            hasGst: draft?.hasGst === true,
+            gstin: draft?.hasGst === true ? draft?.gstin : '',
+            acceptRefundPolicy: draft?.acceptRefundPolicy === true,
         });
         if (lock !== payLock.current) return;
         if (!created.ok) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import {
     Dialog,
@@ -9,6 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '../ui/dialog';
+import { gstinBody, isValidGstin } from '../../lib/gstin';
 import { formatMoney } from '../../lib/subscription';
 
 const FIELD_CLASS =
@@ -29,6 +30,7 @@ function draftFromBilling(billing) {
         email: billing?.email || '',
         phone: displayPhone(billing?.phone) || '',
         address: billing?.address || '',
+        gstin: '',
     };
 }
 
@@ -71,6 +73,8 @@ function Field({ id, label, value, onChange, type = 'text', disabled, multiline 
 export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenChange, onConfirm }) {
     const [draft, setDraft] = useState(() => draftFromBilling(billing));
     const [editing, setEditing] = useState(false);
+    const [acceptedRefund, setAcceptedRefund] = useState(false);
+    const [hasGst, setHasGst] = useState(false);
     const name = billing?.name;
     const pumpName = billing?.pumpName;
     const email = billing?.email;
@@ -81,9 +85,14 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
         if (!open) return;
         setDraft(draftFromBilling({ name, pumpName, email, phone, address }));
         setEditing(false);
+        setAcceptedRefund(false);
+        setHasGst(false);
     }, [open, name, pumpName, email, phone, address]);
 
     const setField = (key) => (value) => setDraft((prev) => ({ ...prev, [key]: value }));
+    const gstin = gstinBody(draft.gstin);
+    const gstinReady = !hasGst || isValidGstin(gstin);
+    const gstinInvalid = hasGst && Boolean(gstin) && !isValidGstin(gstin);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,6 +148,63 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
                                 <dd className="font-semibold text-pf-navy">{formatMoney(plan.total, plan.currency)}</dd>
                             </div>
                         </dl>
+                        <label className="flex items-start gap-2.5 text-sm font-jakarta text-slate-600">
+                            <input
+                                type="checkbox"
+                                checked={hasGst}
+                                disabled={paying}
+                                onChange={(event) => setHasGst(event.target.checked)}
+                                data-testid="pay-has-gst"
+                                className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-pf-navy focus:ring-pf-sky"
+                            />
+                            <span>Do you have GST?</span>
+                        </label>
+                        {hasGst ? (
+                            <label className="block" htmlFor="pay-gstin">
+                                <span className="text-xs font-semibold text-slate-500 font-jakarta">GSTIN</span>
+                                <input
+                                    id="pay-gstin"
+                                    type="text"
+                                    inputMode="text"
+                                    autoComplete="off"
+                                    spellCheck={false}
+                                    maxLength={15}
+                                    disabled={paying}
+                                    value={gstin}
+                                    onChange={(event) => setField('gstin')(gstinBody(event.target.value))}
+                                    data-testid="pay-gstin"
+                                    className={`${FIELD_CLASS} mt-1 uppercase tracking-wide`}
+                                    aria-invalid={gstinInvalid}
+                                />
+                                {!gstinReady ? (
+                                    <span className="mt-1 block text-xs font-jakarta text-rose-600">
+                                        Enter a valid 15-character GSTIN.
+                                    </span>
+                                ) : null}
+                            </label>
+                        ) : null}
+                        <label className="flex items-start gap-2.5 text-sm font-jakarta text-slate-600">
+                            <input
+                                type="checkbox"
+                                checked={acceptedRefund}
+                                disabled={paying}
+                                onChange={(event) => setAcceptedRefund(event.target.checked)}
+                                data-testid="pay-accept-refund"
+                                className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-pf-navy focus:ring-pf-sky"
+                            />
+                            <span>
+                                I accept the{' '}
+                                <Link
+                                    to="/refund-policy"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="font-semibold text-pf-sky hover:underline"
+                                >
+                                    Refund and Cancellation Policy
+                                </Link>
+                                .
+                            </span>
+                        </label>
                     </div>
                 ) : null}
                 {error ? <p className="text-sm text-rose-600 font-jakarta">{error}</p> : null}
@@ -152,8 +218,13 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
                     </button>
                     <button
                         type="button"
-                        disabled={paying || !plan}
-                        onClick={() => onConfirm(draft)}
+                        disabled={paying || !plan || !acceptedRefund || !gstinReady}
+                        onClick={() => onConfirm({
+                            ...draft,
+                            hasGst,
+                            gstin: hasGst ? gstin : '',
+                            acceptRefundPolicy: true,
+                        })}
                         data-testid="pay-confirm-now"
                         className="inline-flex items-center justify-center rounded-full bg-pf-navy text-white px-5 py-2.5 text-sm font-bold font-jakarta hover:bg-pf-navy/90 disabled:opacity-50"
                     >

@@ -28,14 +28,14 @@ export async function fetchPaymentCatalog(scope = 'plans') {
     }
 }
 
-export async function createPaymentOrder({ planId, gstin, phone, name, email, pumpName, address }) {
+export async function createPaymentOrder({ planId, gstin, hasGst, phone, name, email, pumpName, address, acceptRefundPolicy }) {
     const headers = await authHeader();
     if (!headers) return { ok: false, reason: 'signed_out' };
     try {
         const res = await fetch('/api/payment-create-order', {
             method: 'POST',
             headers: { ...headers, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ planId, gstin, phone, name, email, pumpName, address }),
+            body: JSON.stringify({ planId, gstin, hasGst, phone, name, email, pumpName, address, acceptRefundPolicy }),
         });
         return readJson(res);
     } catch {
@@ -72,10 +72,12 @@ export async function fetchPaymentStatus(orderId) {
 export function paymentErrorText(reason) {
     if (reason === 'payments_offline') return 'Pay is not open yet. Call PetroFI and we will take this on the pump.';
     if (reason === 'unknown_plan') return 'Pick a plan to continue.';
-    if (reason === 'invalid_gstin') return 'Enter a valid 15-character GSTIN, or leave it blank.';
+    if (reason === 'invalid_gstin') return 'Enter a valid 15-character GSTIN.';
     if (reason === 'invalid_email') return 'Enter a valid email address.';
     if (reason === 'no_pump') return 'No pump is linked to this login yet.';
     if (reason === 'phone_required') return 'Add a 10-digit mobile number to pay.';
+    if (reason === 'refund_policy_required') return 'Accept the Refund and Cancellation Policy to pay.';
+    if (reason === 'consent_failed') return 'We could not record your acceptance of the Refund and Cancellation Policy. Try again.';
     if (reason === 'too_fast') return 'Wait a few seconds and try again.';
     if (reason === 'cashfree_error') return 'We could not start this payment. Try again.';
     if (reason === 'signed_out') return 'Sign in again to pay.';
