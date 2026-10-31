@@ -12,6 +12,7 @@ import PlansPanel from './components/account/PlansPanel';
 import ProfilePanel from './components/account/ProfilePanel';
 import SubscriptionPage from './pages/SubscriptionPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
 
 function App() {
     useVisualKeyboard();
@@ -30,6 +31,7 @@ function App() {
                         </Route>
                         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                         <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+                        <Route path="/refund-policy" element={<RefundPolicyPage />} />
                     </Routes>
                     <Analytics />
                 </div>

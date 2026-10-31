@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import LegalPageLayout, {
     LegalCallout,
     LegalContactCard,
@@ -48,6 +49,12 @@ const TermsOfServicePage = () => {
             lastUpdated="31 October 2026"
             controller="Vitespace Private Limited"
             sections={SECTIONS}
+            related={{
+                title: 'Refund and Cancellation Policy',
+                description: 'How to cancel, the 15-day refund on a first paid subscription, and which payments are not refunded.',
+                to: '/refund-policy',
+                cta: 'Read the policy',
+            }}
         >
             <LegalSection id="about" number="1" title="About PetroFI and Vitespace">
                 <LegalP>
@@ -190,13 +197,45 @@ const TermsOfServicePage = () => {
                     6.1. Access may depend on registration approval, subscription status, and/or payment verification as
                     configured for your outlet.
                 </LegalP>
+                <LegalH3>6.2 Free trial</LegalH3>
                 <LegalP>
-                    6.2. Fees, billing cycles, trials, and refunds (if any) will be as stated in a separate order form,
-                    invoice, website pricing page, or written agreement with Vitespace. Unpaid or suspended subscriptions
-                    may result in restricted or terminated access.
+                    Vitespace may offer a new outlet a complimentary trial of fifteen (15) to thirty (30) calendar days,
+                    or another length we state on the pricing page, in the app, or in writing. The trial gives access to
+                    the features included in that offer so you can judge whether PetroFI fits the outlet before you pay.
+                </LegalP>
+                <LegalP>The trial is subject to these conditions:</LegalP>
+                <LegalList
+                    items={[
+                        'Only one free trial is available for each outlet or legal entity.',
+                        'We may change, extend, or stop offering free trials.',
+                        'You do not need to enter payment details to start a trial unless we say so for that offer.',
+                        'These Terms apply in full during the trial.',
+                    ]}
+                />
+                <LegalP>
+                    When the trial ends and the outlet does not have a paid subscription, access to operational features
+                    is suspended until a subscription is paid.
+                </LegalP>
+                <LegalH3>6.3 Renewal</LegalH3>
+                <LegalP>
+                    Subscription fees are payable in advance for the billing period you choose. PetroFI does not renew
+                    a subscription automatically and does not take automatic deductions. You renew by starting a payment
+                    yourself. Operational features stay available only while the subscription is paid and current. If
+                    payment is not made by the due date, we may suspend or end access to those features.
+                </LegalP>
+                <LegalH3>6.4 Price changes</LegalH3>
+                <LegalP>
+                    We may change subscription prices with at least thirty (30) calendar days’ notice, by email, in the
+                    app, or on the pricing page. If you keep using the Service after the new price takes effect, you
+                    accept that price.
                 </LegalP>
                 <LegalP>
-                    6.3. Taxes applicable under Indian law (or other applicable jurisdiction) are your responsibility
+                    6.5. The fee, billing cycle, and any other commercial terms are as stated on the pricing page, in an
+                    order or invoice, or in a written agreement with Vitespace. Refunds are set out in the{' '}
+                    <Link className="text-pf-sky hover:underline" to="/refund-policy">Refund and Cancellation Policy</Link>.
+                </LegalP>
+                <LegalP>
+                    6.6. Taxes applicable under Indian law (or other applicable jurisdiction) are your responsibility
                     unless otherwise stated.
                 </LegalP>
             </LegalSection>
@@ -330,8 +369,8 @@ const TermsOfServicePage = () => {
                     merger, acquisition, or sale of assets.
                 </LegalP>
                 <LegalP>
-                    17.4. These Terms, together with the Privacy Policy and any written commercial agreement, form the
-                    entire agreement regarding the Service.
+                    17.4. These Terms, together with the Privacy Policy, the Refund and Cancellation Policy, and any written commercial
+                    agreement, form the entire agreement regarding the Service.
                 </LegalP>
             </LegalSection>
 

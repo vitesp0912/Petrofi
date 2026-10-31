@@ -24,7 +24,7 @@ const LINKS = {
     Legal: [
         { label: 'Privacy Policy', to: '/privacy-policy' },
         { label: 'Terms of Service', to: '/terms-of-service' },
-        { label: 'Refund Policy' },
+        { label: 'Refund and Cancellation', to: '/refund-policy' },
         { label: 'Security' },
     ],
 };
