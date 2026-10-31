@@ -51,9 +51,9 @@ const RefundPolicyPage = () => {
             <LegalSection id="introduction" number="1" title="Introduction">
                 <LegalP>
                     This Refund and Cancellation Policy governs subscriptions to PetroFI, a petrol pump management
-                    software service provided by{' '}
-                    <strong className="text-pf-navy font-semibold">Vitespace Private Limited</strong>, operating under
-                    the PetroFI brand (“PetroFI”, “we”, “us”, or “our”).
+                    software product owned and provided by{' '}
+                    <strong className="text-pf-navy font-semibold">Vitespace Private Limited</strong> (“Vitespace”,
+                    “we”, “us”, or “our”). PetroFI is the product name.
                 </LegalP>
                 <LegalP>
                     By purchasing a PetroFI subscription, you agree to this policy, along with our{' '}

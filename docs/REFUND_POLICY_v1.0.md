@@ -10,7 +10,7 @@
 
 ## 1. Introduction
 
-This Refund and Cancellation Policy governs subscriptions to PetroFI, a petrol pump management software service provided by **Vitespace Private Limited**, operating under the PetroFI brand.
+This Refund and Cancellation Policy governs subscriptions to PetroFI, a petrol pump management software product owned and provided by **Vitespace Private Limited** (“Vitespace”, “we”, “us”, or “our”). PetroFI is the product name.
 
 By purchasing a PetroFI subscription, you agree to this policy, along with our Terms of Service and Privacy Policy.
 
