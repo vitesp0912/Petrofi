@@ -27,7 +27,7 @@ const RefundPolicyPage = () => {
     usePageMeta({
         title: 'Refund and Cancellation Policy | PetroFI',
         description:
-            'How to cancel a PetroFI subscription and when a refund is available. The first paid subscription for a pump can be refunded within 15 calendar days of activation.',
+            'How to cancel a PetroFI subscription and when a refund is available. The first paid subscription for a pump can be refunded if the request is received by 11:59 PM IST on the 15th calendar day, counting the subscription start date as Day 1.',
         canonical: 'https://www.petrofi.in/refund-policy',
     });
 
@@ -64,47 +64,51 @@ const RefundPolicyPage = () => {
 
             <LegalSection id="cancellation" number="2" title="Subscription cancellation">
                 <LegalP>
-                    You may cancel your PetroFI subscription at any time by contacting support at{' '}
-                    <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a>, or
-                    by calling{' '}
-                    <a className="text-pf-sky hover:underline" href="tel:+917398621812">+91 7398621812</a>
-                    {' or '}
-                    <a className="text-pf-sky hover:underline" href="tel:+918700117495">+91 8700117495</a>.
+                    You may cancel your PetroFI subscription at any time by emailing{' '}
+                    <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a>.
                 </LegalP>
-                <LegalP>Upon cancellation:</LegalP>
+                <LegalP>
+                    Cancellation takes effect when PetroFI confirms it. That confirmation stops any future renewal.
+                </LegalP>
                 <LegalList
                     items={[
-                        'Your subscription will not renew for the next billing period.',
-                        'You may continue using PetroFI until the end of your current paid subscription period, unless your account is terminated for a separate lawful reason.',
                         'Cancellation does not automatically result in a refund. Refund eligibility is determined under this policy.',
+                        'Where a refund is made, access to PetroFI for that pump ends after the refund.',
                     ]}
                 />
             </LegalSection>
 
             <LegalSection id="guarantee" number="3" title="15-day refund guarantee">
                 <LegalP>
-                    PetroFI offers a 15-calendar-day refund guarantee on the first paid subscription purchased for a pump.
+                    PetroFI offers a 15-calendar-day refund guarantee on the first paid subscription for a pump. The
+                    subscription start date in India Standard Time (IST) counts as Day 1. The refund request must be
+                    received by email by 11:59 PM IST on the 15th calendar day.
                 </LegalP>
                 <LegalP>To qualify:</LegalP>
                 <LegalList
                     items={[
-                        'The refund request must be submitted within 15 calendar days from the subscription activation date.',
-                        'The request must relate to the first paid subscription for that pump.',
-                        'The subscription must not have already received a refund under this guarantee.',
+                        'The refund request must be received by email by 11:59 PM IST on that 15th calendar day.',
+                        'The request must relate to the first paid subscription for that pump. The guarantee is one per pump.',
+                        'That pump’s first paid subscription must not already have been refunded under this guarantee.',
                     ]}
                 />
+                <LegalP>
+                    A request received by that deadline remains eligible if the review is completed after Day 15.
+                    After the refund is made, access for that pump ends.
+                </LegalP>
                 <LegalP>
                     Eligible customers will receive a full refund of the subscription fee paid, including applicable GST,
                     subject to legally required tax adjustments.
                 </LegalP>
                 <LegalP>
-                    The refund guarantee applies to the initial subscription purchase and does not automatically apply to
-                    subsequent renewals, upgrades, or additional subscription periods.
+                    PetroFI does not change the plan while a paid period is still running. The guarantee does not apply
+                    to a later renewal. At renewal, the pump can choose any available plan, and that payment is a new
+                    subscription period.
                 </LegalP>
             </LegalSection>
 
             <LegalSection id="after-window" number="4" title="Refunds after the 15-day period">
-                <LegalP>After the 15-day refund window expires:</LegalP>
+                <LegalP>After 11:59 PM IST on that 15th calendar day:</LegalP>
                 <LegalList
                     items={[
                         'Subscription fees are generally non-refundable.',
@@ -121,9 +125,18 @@ const RefundPolicyPage = () => {
             <LegalSection id="duplicates" number="5" title="Duplicate payments and billing errors">
                 <LegalP>
                     If you are charged more than once for the same subscription, or you are charged an incorrect amount,
-                    contact us with your payment reference.
+                    email us the payment reference at{' '}
+                    <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a>.
                 </LegalP>
-                <LegalP>Verified duplicate payments and billing errors will be corrected or refunded.</LegalP>
+                <LegalP>
+                    A verified duplicate payment is refunded. It is not kept as extra subscription time. A verified
+                    billing error is corrected or refunded.
+                </LegalP>
+                <LegalP>
+                    If a payment is taken but the subscription is not activated, PetroFI will verify the payment.
+                    After that verification, PetroFI will activate the subscription or initiate a refund within 15
+                    calendar days.
+                </LegalP>
             </LegalSection>
 
             <LegalSection id="availability" number="6" title="Service availability and deficiency">
@@ -149,12 +162,8 @@ const RefundPolicyPage = () => {
                             key: 'contact',
                             content: (
                                 <>
-                                    Contact support at{' '}
-                                    <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a>,
-                                    or call{' '}
-                                    <a className="text-pf-sky hover:underline" href="tel:+917398621812">+91 7398621812</a>
-                                    {' or '}
-                                    <a className="text-pf-sky hover:underline" href="tel:+918700117495">+91 8700117495</a>.
+                                    Email{' '}
+                                    <a className="text-pf-sky hover:underline" href="mailto:admin@petrofi.in">admin@petrofi.in</a>.
                                 </>
                             ),
                         },
@@ -168,7 +177,13 @@ const RefundPolicyPage = () => {
             </LegalSection>
 
             <LegalSection id="processing" number="8" title="Refund processing">
-                <LegalP>Approved refunds will be initiated within 7 business days of approval.</LegalP>
+                <LegalP>
+                    We will approve or decline a refund within 7 calendar days of receiving the refund request.
+                </LegalP>
+                <LegalP>
+                    Where a refund is approved, PetroFI will initiate the refund within 15 calendar days of that
+                    approval.
+                </LegalP>
                 <LegalP>
                     Refunds will generally be returned to the original payment method. The time taken for the funds to
                     appear in your account may depend on your bank, payment provider, or card issuer.
@@ -179,8 +194,9 @@ const RefundPolicyPage = () => {
             <LegalSection id="renewal" number="9" title="Subscription renewal">
                 <LegalP>
                     PetroFI does not renew a subscription automatically and does not take automatic deductions.
-                    Subscription fees are payable in advance for the billing period you choose. You renew by starting a
-                    payment yourself, and you may choose not to renew at any time.
+                    The plan is not changed while a paid period is still running. Subscription fees are payable in
+                    advance for the billing period you choose. You renew by starting a payment yourself, and at that
+                    time you may choose any available plan. You may also choose not to renew.
                 </LegalP>
                 <LegalP>
                     The billing period and amount are shown before you pay. Renewal and price changes are also described
@@ -221,10 +237,6 @@ const RefundPolicyPage = () => {
                 <LegalP>
                     PetroFI may update this policy from time to time. Material changes will be communicated through
                     appropriate channels.
-                </LegalP>
-                <LegalP>
-                    The policy applicable to a subscription purchase will be the version presented and accepted at the
-                    time of that purchase, subject to applicable law.
                 </LegalP>
             </LegalSection>
 
