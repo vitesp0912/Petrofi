@@ -2,7 +2,7 @@ const { send, requireUser, isUuid, adminClient } = require('../server/http');
 const { listQuotes } = require('../server/catalog');
 const { paymentsReady } = require('../server/cashfree');
 
-const ORDER_COLUMNS = 'order_id, amount_total, currency, status, payment_method, paid_at, created_at, plan_id';
+const ORDER_COLUMNS = 'order_id, amount_total, currency, status, payment_method, paid_at, created_at, plan_id, gstin';
 
 function mapOrder(row, planName) {
     return {
@@ -14,6 +14,7 @@ function mapOrder(row, planName) {
         paidAt: row.paid_at || null,
         createdAt: row.created_at || null,
         paymentMethod: row.payment_method || null,
+        gstin: row.gstin || null,
     };
 }
 
