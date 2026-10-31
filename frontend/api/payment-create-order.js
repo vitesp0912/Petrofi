@@ -210,10 +210,12 @@ module.exports = async (req, res) => {
         let cfOrder;
         try {
             cfOrder = await createCashfreeOrder({ ...orderPayload, cart });
-        } catch {
+        } catch (cartErr) {
+            console.error('[payment] cashfree order with cart failed', orderId, cartErr.status || '', cartErr.reason || cartErr.message);
             try {
                 cfOrder = await createCashfreeOrder(orderPayload);
             } catch (err) {
+                console.error('[payment] cashfree order failed', orderId, err.status || '', err.reason || err.message, JSON.stringify(err.data || null));
                 await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
                 send(res, 502, { ok: false, reason: err.reason || 'cashfree_error' });
                 return;
@@ -222,6 +224,10 @@ module.exports = async (req, res) => {
 
         const sessionId = cfOrder?.payment_session_id;
         if (!sessionId) {
+            console.error('[payment] cashfree order missing payment_session_id', orderId, JSON.stringify({
+                cf_order_id: cfOrder?.cf_order_id || null,
+                order_status: cfOrder?.order_status || null,
+            }));
             await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
             send(res, 502, { ok: false, reason: 'cashfree_error' });
             return;
@@ -241,7 +247,8 @@ module.exports = async (req, res) => {
             paymentSessionId: sessionId,
             mode: cfg.mode,
         });
-    } catch {
+    } catch (err) {
+        console.error('[payment] create order failed', err?.message || err);
         send(res, 500, { ok: false, reason: 'create_failed' });
     }
 };

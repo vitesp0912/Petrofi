@@ -50,6 +50,8 @@ async function cashfreeRequest(path, { method = 'GET', body } = {}) {
         error.reason = 'cashfree_error';
         error.status = res.status;
         error.data = data;
+        const message = data?.message || data?.error || (typeof data?.raw === 'string' ? data.raw.slice(0, 400) : '');
+        console.error('[cashfree]', method, path, res.status, data?.code || data?.type || '', message);
         throw error;
     }
     return data;
