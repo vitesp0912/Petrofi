@@ -144,8 +144,16 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
                                 <dd className="font-semibold text-pf-navy">{plan.name}</dd>
                             </div>
                             <div className="mt-2 flex justify-between gap-4">
-                                <dt className="text-slate-500">Amount</dt>
-                                <dd className="font-semibold text-pf-navy">{formatMoney(plan.total, plan.currency)}</dd>
+                                <dt className="text-slate-500">Base price</dt>
+                                <dd className="font-semibold text-pf-navy">{formatMoney(plan.base, plan.currency)}</dd>
+                            </div>
+                            <div className="mt-2 flex justify-between gap-4">
+                                <dt className="text-slate-500">GST{plan.gstPct ? ` (${plan.gstPct}%)` : ''}</dt>
+                                <dd className="font-semibold text-pf-navy">{formatMoney(plan.gst, plan.currency)}</dd>
+                            </div>
+                            <div className="mt-3 -mx-1 flex justify-between items-center gap-4 rounded-lg bg-pf-navy px-3 py-2 text-sm text-white">
+                                <dt className="font-bold">Final price</dt>
+                                <dd className="font-bold tabular-nums">{formatMoney(plan.total, plan.currency)}</dd>
                             </div>
                         </dl>
                         <label className="flex items-start gap-2.5 text-sm font-jakarta text-slate-600">
