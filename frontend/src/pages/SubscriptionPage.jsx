@@ -2,12 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import AccountSidebar, { AccountMobileHeader, AccountMobileTabBar } from '../components/account/AccountSidebar';
+import { ExpiredSubscriptionBanner } from '../components/account/AccountBits';
 import LoginForm from '../components/LoginForm';
 import Navbar from '../components/Navbar';
 import RegisterPumpDialog from '../components/RegisterPumpDialog';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
-import { fetchPumpSubscription } from '../lib/subscription';
+import { fetchPumpSubscription, isExpiredSubscription } from '../lib/subscription';
 
 const TRIAL_POINTS = [
     '30 days of full access on your pump',
@@ -186,6 +187,9 @@ function SubscriptionPage() {
                     <div className="flex-1 min-h-0 overflow-y-auto">
                         <div className="px-4 sm:px-6 lg:px-10 xl:px-12 py-4 sm:py-8">
                             <main id="main-content" aria-label="Account">
+                                {!state.loading && isExpiredSubscription(state.subscription) ? (
+                                    <ExpiredSubscriptionBanner subscription={state.subscription} />
+                                ) : null}
                                 <Outlet context={outletContext} />
                             </main>
                         </div>

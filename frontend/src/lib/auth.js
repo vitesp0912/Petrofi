@@ -137,7 +137,7 @@ export async function sendLoginOtp(parsed) {
     }
 
     if (parsed.kind === 'phone') {
-        const { data, error } = await supabase.rpc('validate_phone_for_login', {
+        const { data, error } = await supabase.rpc('validate_phone_for_web_login', {
             phone_number: parsed.phone10,
         });
         if (error) {
@@ -161,7 +161,7 @@ export async function sendLoginOtp(parsed) {
             return { ok: false, error: mapSendError(otpError, parsed.kind) };
         }
     } else {
-        const { data, error } = await supabase.rpc('validate_email_for_login', {
+        const { data, error } = await supabase.rpc('validate_email_for_web_login', {
             p_email: parsed.email,
         });
         if (error) {

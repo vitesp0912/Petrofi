@@ -152,12 +152,6 @@ const PlansPanel = () => {
 
     useEffect(() => {
         if (pageLoading) return undefined;
-        if (active) {
-            setLoading(false);
-            setQuotes([]);
-            setError('');
-            return undefined;
-        }
 
         let cancelled = false;
         setLoading(true);
@@ -174,7 +168,7 @@ const PlansPanel = () => {
         return () => {
             cancelled = true;
         };
-    }, [pageLoading, active]);
+    }, [pageLoading]);
 
     const gstLabel = quotes[0] ? `+${quotes[0].gstPct}% GST` : null;
     const billing = {
@@ -221,11 +215,21 @@ const PlansPanel = () => {
     };
 
     if (pageLoading) return active ? <CurrentPlanSkeleton /> : <PlansSkeleton />;
-    if (active) return <CurrentPlanView pump={pump} subscription={subscription} />;
-    if (loading) return <PlansSkeleton />;
+    if (loading) return active ? <CurrentPlanSkeleton /> : <PlansSkeleton />;
+
+    const currentCode = String(subscription?.planCode || '').trim().toLowerCase();
+    const planButtonLabel = (plan) => {
+        if (!active) return plan.cta;
+        const code = String(plan.id || '').trim().toLowerCase();
+        if (code && code === currentCode) return `Extend ${plan.name}`;
+        return `Upgrade to ${plan.name}`;
+    };
 
     return (
         <div className="max-w-7xl mx-auto min-w-0 space-y-6 sm:space-y-7" data-testid="account-plans">
+            {active ? <CurrentPlanView pump={pump} subscription={subscription} hideFooter /> : null}
+
+            {!active ? (
             <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
                 <div>
                     <p className="text-pf-sky text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-1.5 sm:mb-2">
@@ -245,6 +249,19 @@ const PlansPanel = () => {
                     {trial.pill}
                 </p>
             </header>
+            ) : (
+            <header id="upgrade-plans" className="scroll-mt-4">
+                <p className="text-pf-sky text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] font-jakarta mb-1.5 sm:mb-2">
+                    Upgrade or extend
+                </p>
+                <h2 className="text-[22px] sm:text-[28px] lg:text-[32px] font-bold font-outfit text-pf-navy leading-[1.15]">
+                    Change your PetroFI plan
+                </h2>
+                <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-xl">
+                    Choose any paid plan. Your remaining days stay, and the new plan length is added from your current valid-till date.
+                </p>
+            </header>
+            )}
 
             {error ? (
                 <p className="text-sm text-rose-600 font-jakarta">{error}</p>
@@ -312,15 +329,20 @@ const PlansPanel = () => {
                     const listPrice = listPriceFor(plan);
                     const off = offPercent(listPrice, plan.base);
                     const saved = savedAmount(listPrice, plan.base);
+                    const isCurrent = active && String(plan.id || '').trim().toLowerCase() === currentCode;
                     return (
                         <article
                             key={plan.id}
                             data-testid={`plan-card-${plan.id}`}
                             className={`${cardClass} relative p-5 sm:p-6 lg:max-[1199px]:p-4 min-[1200px]:p-6 flex flex-col min-w-0 ${
                                 plan.featured ? 'ring-2 ring-emerald-400' : ''
-                            }`}
+                            } ${isCurrent ? 'ring-2 ring-pf-sky' : ''}`}
                         >
-                            {plan.featured ? (
+                            {isCurrent ? (
+                                <p className="absolute -top-2.5 left-5 inline-flex rounded-full bg-pf-sky text-pf-navy px-2.5 py-0.5 text-[10px] font-bold tracking-wide font-jakarta">
+                                    CURRENT PLAN
+                                </p>
+                            ) : plan.featured ? (
                                 <p className="absolute -top-2.5 left-5 inline-flex rounded-full bg-emerald-400 text-emerald-950 px-2.5 py-0.5 text-[10px] font-bold tracking-wide font-jakarta">
                                     BEST VALUE
                                 </p>
@@ -402,7 +424,7 @@ const PlansPanel = () => {
                                             : 'border border-slate-200 text-pf-navy hover:bg-slate-50'
                                     }`}
                                 >
-                                    {plan.cta}
+                                    {planButtonLabel(plan)}
                                 </button>
                             </div>
                         </article>
@@ -485,6 +507,8 @@ const PlansPanel = () => {
                 billing={billing}
                 paying={paying}
                 error={payError}
+                upgrade={active}
+                subscription={subscription}
                 onOpenChange={(next) => {
                     if (!next) {
                         payLock.current += 1;

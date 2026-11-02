@@ -91,7 +91,7 @@ export const CurrentPlanSkeleton = () => (
     </div>
 );
 
-const CurrentPlanView = ({ pump, subscription }) => {
+const CurrentPlanView = ({ pump, subscription, hideFooter = false }) => {
     const copy = paidCopy(subscription);
     const progress = periodProgress(subscription?.startDate, subscription?.endDate);
     const duration = planDurationLabel(subscription);
@@ -178,6 +178,23 @@ const CurrentPlanView = ({ pump, subscription }) => {
                 </div>
             </section>
 
+            {copy.live ? (
+                <div className="rounded-xl border border-sky-200 bg-[#E8F4FC] px-4 py-3 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <p className="text-sm font-bold font-outfit text-pf-navy">Upgrade or extend your plan</p>
+                        <p className="mt-0.5 text-[13px] text-slate-600 font-jakarta">
+                            Pick any paid plan below. Remaining days stay, and the new plan length is added on top.
+                        </p>
+                    </div>
+                    <a
+                        href="#upgrade-plans"
+                        className="inline-flex shrink-0 items-center justify-center rounded-full bg-pf-navy px-4 py-2 text-sm font-bold font-jakarta text-white hover:bg-pf-navy/90"
+                    >
+                        See plans
+                    </a>
+                </div>
+            ) : null}
+
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                 <section className={`${cardClass} p-4 sm:p-7`}>
                     <h3 className="text-base sm:text-lg font-bold font-outfit text-pf-navy mb-1">What this plan includes</h3>
@@ -221,22 +238,24 @@ const CurrentPlanView = ({ pump, subscription }) => {
                 </section>
             </div>
 
-            <footer className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1 text-xs text-slate-500 font-jakarta">
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                    <span className="inline-flex items-center gap-1.5">
-                        <Shield size={13} className="text-pf-sky" />
-                        Secure payments
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                        <FileText size={13} className="text-pf-sky" />
-                        GST invoice · Transparent billing
-                    </span>
-                </div>
-                <a href="tel:+917398621812" className="inline-flex items-center gap-1.5 font-semibold text-pf-navy hover:text-pf-sky">
-                    <Phone size={13} />
-                    Need help? +91 73986 21812
-                </a>
-            </footer>
+            {hideFooter ? null : (
+                <footer className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1 text-xs text-slate-500 font-jakarta">
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                        <span className="inline-flex items-center gap-1.5">
+                            <Shield size={13} className="text-pf-sky" />
+                            Secure payments
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                            <FileText size={13} className="text-pf-sky" />
+                            GST invoice · Transparent billing
+                        </span>
+                    </div>
+                    <a href="tel:+917398621812" className="inline-flex items-center gap-1.5 font-semibold text-pf-navy hover:text-pf-sky">
+                        <Phone size={13} />
+                        Need help? +91 73986 21812
+                    </a>
+                </footer>
+            )}
         </div>
     );
 };

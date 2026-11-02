@@ -10,7 +10,7 @@ import {
     DialogTitle,
 } from '../ui/dialog';
 import { gstinBody, isValidGstin } from '../../lib/gstin';
-import { formatMoney } from '../../lib/subscription';
+import { formatDateFull, formatMoney, nextSubscriptionEndDate } from '../../lib/subscription';
 
 const FIELD_CLASS =
     'w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-pf-navy font-jakarta placeholder-slate-400 focus:outline-none focus:border-pf-sky focus:ring-2 focus:ring-pf-sky/20 disabled:opacity-60';
@@ -70,7 +70,17 @@ function Field({ id, label, value, onChange, type = 'text', disabled, multiline 
     );
 }
 
-export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenChange, onConfirm }) {
+export function ConfirmPayDialog({
+    open,
+    plan,
+    billing,
+    paying,
+    error,
+    upgrade = false,
+    subscription = null,
+    onOpenChange,
+    onConfirm,
+}) {
     const [draft, setDraft] = useState(() => draftFromBilling(billing));
     const [editing, setEditing] = useState(false);
     const [acceptedRefund, setAcceptedRefund] = useState(false);
@@ -93,152 +103,179 @@ export function ConfirmPayDialog({ open, plan, billing, paying, error, onOpenCha
     const gstin = gstinBody(draft.gstin);
     const gstinReady = !hasGst || isValidGstin(gstin);
     const gstinInvalid = hasGst && Boolean(gstin) && !isValidGstin(gstin);
+    const validTill = plan
+        ? nextSubscriptionEndDate(plan.days, subscription?.endDate)
+        : null;
+    const validTillLabel = validTill ? formatDateFull(validTill) : null;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md rounded-2xl" data-testid="pay-confirm-dialog">
-                <DialogHeader>
-                    <DialogTitle className="font-outfit text-pf-navy">Confirm payment</DialogTitle>
-                    <DialogDescription className="font-jakarta text-slate-500">
-                        {plan
-                            ? `Continue with ${plan.name}. Check these details, then pay.`
-                            : 'Select a plan to continue.'}
-                    </DialogDescription>
-                </DialogHeader>
-                {plan ? (
-                    <div className="space-y-3">
-                        <div className="flex justify-end -mb-1">
+            <DialogContent
+                className="flex w-[calc(100%-1.25rem)] max-w-lg flex-col gap-0 overflow-hidden rounded-2xl border-0 bg-transparent p-0 shadow-[0_24px_80px_rgba(13,27,62,0.28)] max-h-[calc(var(--vv-height,100svh)-1.25rem)] sm:max-h-[min(90vh,calc(100vh-4rem))] [&>button]:right-3 [&>button]:top-3 [&>button]:text-white [&>button]:opacity-90 [&>button]:hover:opacity-100 [&>button]:hover:bg-white/10 [&>button]:ring-offset-0"
+                data-testid="pay-confirm-dialog"
+            >
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-white">
+                    <div className="shrink-0 bg-pf-navy px-4 py-4 pr-12 text-white sm:px-6 sm:py-5">
+                        <DialogHeader className="space-y-2 text-left">
+                            <DialogTitle className="font-outfit text-xl font-bold uppercase tracking-wide text-white sm:text-2xl">
+                                CONFIRM PAYMENT
+                            </DialogTitle>
+                            <DialogDescription className="font-jakarta text-[13px] leading-relaxed text-white/75 sm:text-sm">
+                                {plan
+                                    ? upgrade
+                                        ? `Upgrade or extend with ${plan.name}. Remaining days stay, and this plan length is added on top.`
+                                        : `Continue with ${plan.name}. Check these details, then pay.`
+                                    : 'Select a plan to continue.'}
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+
+                    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-5">
+                        {plan ? (
+                            <div className="space-y-4">
+                                <div className="flex justify-end -mb-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditing((prev) => !prev)}
+                                        disabled={paying}
+                                        className="inline-flex items-center gap-1 text-xs font-bold text-[#3157D5] font-jakarta hover:text-[#2546b0] disabled:opacity-50"
+                                        data-testid="pay-edit-details"
+                                    >
+                                        <Pencil size={12} strokeWidth={2.25} />
+                                        {editing ? 'Done' : 'Edit'}
+                                    </button>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:px-4">
+                                    {editing ? (
+                                        <div className="space-y-2.5 py-1">
+                                            <Field id="pay-name" label="Name" value={draft.name} onChange={setField('name')} disabled={paying} />
+                                            <Field id="pay-pump" label="Pump" value={draft.pumpName} onChange={setField('pumpName')} disabled={paying} />
+                                            <Field id="pay-email" label="Email" type="email" value={draft.email} onChange={setField('email')} disabled={paying} />
+                                            <Field id="pay-mobile" label="Mobile" type="tel" value={draft.phone} onChange={setField('phone')} disabled={paying} />
+                                            <Field id="pay-address" label="Address" value={draft.address} onChange={setField('address')} disabled={paying} multiline />
+                                        </div>
+                                    ) : (
+                                        <dl className="text-sm font-jakarta">
+                                            <Detail label="Name" value={draft.name} />
+                                            <Detail label="Pump" value={draft.pumpName} />
+                                            <Detail label="Email" value={draft.email} />
+                                            <Detail label="Mobile" value={draft.phone} />
+                                            <Detail label="Address" value={draft.address} />
+                                        </dl>
+                                    )}
+                                </div>
+                                <dl className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 sm:px-4 text-sm font-jakarta">
+                                    <div className="flex justify-between gap-4">
+                                        <dt className="font-semibold text-slate-600">Plan</dt>
+                                        <dd className="font-bold text-pf-navy text-right">{plan.name}</dd>
+                                    </div>
+                                    <div className="mt-2.5 flex justify-between gap-4">
+                                        <dt className="font-semibold text-slate-600">Base price</dt>
+                                        <dd className="font-bold text-pf-navy">{formatMoney(plan.base, plan.currency)}</dd>
+                                    </div>
+                                    <div className="mt-2.5 flex justify-between gap-4">
+                                        <dt className="font-semibold text-slate-600">GST{plan.gstPct ? ` (${plan.gstPct}%)` : ''}</dt>
+                                        <dd className="font-bold text-pf-navy">{formatMoney(plan.gst, plan.currency)}</dd>
+                                    </div>
+                                    {validTillLabel ? (
+                                        <div className="mt-2.5 flex justify-between gap-4">
+                                            <dt className="font-semibold text-slate-600 shrink-0">Valid till</dt>
+                                            <dd className="font-bold text-pf-navy text-right">{validTillLabel}</dd>
+                                        </div>
+                                    ) : null}
+                                    <div className="mt-3 -mx-0.5 flex justify-between items-center gap-4 rounded-lg bg-pf-navy px-3 py-2.5 text-sm text-white">
+                                        <dt className="font-bold">Final price</dt>
+                                        <dd className="font-bold tabular-nums text-base">{formatMoney(plan.total, plan.currency)}</dd>
+                                    </div>
+                                </dl>
+                                <label className="flex items-start gap-2.5 text-sm font-jakarta text-slate-600">
+                                    <input
+                                        type="checkbox"
+                                        checked={hasGst}
+                                        disabled={paying}
+                                        onChange={(event) => setHasGst(event.target.checked)}
+                                        data-testid="pay-has-gst"
+                                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-pf-navy focus:ring-pf-sky"
+                                    />
+                                    <span>Do you have GST?</span>
+                                </label>
+                                {hasGst ? (
+                                    <label className="block" htmlFor="pay-gstin">
+                                        <span className="text-xs font-semibold text-slate-500 font-jakarta">GSTIN</span>
+                                        <input
+                                            id="pay-gstin"
+                                            type="text"
+                                            inputMode="text"
+                                            autoComplete="off"
+                                            spellCheck={false}
+                                            maxLength={15}
+                                            disabled={paying}
+                                            value={gstin}
+                                            onChange={(event) => setField('gstin')(gstinBody(event.target.value))}
+                                            data-testid="pay-gstin"
+                                            className={`${FIELD_CLASS} mt-1 uppercase tracking-wide`}
+                                            aria-invalid={gstinInvalid}
+                                        />
+                                        {!gstinReady ? (
+                                            <span className="mt-1 block text-xs font-jakarta text-rose-600">
+                                                Enter a valid 15-character GSTIN.
+                                            </span>
+                                        ) : null}
+                                    </label>
+                                ) : null}
+                                <label className="flex items-start gap-2.5 text-sm font-jakarta text-slate-600">
+                                    <input
+                                        type="checkbox"
+                                        checked={acceptedRefund}
+                                        disabled={paying}
+                                        onChange={(event) => setAcceptedRefund(event.target.checked)}
+                                        data-testid="pay-accept-refund"
+                                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-pf-navy focus:ring-pf-sky"
+                                    />
+                                    <span>
+                                        I accept the{' '}
+                                        <Link
+                                            to="/refund-policy"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="font-semibold text-pf-sky hover:underline"
+                                        >
+                                            Refund and Cancellation Policy
+                                        </Link>
+                                        .
+                                    </span>
+                                </label>
+                            </div>
+                        ) : null}
+                        {error ? <p className="mt-3 text-sm font-semibold text-rose-600 font-jakarta">{error}</p> : null}
+                    </div>
+
+                    <div className="shrink-0 border-t border-slate-200 bg-white px-4 py-3 sm:px-6 sm:py-4">
+                        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2 sm:space-x-0">
                             <button
                                 type="button"
-                                onClick={() => setEditing((prev) => !prev)}
-                                disabled={paying}
-                                className="inline-flex items-center gap-1 text-xs font-semibold text-[#3157D5] font-jakarta hover:text-[#2546b0] disabled:opacity-50"
-                                data-testid="pay-edit-details"
+                                onClick={() => onOpenChange(false)}
+                                className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-slate-300 px-5 py-2.5 text-sm font-bold text-pf-navy font-jakarta hover:bg-slate-50 disabled:opacity-50 sm:w-auto"
                             >
-                                <Pencil size={12} strokeWidth={2.25} />
-                                {editing ? 'Done' : 'Edit'}
+                                Cancel
                             </button>
-                        </div>
-                        <div className="rounded-xl bg-slate-50 px-4 py-2">
-                            {editing ? (
-                                <div className="space-y-2.5 py-1">
-                                    <Field id="pay-name" label="Name" value={draft.name} onChange={setField('name')} disabled={paying} />
-                                    <Field id="pay-pump" label="Pump" value={draft.pumpName} onChange={setField('pumpName')} disabled={paying} />
-                                    <Field id="pay-email" label="Email" type="email" value={draft.email} onChange={setField('email')} disabled={paying} />
-                                    <Field id="pay-mobile" label="Mobile" type="tel" value={draft.phone} onChange={setField('phone')} disabled={paying} />
-                                    <Field id="pay-address" label="Address" value={draft.address} onChange={setField('address')} disabled={paying} multiline />
-                                </div>
-                            ) : (
-                                <dl className="text-sm font-jakarta">
-                                    <Detail label="Name" value={draft.name} />
-                                    <Detail label="Pump" value={draft.pumpName} />
-                                    <Detail label="Email" value={draft.email} />
-                                    <Detail label="Mobile" value={draft.phone} />
-                                    <Detail label="Address" value={draft.address} />
-                                </dl>
-                            )}
-                        </div>
-                        <dl className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-jakarta">
-                            <div className="flex justify-between gap-4">
-                                <dt className="text-slate-500">Plan</dt>
-                                <dd className="font-semibold text-pf-navy">{plan.name}</dd>
-                            </div>
-                            <div className="mt-2 flex justify-between gap-4">
-                                <dt className="text-slate-500">Base price</dt>
-                                <dd className="font-semibold text-pf-navy">{formatMoney(plan.base, plan.currency)}</dd>
-                            </div>
-                            <div className="mt-2 flex justify-between gap-4">
-                                <dt className="text-slate-500">GST{plan.gstPct ? ` (${plan.gstPct}%)` : ''}</dt>
-                                <dd className="font-semibold text-pf-navy">{formatMoney(plan.gst, plan.currency)}</dd>
-                            </div>
-                            <div className="mt-3 -mx-1 flex justify-between items-center gap-4 rounded-lg bg-pf-navy px-3 py-2 text-sm text-white">
-                                <dt className="font-bold">Final price</dt>
-                                <dd className="font-bold tabular-nums">{formatMoney(plan.total, plan.currency)}</dd>
-                            </div>
-                        </dl>
-                        <label className="flex items-start gap-2.5 text-sm font-jakarta text-slate-600">
-                            <input
-                                type="checkbox"
-                                checked={hasGst}
-                                disabled={paying}
-                                onChange={(event) => setHasGst(event.target.checked)}
-                                data-testid="pay-has-gst"
-                                className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-pf-navy focus:ring-pf-sky"
-                            />
-                            <span>Do you have GST?</span>
-                        </label>
-                        {hasGst ? (
-                            <label className="block" htmlFor="pay-gstin">
-                                <span className="text-xs font-semibold text-slate-500 font-jakarta">GSTIN</span>
-                                <input
-                                    id="pay-gstin"
-                                    type="text"
-                                    inputMode="text"
-                                    autoComplete="off"
-                                    spellCheck={false}
-                                    maxLength={15}
-                                    disabled={paying}
-                                    value={gstin}
-                                    onChange={(event) => setField('gstin')(gstinBody(event.target.value))}
-                                    data-testid="pay-gstin"
-                                    className={`${FIELD_CLASS} mt-1 uppercase tracking-wide`}
-                                    aria-invalid={gstinInvalid}
-                                />
-                                {!gstinReady ? (
-                                    <span className="mt-1 block text-xs font-jakarta text-rose-600">
-                                        Enter a valid 15-character GSTIN.
-                                    </span>
-                                ) : null}
-                            </label>
-                        ) : null}
-                        <label className="flex items-start gap-2.5 text-sm font-jakarta text-slate-600">
-                            <input
-                                type="checkbox"
-                                checked={acceptedRefund}
-                                disabled={paying}
-                                onChange={(event) => setAcceptedRefund(event.target.checked)}
-                                data-testid="pay-accept-refund"
-                                className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-pf-navy focus:ring-pf-sky"
-                            />
-                            <span>
-                                I accept the{' '}
-                                <Link
-                                    to="/refund-policy"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="font-semibold text-pf-sky hover:underline"
-                                >
-                                    Refund and Cancellation Policy
-                                </Link>
-                                .
-                            </span>
-                        </label>
+                            <button
+                                type="button"
+                                disabled={paying || !plan || !acceptedRefund || !gstinReady}
+                                onClick={() => onConfirm({
+                                    ...draft,
+                                    hasGst,
+                                    gstin: hasGst ? gstin : '',
+                                    acceptRefundPolicy: true,
+                                })}
+                                data-testid="pay-confirm-now"
+                                className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-pf-navy px-5 py-2.5 text-sm font-bold font-jakarta text-white shadow-[0_10px_24px_rgba(13,27,62,0.25)] hover:bg-pf-navy/90 disabled:opacity-50 sm:min-w-[9.5rem] sm:flex-1"
+                            >
+                                {paying ? 'Opening a secure payment page…' : 'Pay Now'}
+                            </button>
+                        </DialogFooter>
                     </div>
-                ) : null}
-                {error ? <p className="text-sm text-rose-600 font-jakarta">{error}</p> : null}
-                <DialogFooter className="gap-2 sm:gap-2">
-                    <button
-                        type="button"
-                        onClick={() => onOpenChange(false)}
-                        className="inline-flex items-center justify-center rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-pf-navy font-jakarta hover:bg-slate-50 disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        disabled={paying || !plan || !acceptedRefund || !gstinReady}
-                        onClick={() => onConfirm({
-                            ...draft,
-                            hasGst,
-                            gstin: hasGst ? gstin : '',
-                            acceptRefundPolicy: true,
-                        })}
-                        data-testid="pay-confirm-now"
-                        className="inline-flex items-center justify-center rounded-full bg-pf-navy text-white px-5 py-2.5 text-sm font-bold font-jakarta hover:bg-pf-navy/90 disabled:opacity-50"
-                    >
-                        {paying ? 'Opening a secure payment page…' : 'Pay Now'}
-                    </button>
-                </DialogFooter>
+                </div>
             </DialogContent>
         </Dialog>
     );

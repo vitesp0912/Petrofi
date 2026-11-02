@@ -41,7 +41,7 @@ A request received by that deadline remains eligible if the review is completed 
 
 Eligible customers will receive a full refund of the subscription fee paid, including applicable GST, subject to legally required tax adjustments.
 
-PetroFI does not change the plan while a paid period is still running. The guarantee does not apply to a later renewal. At renewal, the pump can choose any available plan, and that payment is a new subscription period.
+While a paid period is still running, you may upgrade or extend by buying any available paid plan. Remaining days are kept, and the new plan length is added from the current valid-till date. The 15-day guarantee applies only to the first paid subscription for that pump, not to a later upgrade, extension, or renewal.
 
 ---
 
@@ -103,7 +103,7 @@ PetroFI does not guarantee a specific bank processing time.
 
 ## 9. Subscription renewal
 
-PetroFI does not renew a subscription automatically and does not take automatic deductions. The plan is not changed while a paid period is still running. Subscription fees are payable in advance for the billing period you choose. You renew by starting a payment yourself, and at that time you may choose any available plan. You may also choose not to renew.
+PetroFI does not renew a subscription automatically and does not take automatic deductions. Subscription fees are payable in advance for the billing period you choose. You may upgrade, extend, or renew by starting a payment yourself and choosing any available paid plan. If you pay while a period is still running, remaining days stay and the new plan length is added on top. You may also choose not to renew.
 
 The billing period and amount are shown before you pay. Renewal and price changes are also described in the Terms of Service.
 

@@ -88,6 +88,18 @@ export function isActiveSubscription(subscription) {
     return String(subscription?.status || '').trim().toLowerCase() === 'active';
 }
 
+export function isExpiredSubscription(subscription) {
+    if (!subscription) return false;
+    const remaining = subscription.remainingDays ?? daysUntil(subscription.endDate);
+    if (remaining != null && remaining < 0) return true;
+    if (subscription.endDate) {
+        const end = new Date(subscription.endDate);
+        if (!Number.isNaN(end.getTime()) && end.getTime() < Date.now()) return true;
+    }
+    const status = String(subscription.status || '').trim().toLowerCase();
+    return status === 'expired' || status === 'inactive';
+}
+
 export function planDurationLabel(subscription) {
     const days = Number(subscription?.days);
     const months = Number(subscription?.months);
@@ -187,6 +199,18 @@ export function daysUntil(value) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return null;
     return Math.ceil((date.getTime() - Date.now()) / 86400000);
+}
+
+/** Matches paid-order trigger: keep future end_date, else start from now, then add plan days. */
+export function nextSubscriptionEndDate(planDays, currentEndDate, now = new Date()) {
+    const days = Number(planDays);
+    if (!Number.isFinite(days) || days <= 0) return null;
+    const current = currentEndDate ? new Date(currentEndDate) : null;
+    const base =
+        current && !Number.isNaN(current.getTime()) && current.getTime() > now.getTime()
+            ? current
+            : now;
+    return new Date(base.getTime() + days * 86400000);
 }
 
 export function trialCopy(subscription) {

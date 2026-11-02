@@ -114,7 +114,6 @@ const ProfilePanel = () => {
             <PageIntro
                 kicker="Profile"
                 title={displayName ? `Hello, ${displayName}` : 'Your pump'}
-                text="This is the live status of this PetroFI login: plan, valid till, and pump details."
             />
 
             <section className="relative overflow-hidden rounded-2xl bg-pf-navy text-white p-4 sm:p-8 shadow-[0_18px_50px_rgba(13,27,62,0.22)]">

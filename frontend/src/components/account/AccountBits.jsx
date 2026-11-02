@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
-import { statusTone, titleCase } from '../../lib/subscription';
+import { formatDate, statusTone, titleCase } from '../../lib/subscription';
 
 const PETROFI_MARK =
     'https://customer-assets.emergentagent.com/job_shift-clarity/artifacts/zbnh3pqn_app_icon.png';
@@ -83,3 +83,25 @@ export const PageIntro = ({ kicker, title, text }) => (
         {text ? <p className="mt-1.5 sm:mt-2 text-[13px] sm:text-[15px] text-slate-500 font-jakarta leading-relaxed max-w-2xl">{text}</p> : null}
     </header>
 );
+
+export const ExpiredSubscriptionBanner = ({ subscription }) => {
+    const endedOn = formatDate(subscription?.endDate);
+    return (
+        <div
+            className="mb-4 sm:mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+            data-testid="subscription-expired-banner"
+            role="status"
+        >
+            <p className="text-[13px] sm:text-sm font-jakarta text-amber-950 leading-snug">
+                <span className="font-semibold">Your subscription has expired</span>
+                {endedOn && endedOn !== 'Not set' ? ` on ${endedOn}` : ''}. Renew to keep using PetroFI.
+            </p>
+            <Link
+                to="/subscription/plans"
+                className="inline-flex shrink-0 items-center justify-center rounded-full bg-pf-navy px-4 py-2 text-xs sm:text-sm font-bold font-jakarta text-white hover:bg-pf-navy/90"
+            >
+                Renew plan
+            </Link>
+        </div>
+    );
+};
