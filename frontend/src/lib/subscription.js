@@ -1,70 +1,106 @@
 import { supabase } from './supabase';
 import { reportClientErrorQuiet } from './errorLog';
+import {
+    bindAccountCacheUser,
+    clearAccountCache,
+    getCachedSubscription,
+    setCachedSubscription,
+} from './accountCache';
 
-export async function fetchPumpSubscription() {
+let subscriptionInflight = null;
+
+export async function fetchPumpSubscription({ force = false } = {}) {
     if (!supabase) {
         return { ok: false, reason: 'unavailable' };
     }
 
     const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData?.session?.access_token;
-    if (!token) {
+    const session = sessionData?.session;
+    const token = session?.access_token;
+    const userId = session?.user?.id || null;
+    if (!token || !userId) {
+        clearAccountCache();
         return { ok: false, reason: 'signed_out' };
     }
 
-    try {
-        const res = await fetch('/api/subscription', {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        const contentType = res.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-            reportClientErrorQuiet({
-                module: 'subscriptions',
-                severity: 'error',
-                errorType: 'subscription_non_json',
-                message: 'Subscription API returned non-JSON',
-                endpoint: '/api/subscription',
-                httpMethod: 'GET',
-                responseStatus: res.status,
+    bindAccountCacheUser(userId);
+    if (!force) {
+        const cached = getCachedSubscription(userId);
+        if (cached?.data?.ok && cached.fresh) {
+            return { ...cached.data, fromCache: true };
+        }
+    }
+
+    if (subscriptionInflight && !force) {
+        return subscriptionInflight;
+    }
+
+    subscriptionInflight = (async () => {
+        try {
+            const res = await fetch('/api/subscription', {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${token}` },
             });
-            return { ok: false, reason: 'unavailable' };
-        }
-        const body = await res.json().catch(() => null);
-        if (res.status === 401) {
-            if (supabase) await supabase.auth.signOut();
-            return { ok: false, reason: 'signed_out' };
-        }
-        if (!res.ok || !body?.ok) {
-            const reason = body?.reason || 'load_failed';
-            // Server already writes API/DB failures; only mirror opaque client-side gaps.
-            if (reason === 'unavailable') {
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
                 reportClientErrorQuiet({
                     module: 'subscriptions',
                     severity: 'error',
-                    errorType: 'subscription_load_failed',
-                    message: `Subscription load failed: ${reason}`,
+                    errorType: 'subscription_non_json',
+                    message: 'Subscription API returned non-JSON',
                     endpoint: '/api/subscription',
                     httpMethod: 'GET',
                     responseStatus: res.status,
-                    details: { reason },
                 });
+                const cached = getCachedSubscription(userId);
+                if (cached?.data?.ok) return { ...cached.data, fromCache: true, stale: true };
+                return { ok: false, reason: 'unavailable' };
             }
-            return { ok: false, reason };
+            const body = await res.json().catch(() => null);
+            if (res.status === 401) {
+                clearAccountCache();
+                if (supabase) await supabase.auth.signOut();
+                return { ok: false, reason: 'signed_out' };
+            }
+            if (!res.ok || !body?.ok) {
+                const reason = body?.reason || 'load_failed';
+                if (reason === 'unavailable') {
+                    reportClientErrorQuiet({
+                        module: 'subscriptions',
+                        severity: 'error',
+                        errorType: 'subscription_load_failed',
+                        message: `Subscription load failed: ${reason}`,
+                        endpoint: '/api/subscription',
+                        httpMethod: 'GET',
+                        responseStatus: res.status,
+                        details: { reason },
+                    });
+                }
+                const cached = getCachedSubscription(userId);
+                if (cached?.data?.ok) return { ...cached.data, fromCache: true, stale: true };
+                return { ok: false, reason };
+            }
+            setCachedSubscription(userId, body);
+            return body;
+        } catch (err) {
+            reportClientErrorQuiet({
+                module: 'subscriptions',
+                severity: 'error',
+                errorType: 'subscription_network',
+                message: err?.message || 'subscription network failure',
+                stack: err?.stack || null,
+                endpoint: '/api/subscription',
+                httpMethod: 'GET',
+            });
+            const cached = getCachedSubscription(userId);
+            if (cached?.data?.ok) return { ...cached.data, fromCache: true, stale: true };
+            return { ok: false, reason: 'load_failed' };
+        } finally {
+            subscriptionInflight = null;
         }
-        return body;
-    } catch (err) {
-        reportClientErrorQuiet({
-            module: 'subscriptions',
-            severity: 'error',
-            errorType: 'subscription_network',
-            message: err?.message || 'subscription network failure',
-            stack: err?.stack || null,
-            endpoint: '/api/subscription',
-            httpMethod: 'GET',
-        });
-        return { ok: false, reason: 'load_failed' };
-    }
+    })();
+
+    return subscriptionInflight;
 }
 
 export function titleCase(value) {

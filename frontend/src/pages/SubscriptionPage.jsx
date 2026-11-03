@@ -10,6 +10,8 @@ import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { fetchPumpSubscription, isExpiredSubscription } from '../lib/subscription';
 import { setErrorLogContext } from '../lib/errorLog';
+import { clearAccountCache, getCachedSubscription } from '../lib/accountCache';
+import { prefetchAccountCatalogs } from '../lib/payments';
 
 const TRIAL_POINTS = [
     '30 days of full access on your pump',
@@ -39,6 +41,7 @@ function SubscriptionPage() {
 
         if (authLoading) return undefined;
         if (!user) {
+            clearAccountCache();
             setErrorLogContext(() => ({ userId: null, pumpId: null }));
             setState({
                 loading: false,
@@ -50,10 +53,27 @@ function SubscriptionPage() {
             return undefined;
         }
 
-        setState((prev) => ({ ...prev, loading: true, reason: '' }));
-        fetchPumpSubscription().then((result) => {
+        const cached = getCachedSubscription(user.id);
+        if (cached?.data?.ok) {
+            setState({
+                loading: false,
+                reason: '',
+                profile: cached.data.profile,
+                pump: cached.data.pump,
+                subscription: cached.data.subscription,
+            });
+            setErrorLogContext(() => ({
+                userId: user.id,
+                pumpId: cached.data.pump?.id || null,
+            }));
+        } else {
+            setState((prev) => ({ ...prev, loading: true, reason: '' }));
+        }
+
+        fetchPumpSubscription({ force: !cached?.fresh }).then((result) => {
             if (cancelled) return;
             if (!result.ok) {
+                if (cached?.data?.ok) return;
                 setState({
                     loading: false,
                     reason: result.reason,
@@ -74,6 +94,7 @@ function SubscriptionPage() {
                 pump: result.pump,
                 subscription: result.subscription,
             });
+            prefetchAccountCatalogs();
         });
 
         return () => {

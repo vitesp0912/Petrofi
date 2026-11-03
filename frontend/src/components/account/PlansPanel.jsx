@@ -11,6 +11,7 @@ import {
     startHostedCheckout,
 } from '../../lib/payments';
 import { reportClientErrorQuiet } from '../../lib/errorLog';
+import { getCachedPlans } from '../../lib/accountCache';
 import CurrentPlanView, { CurrentPlanSkeleton } from './CurrentPlanView';
 import { ConfirmPayDialog } from './PaymentDialogs';
 import { Bone, cardClass } from './AccountBits';
@@ -135,8 +136,9 @@ const PlansPanel = () => {
     const { user, loading: pageLoading, profile, pump, subscription } = useOutletContext();
     const active = isActiveSubscription(subscription);
     const trial = trialCopy(subscription);
-    const [quotes, setQuotes] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const initialPlans = user?.id ? getCachedPlans(user.id) : null;
+    const [quotes, setQuotes] = useState(() => initialPlans?.data?.quotes || []);
+    const [loading, setLoading] = useState(() => !initialPlans?.data?.ok);
     const [error, setError] = useState('');
     const [selected, setSelected] = useState(null);
     const [paying, setPaying] = useState(false);
@@ -156,21 +158,31 @@ const PlansPanel = () => {
         if (pageLoading) return undefined;
 
         let cancelled = false;
-        setLoading(true);
-        fetchPaymentCatalog().then((result) => {
+        const cached = user?.id ? getCachedPlans(user.id) : null;
+        if (cached?.data?.ok) {
+            setQuotes(cached.data.quotes || []);
+            setError('');
+            setLoading(false);
+        } else {
+            setLoading(true);
+        }
+
+        fetchPaymentCatalog('plans', { force: !cached?.fresh }).then((result) => {
             if (cancelled) return;
             setLoading(false);
             if (!result.ok) {
+                if (cached?.data?.ok) return;
                 setError(paymentErrorText(result.reason));
                 setQuotes([]);
                 return;
             }
+            setError('');
             setQuotes(result.quotes || []);
         });
         return () => {
             cancelled = true;
         };
-    }, [pageLoading]);
+    }, [pageLoading, user?.id]);
 
     const gstLabel = quotes[0] ? `+${quotes[0].gstPct}% GST` : null;
     const billing = {
@@ -225,8 +237,9 @@ const PlansPanel = () => {
         }
     };
 
-    if (pageLoading) return active ? <CurrentPlanSkeleton /> : <PlansSkeleton />;
-    if (loading) return active ? <CurrentPlanSkeleton /> : <PlansSkeleton />;
+    if ((pageLoading || loading) && quotes.length === 0) {
+        return active ? <CurrentPlanSkeleton /> : <PlansSkeleton />;
+    }
 
     const currentCode = String(subscription?.planCode || '').trim().toLowerCase();
     const planButtonLabel = (plan) => {

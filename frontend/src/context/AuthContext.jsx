@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { clearAccountCache } from '../lib/accountCache';
 
 const AuthContext = createContext({
     session: null,
@@ -21,6 +22,9 @@ export function AuthProvider({ children }) {
         let cancelled = false;
         const applySession = (nextSession) => {
             if (cancelled) return;
+            if (!nextSession?.user?.id) {
+                clearAccountCache();
+            }
             setSession(nextSession ?? null);
             setLoading(false);
         };
@@ -44,6 +48,7 @@ export function AuthProvider({ children }) {
         user: session?.user ?? null,
         loading,
         signOut: async () => {
+            clearAccountCache();
             if (supabase) await supabase.auth.signOut();
         },
     }), [session, loading]);

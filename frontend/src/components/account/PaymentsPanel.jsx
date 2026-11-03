@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom
 import { Receipt } from 'lucide-react';
 import { formatDate, formatMoney, titleCase } from '../../lib/subscription';
 import { fetchPaymentCatalog, fetchPaymentStatus } from '../../lib/payments';
+import { getCachedOrders } from '../../lib/accountCache';
 import { PaymentResultDialog, paymentResultKind } from './PaymentDialogs';
 import { Bone, cardClass, StatusPill } from './AccountBits';
 
@@ -59,35 +60,49 @@ const PaymentsSkeleton = () => (
 );
 
 const PaymentsPanel = () => {
-    const { loading } = useOutletContext();
+    const { user, loading } = useOutletContext();
     const navigate = useNavigate();
     const [params] = useSearchParams();
     const returnOrderId = params.get('order_id') || '';
     const handledReturn = useRef('');
 
-    const [orders, setOrders] = useState([]);
-    const [ordersLoading, setOrdersLoading] = useState(true);
+    const initialOrders = user?.id ? getCachedOrders(user.id) : null;
+    const [orders, setOrders] = useState(() => initialOrders?.data?.orders || []);
+    const [ordersLoading, setOrdersLoading] = useState(() => !initialOrders?.data?.ok);
     const [loadError, setLoadError] = useState('');
     const [resultStatus, setResultStatus] = useState('');
     const [resultPlanName, setResultPlanName] = useState('');
 
     useEffect(() => {
         let cancelled = false;
-        setOrdersLoading(true);
-        fetchPaymentCatalog('orders').then((result) => {
+        const cached = user?.id ? getCachedOrders(user.id) : null;
+        if (cached?.data?.ok) {
+            setOrders(cached.data.orders || []);
+            setLoadError('');
+            setOrdersLoading(false);
+        } else if (!loading) {
+            setOrdersLoading(true);
+        }
+
+        fetchPaymentCatalog('orders', { force: !cached?.fresh }).then((result) => {
             if (cancelled) return;
             if (!result.ok) {
+                if (cached?.data?.ok) {
+                    setOrdersLoading(false);
+                    return;
+                }
                 setLoadError('Transactions could not load.');
                 setOrdersLoading(false);
                 return;
             }
+            setLoadError('');
             setOrders(result.orders || []);
             setOrdersLoading(false);
         });
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [user?.id, loading]);
 
     useEffect(() => {
         if (!returnOrderId || handledReturn.current === returnOrderId) return undefined;
@@ -96,7 +111,7 @@ const PaymentsPanel = () => {
         fetchPaymentStatus(returnOrderId).then(async (result) => {
             if (cancelled) return;
             const kind = paymentResultKind(result.ok ? result.status : 'failed');
-            const catalogResult = await fetchPaymentCatalog('orders');
+            const catalogResult = await fetchPaymentCatalog('orders', { force: true });
             if (cancelled) return;
             const nextOrders = catalogResult.ok ? catalogResult.orders || [] : [];
             if (catalogResult.ok) setOrders(nextOrders);
@@ -110,7 +125,7 @@ const PaymentsPanel = () => {
         };
     }, [returnOrderId, navigate]);
 
-    if (loading || ordersLoading) return <PaymentsSkeleton />;
+    if ((loading || ordersLoading) && orders.length === 0) return <PaymentsSkeleton />;
 
     return (
         <div className="max-w-5xl mx-auto space-y-6 sm:space-y-7" data-testid="account-payments">

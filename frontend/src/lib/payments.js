@@ -1,5 +1,14 @@
 import { supabase } from './supabase';
 import { reportClientErrorQuiet } from './errorLog';
+import {
+    bindAccountCacheUser,
+    getCachedOrders,
+    getCachedPlans,
+    invalidateOrdersCache,
+    invalidateSubscriptionCache,
+    setCachedOrders,
+    setCachedPlans,
+} from './accountCache';
 
 const LOG_REASONS = new Set([
     'unavailable',
@@ -12,11 +21,14 @@ const LOG_REASONS = new Set([
     'payments_offline',
 ]);
 
+const catalogInflight = { plans: null, orders: null };
+
 function authHeader() {
     return supabase.auth.getSession().then(({ data }) => {
         const token = data?.session?.access_token;
+        const userId = data?.session?.user?.id || null;
         if (!token) return null;
-        return { Authorization: `Bearer ${token}` };
+        return { Authorization: `Bearer ${token}`, userId };
     });
 }
 
@@ -44,35 +56,71 @@ async function readJson(res) {
     return body;
 }
 
-export async function fetchPaymentCatalog(scope = 'plans') {
-    const headers = await authHeader();
-    if (!headers) return { ok: false, reason: 'signed_out' };
-    try {
-        const query = scope === 'orders' ? '?scope=orders' : '?scope=plans';
-        const res = await fetch(`/api/payment-catalog${query}`, { headers });
-        const body = await readJson(res);
-        if (!body?.ok && (body?.reason === 'unavailable' || !res.headers.get('content-type')?.includes('application/json'))) {
-            logPaymentFailure('payment_catalog_failed', body?.reason || 'unavailable', {
+export async function fetchPaymentCatalog(scope = 'plans', { force = false } = {}) {
+    const auth = await authHeader();
+    if (!auth) return { ok: false, reason: 'signed_out' };
+    const { userId, ...headers } = auth;
+    bindAccountCacheUser(userId);
+
+    const cacheKey = scope === 'orders' ? 'orders' : 'plans';
+    if (!force) {
+        const cached = cacheKey === 'orders' ? getCachedOrders(userId) : getCachedPlans(userId);
+        if (cached?.data?.ok && cached.fresh) {
+            return { ...cached.data, fromCache: true };
+        }
+    }
+
+    if (catalogInflight[cacheKey] && !force) {
+        return catalogInflight[cacheKey];
+    }
+
+    catalogInflight[cacheKey] = (async () => {
+        try {
+            const query = cacheKey === 'orders' ? '?scope=orders' : '?scope=plans';
+            const res = await fetch(`/api/payment-catalog${query}`, { headers });
+            const body = await readJson(res);
+            if (!body?.ok && (body?.reason === 'unavailable' || !res.headers.get('content-type')?.includes('application/json'))) {
+                logPaymentFailure('payment_catalog_failed', body?.reason || 'unavailable', {
+                    endpoint: '/api/payment-catalog',
+                    httpMethod: 'GET',
+                    responseStatus: body?.responseStatus || res.status,
+                    scope: cacheKey,
+                });
+            }
+            if (body?.ok) {
+                if (cacheKey === 'orders') setCachedOrders(userId, body);
+                else setCachedPlans(userId, body);
+                return body;
+            }
+            const cached = cacheKey === 'orders' ? getCachedOrders(userId) : getCachedPlans(userId);
+            if (cached?.data?.ok) return { ...cached.data, fromCache: true, stale: true };
+            return body;
+        } catch (err) {
+            logPaymentFailure('payment_catalog_network', 'unavailable', {
                 endpoint: '/api/payment-catalog',
                 httpMethod: 'GET',
-                responseStatus: body?.responseStatus || res.status,
-                scope,
+                message: err?.message,
             });
+            const cached = cacheKey === 'orders' ? getCachedOrders(userId) : getCachedPlans(userId);
+            if (cached?.data?.ok) return { ...cached.data, fromCache: true, stale: true };
+            return { ok: false, reason: 'unavailable' };
+        } finally {
+            catalogInflight[cacheKey] = null;
         }
-        return body;
-    } catch (err) {
-        logPaymentFailure('payment_catalog_network', 'unavailable', {
-            endpoint: '/api/payment-catalog',
-            httpMethod: 'GET',
-            message: err?.message,
-        });
-        return { ok: false, reason: 'unavailable' };
-    }
+    })();
+
+    return catalogInflight[cacheKey];
+}
+
+export function prefetchAccountCatalogs() {
+    void fetchPaymentCatalog('plans').catch(() => {});
+    void fetchPaymentCatalog('orders').catch(() => {});
 }
 
 export async function createPaymentOrder({ planId, gstin, hasGst, phone, name, email, pumpName, address, acceptRefundPolicy }) {
-    const headers = await authHeader();
-    if (!headers) return { ok: false, reason: 'signed_out' };
+    const auth = await authHeader();
+    if (!auth) return { ok: false, reason: 'signed_out' };
+    const { userId, ...headers } = auth;
     try {
         const res = await fetch('/api/payment-create-order', {
             method: 'POST',
@@ -88,6 +136,10 @@ export async function createPaymentOrder({ planId, gstin, hasGst, phone, name, e
                 planId,
             });
         }
+        if (body?.ok) {
+            invalidateOrdersCache();
+            invalidateSubscriptionCache();
+        }
         return body;
     } catch (err) {
         logPaymentFailure('payment_create_network', 'unavailable', {
@@ -101,23 +153,27 @@ export async function createPaymentOrder({ planId, gstin, hasGst, phone, name, e
 }
 
 export async function savePaymentStatus(orderId, status) {
-    const headers = await authHeader();
-    if (!headers) return { ok: false, reason: 'signed_out' };
+    const auth = await authHeader();
+    if (!auth) return { ok: false, reason: 'signed_out' };
+    const { userId, ...headers } = auth;
     try {
         const res = await fetch('/api/payment-save', {
             method: 'POST',
             headers: { ...headers, 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId, status }),
         });
-        return readJson(res);
+        const body = await readJson(res);
+        if (body?.ok) invalidateOrdersCache();
+        return body;
     } catch {
         return { ok: false, reason: 'unavailable' };
     }
 }
 
 export async function fetchPaymentStatus(orderId) {
-    const headers = await authHeader();
-    if (!headers) return { ok: false, reason: 'signed_out' };
+    const auth = await authHeader();
+    if (!auth) return { ok: false, reason: 'signed_out' };
+    const { userId, ...headers } = auth;
     try {
         const res = await fetch(`/api/payment-status?order_id=${encodeURIComponent(orderId)}`, { headers });
         const body = await readJson(res);
@@ -128,6 +184,12 @@ export async function fetchPaymentStatus(orderId) {
                 responseStatus: body?.responseStatus || res.status,
                 orderId,
             });
+        }
+        if (body?.ok) {
+            invalidateOrdersCache();
+            if (String(body.status || '').toLowerCase() === 'paid') {
+                invalidateSubscriptionCache();
+            }
         }
         return body;
     } catch (err) {
