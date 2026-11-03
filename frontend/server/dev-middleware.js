@@ -11,6 +11,7 @@ const HANDLERS = {
     '/api/payment-status': path.join(apiDir, 'payment-status.js'),
     '/api/payment-save': path.join(apiDir, 'payment-save.js'),
     '/api/payment-webhook': path.join(apiDir, 'payment-webhook.js'),
+    '/api/error-log': path.join(apiDir, 'error-log.js'),
 };
 
 function pathnameOf(req) {
@@ -74,6 +75,20 @@ function localApiMiddleware(req, res, next) {
     const needsBody = !isWebhook && (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH');
     const task = needsBody ? readJsonBody(req).then(run) : run();
     task.catch((err) => {
+        try {
+            const { logQuietly, fromRequest } = require('./error-log');
+            logQuietly({
+                ...fromRequest(req),
+                source: 'api',
+                severity: 'critical',
+                module: 'general',
+                errorType: 'unhandled_api_exception',
+                error: err,
+                responseStatus: 500,
+            });
+        } catch {
+            /* ignore logger failures */
+        }
         if (res.headersSent) {
             next(err);
             return;

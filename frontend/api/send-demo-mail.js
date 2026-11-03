@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { logQuietly, fromRequest, sanitizePayload } = require('../server/error-log');
 
 /**
  * Vercel serverless function: sends demo request form data via SMTP.
@@ -27,6 +28,15 @@ module.exports = async (req, res) => {
     const port = parseInt(process.env.SMTP_MAIL_PORT || '587', 10);
 
     if (!host || !user || !pass || !to) {
+        logQuietly({
+            ...fromRequest(req, { requestPayload: sanitizePayload({ name, pump_name, city, phone, email, source }) }),
+            source: 'backend',
+            severity: 'error',
+            module: source === 'screenshots' ? 'pump_management' : 'demo',
+            errorType: 'mail_not_configured',
+            message: 'Mail is not configured.',
+            responseStatus: 500,
+        });
         res.status(500).json({ error: 'Mail is not configured.' });
         return;
     }
@@ -62,7 +72,16 @@ module.exports = async (req, res) => {
             replyTo,
         });
         res.status(200).json({ ok: true });
-    } catch {
+    } catch (err) {
+        logQuietly({
+            ...fromRequest(req, { requestPayload: sanitizePayload({ name, pump_name, city, phone, email, source }) }),
+            source: 'backend',
+            severity: 'error',
+            module: isRegister ? 'pump_management' : 'demo',
+            errorType: 'mail_send_failed',
+            error: err,
+            responseStatus: 500,
+        });
         res.status(500).json({ error: 'Failed to send email' });
     }
 };

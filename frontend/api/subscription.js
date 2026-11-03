@@ -1,4 +1,5 @@
 const { send, requireUser, isUuid, adminClient } = require('../server/http');
+const { logQuietly, fromRequest } = require('../server/error-log');
 
 const PUMP_COLUMNS =
     'id, pump_code, name, city, state, address, pincode, owner_name, phone, email, registration_status';
@@ -15,6 +16,7 @@ function emptyPayload(profile) {
 
 function mapPump(row) {
     return {
+        id: row.id || null,
         code: row.pump_code || null,
         name: row.name || null,
         city: row.city || null,
@@ -110,6 +112,16 @@ module.exports = async (req, res) => {
             .maybeSingle();
 
         if (profileError) {
+            logQuietly({
+                ...fromRequest(req, { userId: auth.user.id }),
+                source: 'database',
+                severity: 'error',
+                module: 'subscriptions',
+                errorType: 'profile_load_failed',
+                message: profileError.message || 'load_failed',
+                details: { code: profileError.code, reason: 'load_failed' },
+                responseStatus: 500,
+            });
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -131,11 +143,31 @@ module.exports = async (req, res) => {
         ]);
 
         if (pumpError) {
+            logQuietly({
+                ...fromRequest(req, { userId: auth.user.id, pumpId }),
+                source: 'database',
+                severity: 'error',
+                module: 'subscriptions',
+                errorType: 'pump_load_failed',
+                message: pumpError.message || 'load_failed',
+                details: { code: pumpError.code, reason: 'load_failed' },
+                responseStatus: 500,
+            });
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
 
         if (subError) {
+            logQuietly({
+                ...fromRequest(req, { userId: auth.user.id, pumpId }),
+                source: 'database',
+                severity: 'error',
+                module: 'subscriptions',
+                errorType: 'subscription_load_failed',
+                message: subError.message || 'load_failed',
+                details: { code: subError.code, reason: 'load_failed' },
+                responseStatus: 500,
+            });
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -151,7 +183,16 @@ module.exports = async (req, res) => {
             pump,
             subscription: current ? mapSubscription(current, names[current.plan_id]) : null,
         });
-    } catch {
+    } catch (err) {
+        logQuietly({
+            ...fromRequest(req),
+            source: 'api',
+            severity: 'error',
+            module: 'subscriptions',
+            errorType: 'subscription_unhandled',
+            error: err,
+            responseStatus: 500,
+        });
         send(res, 500, { ok: false, reason: 'load_failed' });
     }
 };

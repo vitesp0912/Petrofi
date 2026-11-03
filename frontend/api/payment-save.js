@@ -1,5 +1,6 @@
 const { send, requireUser, adminClient, readJsonBody } = require('../server/http');
 const { savePaymentOrder } = require('../server/save-payment-order');
+const { logQuietly, fromRequest } = require('../server/error-log');
 
 const CLIENT_STATUSES = new Set(['failed', 'expired', 'user_dropped']);
 const ORDER_ID_RE = /^(PF-[0-9A-F]{8}|pf_[a-z0-9_]+)$/i;
@@ -43,6 +44,16 @@ module.exports = async (req, res) => {
             .maybeSingle();
 
         if (error) {
+            logQuietly({
+                ...fromRequest(req, { userId: auth.user.id, requestPayload: { orderId, status } }),
+                source: 'database',
+                severity: 'error',
+                module: 'payments',
+                errorType: 'payment_save_lookup_failed',
+                message: error.message || 'save_failed',
+                details: { code: error.code, orderId },
+                responseStatus: 500,
+            });
             send(res, 500, { ok: false, reason: 'save_failed' });
             return;
         }
@@ -67,6 +78,15 @@ module.exports = async (req, res) => {
             status: saved.status,
         });
     } catch (err) {
+        logQuietly({
+            ...fromRequest(req),
+            source: 'api',
+            severity: 'error',
+            module: 'payments',
+            errorType: 'payment_save_unhandled',
+            error: err,
+            responseStatus: 500,
+        });
         send(res, 500, { ok: false, reason: err.reason || 'save_failed' });
     }
 };

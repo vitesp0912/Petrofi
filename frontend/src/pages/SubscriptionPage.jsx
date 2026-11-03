@@ -9,6 +9,7 @@ import RegisterPumpDialog from '../components/RegisterPumpDialog';
 import { useAuth } from '../context/AuthContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { fetchPumpSubscription, isExpiredSubscription } from '../lib/subscription';
+import { setErrorLogContext } from '../lib/errorLog';
 
 const TRIAL_POINTS = [
     '30 days of full access on your pump',
@@ -38,6 +39,7 @@ function SubscriptionPage() {
 
         if (authLoading) return undefined;
         if (!user) {
+            setErrorLogContext(() => ({ userId: null, pumpId: null }));
             setState({
                 loading: false,
                 reason: 'signed_out',
@@ -61,6 +63,10 @@ function SubscriptionPage() {
                 });
                 return;
             }
+            setErrorLogContext(() => ({
+                userId: user?.id || null,
+                pumpId: result.pump?.id || null,
+            }));
             setState({
                 loading: false,
                 reason: '',

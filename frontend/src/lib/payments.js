@@ -1,4 +1,16 @@
 import { supabase } from './supabase';
+import { reportClientErrorQuiet } from './errorLog';
+
+const LOG_REASONS = new Set([
+    'unavailable',
+    'cashfree_error',
+    'consent_failed',
+    'create_failed',
+    'load_failed',
+    'save_failed',
+    'fulfill_failed',
+    'payments_offline',
+]);
 
 function authHeader() {
     return supabase.auth.getSession().then(({ data }) => {
@@ -8,12 +20,28 @@ function authHeader() {
     });
 }
 
+function logPaymentFailure(errorType, reason, details = {}) {
+    if (!reason || reason === 'signed_out' || !LOG_REASONS.has(reason)) return;
+    reportClientErrorQuiet({
+        module: 'payments',
+        severity: reason === 'cashfree_error' || reason === 'fulfill_failed' ? 'critical' : 'error',
+        errorType,
+        message: `Payment client failure: ${reason}`,
+        details: { reason, ...details },
+        endpoint: details.endpoint || null,
+        httpMethod: details.httpMethod || null,
+        responseStatus: details.responseStatus || null,
+    });
+}
+
 async function readJson(res) {
     const contentType = res.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
-        return { ok: false, reason: 'unavailable' };
+        return { ok: false, reason: 'unavailable', responseStatus: res.status };
     }
-    return res.json().catch(() => ({ ok: false, reason: 'unavailable' }));
+    const body = await res.json().catch(() => ({ ok: false, reason: 'unavailable' }));
+    if (body && typeof body === 'object') body.responseStatus = res.status;
+    return body;
 }
 
 export async function fetchPaymentCatalog(scope = 'plans') {
@@ -22,8 +50,22 @@ export async function fetchPaymentCatalog(scope = 'plans') {
     try {
         const query = scope === 'orders' ? '?scope=orders' : '?scope=plans';
         const res = await fetch(`/api/payment-catalog${query}`, { headers });
-        return readJson(res);
-    } catch {
+        const body = await readJson(res);
+        if (!body?.ok && (body?.reason === 'unavailable' || !res.headers.get('content-type')?.includes('application/json'))) {
+            logPaymentFailure('payment_catalog_failed', body?.reason || 'unavailable', {
+                endpoint: '/api/payment-catalog',
+                httpMethod: 'GET',
+                responseStatus: body?.responseStatus || res.status,
+                scope,
+            });
+        }
+        return body;
+    } catch (err) {
+        logPaymentFailure('payment_catalog_network', 'unavailable', {
+            endpoint: '/api/payment-catalog',
+            httpMethod: 'GET',
+            message: err?.message,
+        });
         return { ok: false, reason: 'unavailable' };
     }
 }
@@ -37,8 +79,23 @@ export async function createPaymentOrder({ planId, gstin, hasGst, phone, name, e
             headers: { ...headers, 'Content-Type': 'application/json' },
             body: JSON.stringify({ planId, gstin, hasGst, phone, name, email, pumpName, address, acceptRefundPolicy }),
         });
-        return readJson(res);
-    } catch {
+        const body = await readJson(res);
+        if (!body?.ok && body?.reason === 'unavailable') {
+            logPaymentFailure('payment_create_failed', 'unavailable', {
+                endpoint: '/api/payment-create-order',
+                httpMethod: 'POST',
+                responseStatus: body?.responseStatus || res.status,
+                planId,
+            });
+        }
+        return body;
+    } catch (err) {
+        logPaymentFailure('payment_create_network', 'unavailable', {
+            endpoint: '/api/payment-create-order',
+            httpMethod: 'POST',
+            message: err?.message,
+            planId,
+        });
         return { ok: false, reason: 'unavailable' };
     }
 }
@@ -63,8 +120,23 @@ export async function fetchPaymentStatus(orderId) {
     if (!headers) return { ok: false, reason: 'signed_out' };
     try {
         const res = await fetch(`/api/payment-status?order_id=${encodeURIComponent(orderId)}`, { headers });
-        return readJson(res);
-    } catch {
+        const body = await readJson(res);
+        if (!body?.ok && body?.reason === 'unavailable') {
+            logPaymentFailure('payment_status_failed', 'unavailable', {
+                endpoint: '/api/payment-status',
+                httpMethod: 'GET',
+                responseStatus: body?.responseStatus || res.status,
+                orderId,
+            });
+        }
+        return body;
+    } catch (err) {
+        logPaymentFailure('payment_status_network', 'unavailable', {
+            endpoint: '/api/payment-status',
+            httpMethod: 'GET',
+            message: err?.message,
+            orderId,
+        });
         return { ok: false, reason: 'unavailable' };
     }
 }
@@ -87,15 +159,21 @@ export function paymentErrorText(reason) {
 let cashfreeLoader = null;
 
 export function loadCashfreeSdk() {
-    if (window.Cashfree) return Promise.resolve(window.Cashfree);
+    if (typeof window !== 'undefined' && typeof window.Cashfree === 'function') {
+        return Promise.resolve(window.Cashfree);
+    }
     if (cashfreeLoader) return cashfreeLoader;
     cashfreeLoader = new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
         script.async = true;
         script.onload = () => {
-            if (window.Cashfree) resolve(window.Cashfree);
-            else reject(new Error('checkout_unavailable'));
+            if (typeof window.Cashfree === 'function') {
+                resolve(window.Cashfree);
+                return;
+            }
+            cashfreeLoader = null;
+            reject(new Error('checkout_unavailable'));
         };
         script.onerror = () => {
             cashfreeLoader = null;
@@ -106,11 +184,59 @@ export function loadCashfreeSdk() {
     return cashfreeLoader;
 }
 
+function checkoutFail(reason, detail) {
+    const err = new Error(reason);
+    err.reason = reason;
+    if (detail) err.detail = String(detail).slice(0, 180);
+    return err;
+}
+
 export async function startHostedCheckout(created) {
-    const Checkout = await loadCashfreeSdk();
-    const client = Checkout({ mode: created.mode === 'production' ? 'production' : 'sandbox' });
-    await client.checkout({
-        paymentSessionId: created.paymentSessionId,
-        redirectTarget: '_self',
-    });
+    const sessionId = String(created?.paymentSessionId || '').trim();
+    if (!sessionId) throw checkoutFail('checkout_no_session');
+
+    let Checkout;
+    try {
+        Checkout = await loadCashfreeSdk();
+    } catch {
+        throw checkoutFail('checkout_unavailable');
+    }
+
+    const mode = created.mode === 'production' ? 'production' : 'sandbox';
+    let client;
+    try {
+        client = Checkout({ mode });
+    } catch (err) {
+        throw checkoutFail('checkout_init_failed', err?.message);
+    }
+
+    let result;
+    try {
+        result = await client.checkout({
+            paymentSessionId: sessionId,
+            redirectTarget: '_self',
+        });
+    } catch (err) {
+        throw checkoutFail('checkout_open_failed', err?.message || err?.code);
+    }
+
+    if (result?.error) {
+        const detail = result.error.message || result.error.code || result.error;
+        throw checkoutFail('checkout_open_failed', detail);
+    }
+}
+
+export function checkoutErrorText(err) {
+    const reason = err?.reason || '';
+    if (reason === 'checkout_unavailable') {
+        return 'Cashfree could not load in this browser. Allow sdk.cashfree.com, or turn off blockers, then try again.';
+    }
+    if (reason === 'checkout_no_session') {
+        return 'Payment was created but the checkout session was missing. Try again.';
+    }
+    if (reason === 'checkout_init_failed' || reason === 'checkout_open_failed') {
+        if (err?.detail) return `Payment page could not open: ${err.detail}`;
+        return 'The payment page could not open. Confirm this site domain is allowed in Cashfree, then try again.';
+    }
+    return 'The payment page could not open. Try again.';
 }

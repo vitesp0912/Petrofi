@@ -1,6 +1,7 @@
 const { send, requireUser, isUuid, adminClient } = require('../server/http');
 const { listQuotes } = require('../server/catalog');
 const { paymentsReady } = require('../server/cashfree');
+const { logQuietly, fromRequest } = require('../server/error-log');
 
 const ORDER_COLUMNS = 'order_id, amount_total, currency, status, payment_method, paid_at, created_at, plan_id, gstin';
 
@@ -69,6 +70,16 @@ module.exports = async (req, res) => {
             .maybeSingle();
 
         if (profileError) {
+            logQuietly({
+                ...fromRequest(req, { userId: auth.user.id }),
+                source: 'database',
+                severity: 'error',
+                module: 'payments',
+                errorType: 'catalog_profile_failed',
+                message: profileError.message || 'load_failed',
+                details: { code: profileError.code },
+                responseStatus: 500,
+            });
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -86,6 +97,15 @@ module.exports = async (req, res) => {
         payload.hasPump = Boolean(pumpId);
         send(res, 200, payload);
     } catch (err) {
+        logQuietly({
+            ...fromRequest(req),
+            source: 'api',
+            severity: 'error',
+            module: 'payments',
+            errorType: 'catalog_unhandled',
+            error: err,
+            responseStatus: 500,
+        });
         send(res, 500, { ok: false, reason: 'load_failed' });
     }
 };

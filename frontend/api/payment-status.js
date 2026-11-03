@@ -1,6 +1,7 @@
 const { send, requireUser, adminClient } = require('../server/http');
 const { paymentsReady, getCashfreeOrder, getSuccessfulPaymentId, orderIsPaid, amountsMatch } = require('../server/cashfree');
 const { fulfillPaidOrder } = require('../server/fulfill');
+const { logQuietly, fromRequest } = require('../server/error-log');
 
 const ORDER_COLUMNS =
     'order_id, user_id, pump_id, plan_id, amount_total, status, cf_order_id, cf_payment_id, paid_at, payment_method';
@@ -40,6 +41,16 @@ module.exports = async (req, res) => {
             .maybeSingle();
 
         if (error) {
+            logQuietly({
+                ...fromRequest(req, { userId: auth.user.id }),
+                source: 'database',
+                severity: 'error',
+                module: 'payments',
+                errorType: 'payment_status_lookup_failed',
+                message: error.message || 'load_failed',
+                details: { code: error.code, orderId },
+                responseStatus: 500,
+            });
             send(res, 500, { ok: false, reason: 'load_failed' });
             return;
         }
@@ -54,6 +65,16 @@ module.exports = async (req, res) => {
                 paidAt: row.paid_at || new Date().toISOString(),
             });
             if (!healed.ok) {
+                logQuietly({
+                    ...fromRequest(req, { userId: auth.user.id, pumpId: row.pump_id }),
+                    source: 'backend',
+                    severity: 'critical',
+                    module: 'payments',
+                    errorType: 'payment_status_heal_failed',
+                    message: 'fulfill_failed',
+                    details: { orderId, reason: healed.reason || 'fulfill_failed' },
+                    responseStatus: 500,
+                });
                 send(res, 500, { ok: false, reason: 'fulfill_failed' });
                 return;
             }
@@ -88,12 +109,31 @@ module.exports = async (req, res) => {
         });
 
         if (!result.ok) {
+            logQuietly({
+                ...fromRequest(req, { userId: auth.user.id, pumpId: row.pump_id }),
+                source: 'backend',
+                severity: 'critical',
+                module: 'payments',
+                errorType: 'payment_status_fulfill_failed',
+                message: 'fulfill_failed',
+                details: { orderId, reason: result.reason || 'fulfill_failed' },
+                responseStatus: 500,
+            });
             send(res, 500, { ok: false, reason: 'fulfill_failed' });
             return;
         }
 
         reply(res, 'paid', orderId);
-    } catch {
+    } catch (err) {
+        logQuietly({
+            ...fromRequest(req),
+            source: 'api',
+            severity: 'error',
+            module: 'payments',
+            errorType: 'payment_status_unhandled',
+            error: err,
+            responseStatus: 500,
+        });
         send(res, 500, { ok: false, reason: 'load_failed' });
     }
 };

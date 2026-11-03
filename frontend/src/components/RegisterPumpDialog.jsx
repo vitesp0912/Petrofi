@@ -7,6 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from './ui/dialog';
+import { reportClientErrorQuiet } from '../lib/errorLog';
 
 const API_SEND_DEMO = '/api/send-demo-mail';
 const EMPTY = { name: '', phone: '', pump_name: '', address: '' };
@@ -70,8 +71,29 @@ const RegisterPumpDialog = ({ open, onOpenChange, onSuccess, source = 'screensho
                 onSuccess?.();
                 return;
             }
+            if (!data) {
+                reportClientErrorQuiet({
+                    module: 'pump_management',
+                    severity: 'error',
+                    errorType: 'register_pump_failed',
+                    message: 'Pump registration failed without JSON body',
+                    endpoint: API_SEND_DEMO,
+                    httpMethod: 'POST',
+                    responseStatus: res.status,
+                    requestPayload: { source },
+                });
+            }
             setStatus('error');
-        } catch {
+        } catch (err) {
+            reportClientErrorQuiet({
+                module: 'pump_management',
+                severity: 'error',
+                errorType: 'register_pump_network',
+                message: err?.message || 'Pump registration network failure',
+                stack: err?.stack || null,
+                endpoint: API_SEND_DEMO,
+                httpMethod: 'POST',
+            });
             setStatus('error');
         }
     };

@@ -1,4 +1,5 @@
 const { savePaymentOrder } = require('./save-payment-order');
+const { logQuietly } = require('./error-log');
 
 async function fulfillPaidOrder(admin, row, extras = {}) {
     if (!admin || !row?.order_id) {
@@ -26,6 +27,22 @@ async function fulfillPaidOrder(admin, row, extras = {}) {
         if (err.reason === 'already_paid') {
             return { ok: true, already: true };
         }
+        logQuietly({
+            source: 'database',
+            severity: 'critical',
+            module: 'payments',
+            errorType: 'fulfill_failed',
+            error: err,
+            message: err?.message || 'fulfill_failed',
+            userId: row.user_id,
+            pumpId: row.pump_id,
+            endpoint: 'fulfillPaidOrder',
+            details: {
+                orderId: row.order_id,
+                reason: err?.reason || 'fulfill_failed',
+            },
+            responseStatus: 500,
+        });
         return { ok: false, reason: 'fulfill_failed' };
     }
 

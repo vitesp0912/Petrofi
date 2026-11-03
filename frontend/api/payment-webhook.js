@@ -2,6 +2,7 @@ const { send, adminClient } = require('../server/http');
 const { paymentsReady, verifyWebhookSignature, orderIsPaid, amountsMatch, getCashfreeOrder, getSuccessfulPaymentId } = require('../server/cashfree');
 const { fulfillPaidOrder } = require('../server/fulfill');
 const { savePaymentOrder } = require('../server/save-payment-order');
+const { logQuietly, fromRequest } = require('../server/error-log');
 
 module.exports.config = {
     api: { bodyParser: false },
@@ -59,6 +60,16 @@ module.exports = async (req, res) => {
     const eventId = header(req, 'x-webhook-id') || header(req, 'x-idempotency-key') || header(req, 'x-idempotency-header');
 
     if (!verifyWebhookSignature(rawBody, timestamp, signature)) {
+        logQuietly({
+            ...fromRequest(req),
+            source: 'api',
+            severity: 'warning',
+            module: 'payments',
+            errorType: 'webhook_invalid_signature',
+            message: 'Cashfree webhook signature failed',
+            details: { hasTimestamp: Boolean(timestamp), hasSignature: Boolean(signature) },
+            responseStatus: 401,
+        });
         send(res, 401, { ok: false, reason: 'invalid_signature' });
         return;
     }
@@ -101,6 +112,18 @@ module.exports = async (req, res) => {
         .maybeSingle();
 
     if (error || !row) {
+        if (error) {
+            logQuietly({
+                ...fromRequest(req),
+                source: 'database',
+                severity: 'error',
+                module: 'payments',
+                errorType: 'webhook_order_lookup_failed',
+                message: error.message || 'webhook order lookup failed',
+                details: { code: error.code, orderId: event.orderId },
+                responseStatus: 200,
+            });
+        }
         send(res, 200, { ok: true });
         return;
     }
@@ -159,6 +182,16 @@ module.exports = async (req, res) => {
     });
 
     if (!result.ok) {
+        logQuietly({
+            ...fromRequest(req, { userId: row.user_id, pumpId: row.pump_id }),
+            source: 'backend',
+            severity: 'critical',
+            module: 'payments',
+            errorType: 'webhook_fulfill_failed',
+            message: 'fulfill_failed',
+            details: { orderId: row.order_id, reason: result.reason || 'fulfill_failed' },
+            responseStatus: 500,
+        });
         send(res, 500, { ok: false, reason: 'fulfill_failed' });
         return;
     }

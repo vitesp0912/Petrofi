@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { reportClientErrorQuiet } from './errorLog';
 
 export const IDENTIFIER_MAX_LENGTH = 254;
 export const OTP_LENGTH = 6;
@@ -141,6 +142,14 @@ export async function sendLoginOtp(parsed) {
             phone_number: parsed.phone10,
         });
         if (error) {
+            reportClientErrorQuiet({
+                module: 'authentication',
+                severity: 'error',
+                errorType: 'validate_phone_rpc_failed',
+                message: error.message || 'validate_phone_for_web_login failed',
+                details: { code: error.code || null },
+                endpoint: 'validate_phone_for_web_login',
+            });
             return { ok: false, error: 'We could not check this account right now. Please try again.' };
         }
         const check = readAccountCheck(data);
@@ -158,6 +167,14 @@ export async function sendLoginOtp(parsed) {
             options: { shouldCreateUser: false },
         });
         if (otpError) {
+            reportClientErrorQuiet({
+                module: 'authentication',
+                severity: 'error',
+                errorType: 'otp_send_phone_failed',
+                message: otpError.message || 'phone otp send failed',
+                details: { code: otpError.code || null, status: otpError.status || null },
+                endpoint: 'signInWithOtp',
+            });
             return { ok: false, error: mapSendError(otpError, parsed.kind) };
         }
     } else {
@@ -165,6 +182,14 @@ export async function sendLoginOtp(parsed) {
             p_email: parsed.email,
         });
         if (error) {
+            reportClientErrorQuiet({
+                module: 'authentication',
+                severity: 'error',
+                errorType: 'validate_email_rpc_failed',
+                message: error.message || 'validate_email_for_web_login failed',
+                details: { code: error.code || null },
+                endpoint: 'validate_email_for_web_login',
+            });
             return { ok: false, error: 'We could not check this account right now. Please try again.' };
         }
         const check = readAccountCheck(data);
@@ -182,6 +207,14 @@ export async function sendLoginOtp(parsed) {
             options: { shouldCreateUser: false },
         });
         if (otpError) {
+            reportClientErrorQuiet({
+                module: 'authentication',
+                severity: 'error',
+                errorType: 'otp_send_email_failed',
+                message: otpError.message || 'email otp send failed',
+                details: { code: otpError.code || null, status: otpError.status || null },
+                endpoint: 'signInWithOtp',
+            });
             return { ok: false, error: mapSendError(otpError, parsed.kind) };
         }
     }

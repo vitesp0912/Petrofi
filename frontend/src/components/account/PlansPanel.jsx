@@ -3,12 +3,14 @@ import { useOutletContext } from 'react-router-dom';
 import { ArrowRight, Check, FileText, Phone, Shield } from 'lucide-react';
 import { formatMoney, isActiveSubscription, trialCopy } from '../../lib/subscription';
 import {
+    checkoutErrorText,
     createPaymentOrder,
     fetchPaymentCatalog,
     paymentErrorText,
     savePaymentStatus,
     startHostedCheckout,
 } from '../../lib/payments';
+import { reportClientErrorQuiet } from '../../lib/errorLog';
 import CurrentPlanView, { CurrentPlanSkeleton } from './CurrentPlanView';
 import { ConfirmPayDialog } from './PaymentDialogs';
 import { Bone, cardClass } from './AccountBits';
@@ -203,12 +205,21 @@ const PlansPanel = () => {
         }
         try {
             await startHostedCheckout(created);
-        } catch {
+        } catch (err) {
             if (lock !== payLock.current) return;
             if (created.orderId) {
                 await savePaymentStatus(created.orderId, 'user_dropped');
             }
-            setPayError('The payment page could not open. Try again.');
+            reportClientErrorQuiet({
+                module: 'payments',
+                severity: 'error',
+                errorType: err?.reason || 'checkout_open_failed',
+                message: err?.detail || err?.message || 'The payment page could not open',
+                stack: err?.stack || null,
+                details: { orderId: created.orderId || null, mode: created.mode || null },
+                endpoint: 'startHostedCheckout',
+            });
+            setPayError(checkoutErrorText(err));
         } finally {
             if (lock === payLock.current) setPaying(false);
         }

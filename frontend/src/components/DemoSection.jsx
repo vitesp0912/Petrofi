@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import { reportClientErrorQuiet } from '../lib/errorLog';
 
 const API_SEND_DEMO = '/api/send-demo-mail';
 
@@ -34,8 +35,29 @@ const DemoSection = ({ id }) => {
                 setForm({ name: '', pump_name: '', city: '', phone: '', email: '' });
                 return;
             }
+            // Server logs mail/API failures; keep client log for unexpected non-JSON/empty replies only.
+            if (!data) {
+                reportClientErrorQuiet({
+                    module: 'demo',
+                    severity: 'error',
+                    errorType: 'demo_request_failed',
+                    message: 'Demo request failed without JSON body',
+                    endpoint: API_SEND_DEMO,
+                    httpMethod: 'POST',
+                    responseStatus: res.status,
+                });
+            }
             setStatus('error');
-        } catch {
+        } catch (err) {
+            reportClientErrorQuiet({
+                module: 'demo',
+                severity: 'error',
+                errorType: 'demo_request_network',
+                message: err?.message || 'Demo request network failure',
+                stack: err?.stack || null,
+                endpoint: API_SEND_DEMO,
+                httpMethod: 'POST',
+            });
             setStatus('error');
         }
     };

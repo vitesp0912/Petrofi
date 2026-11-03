@@ -4,9 +4,33 @@ const { paymentsReady, cashfreeConfig, createOrderId, createCashfreeOrder } = re
 const { buyerFrom, applyBuyerOverrides, cashfreeCustomer, normalizeGstin } = require('../server/buyer');
 const { savePaymentOrder } = require('../server/save-payment-order');
 const { recordRefundConsent } = require('../server/legal-consent');
+const { logQuietly, fromRequest, sanitizePayload } = require('../server/error-log');
 
 const PUMP_COLUMNS = 'id, pump_code, name, owner_name, phone, email, address, city, state, pincode';
 const RATE_LIMIT_MS = 20 * 1000;
+
+function failCreate(req, res, status, reason, ctx = {}) {
+    const severity = status >= 500 ? 'error' : 'warning';
+    if (status >= 500 || reason === 'cashfree_error' || reason === 'consent_failed' || reason === 'create_failed') {
+        logQuietly({
+            ...fromRequest(req, {
+                userId: ctx.userId,
+                pumpId: ctx.pumpId,
+                requestPayload: sanitizePayload(ctx.requestPayload),
+            }),
+            source: ctx.source || 'api',
+            severity: ctx.severity || severity,
+            module: 'payments',
+            errorType: reason || 'create_failed',
+            message: ctx.message || reason || 'create_failed',
+            stack: ctx.stack || null,
+            details: ctx.details || { reason },
+            responseStatus: status,
+            error: ctx.error,
+        });
+    }
+    send(res, status, { ok: false, reason });
+}
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
@@ -141,7 +165,14 @@ module.exports = async (req, res) => {
                 billingPhone: buyer.phone,
             });
         } catch (err) {
-            send(res, 500, { ok: false, reason: err.reason || 'create_failed' });
+            failCreate(req, res, 500, err.reason || 'create_failed', {
+                userId: auth.user.id,
+                pumpId,
+                source: 'database',
+                error: err,
+                requestPayload: body,
+                details: { orderId, reason: err.reason || 'create_failed' },
+            });
             return;
         }
 
@@ -149,7 +180,14 @@ module.exports = async (req, res) => {
             await recordRefundConsent(admin, { userId: auth.user.id, pumpId, req });
         } catch (err) {
             await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
-            send(res, 500, { ok: false, reason: err.reason || 'consent_failed' });
+            failCreate(req, res, 500, err.reason || 'consent_failed', {
+                userId: auth.user.id,
+                pumpId,
+                source: 'database',
+                error: err,
+                requestPayload: body,
+                details: { orderId, reason: err.reason || 'consent_failed' },
+            });
             return;
         }
 
@@ -214,7 +252,20 @@ module.exports = async (req, res) => {
                 cfOrder = await createCashfreeOrder(orderPayload);
             } catch (err) {
                 await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
-                send(res, 502, { ok: false, reason: err.reason || 'cashfree_error' });
+                failCreate(req, res, 502, err.reason || 'cashfree_error', {
+                    userId: auth.user.id,
+                    pumpId,
+                    source: 'api',
+                    severity: 'critical',
+                    error: err,
+                    requestPayload: body,
+                    details: {
+                        orderId,
+                        amount: chargeAmount,
+                        reason: err.reason || 'cashfree_error',
+                        cashfreeStatus: err.status || null,
+                    },
+                });
                 return;
             }
         }
@@ -222,7 +273,15 @@ module.exports = async (req, res) => {
         const sessionId = cfOrder?.payment_session_id;
         if (!sessionId) {
             await savePaymentOrder(admin, { orderId, status: 'failed', userId: auth.user.id }).catch(() => {});
-            send(res, 502, { ok: false, reason: 'cashfree_error' });
+            failCreate(req, res, 502, 'cashfree_error', {
+                userId: auth.user.id,
+                pumpId,
+                source: 'api',
+                severity: 'critical',
+                message: 'Cashfree order missing payment_session_id',
+                requestPayload: body,
+                details: { orderId, amount: chargeAmount, cfOrderId: cfOrder?.cf_order_id || null },
+            });
             return;
         }
 
@@ -240,7 +299,11 @@ module.exports = async (req, res) => {
             paymentSessionId: sessionId,
             mode: cfg.mode,
         });
-    } catch {
-        send(res, 500, { ok: false, reason: 'create_failed' });
+    } catch (err) {
+        failCreate(req, res, 500, 'create_failed', {
+            source: 'api',
+            severity: 'critical',
+            error: err,
+        });
     }
 };
