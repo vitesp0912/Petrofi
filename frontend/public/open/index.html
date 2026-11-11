@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Open PetroFI</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Open the PetroFI app or continue on the web." />
+  <style>
+    :root {
+      --navy: #0d1b3e;
+      --sky: #124076;
+      --bg: #f3f6fb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      text-align: center;
+      padding: 1.5rem;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 18px 50px rgba(13, 27, 62, 0.08);
+    }
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+    #msg {
+      margin: 0 0 1.5rem;
+      color: #64748b;
+      line-height: 1.45;
+    }
+    a.btn {
+      display: inline-block;
+      margin: 0.4rem;
+      padding: 0.8rem 1.25rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .primary { background: var(--sky); color: #fff; }
+    .secondary { background: #e8eef5; color: var(--sky); }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>PetroFI</h1>
+    <p id="msg">Opening PetroFI…</p>
+    <p>
+      <a class="btn primary" id="openApp" href="https://petrofi.in/open">Open app</a>
+      <a class="btn secondary" id="store" href="https://app.petrofi.in/">Continue on web</a>
+    </p>
+  </main>
+  <script>
+    (function () {
+      var ua = navigator.userAgent || "";
+      var isAndroid = /Android/i.test(ua);
+      var isIOS = /iPhone|iPad|iPod/i.test(ua);
+      var play =
+        "https://play.google.com/store/apps/details?id=com.petrofi.app";
+      var appStore =
+        "https://apps.apple.com/in/app/petrofi/id6758732447";
+      var web = "https://app.petrofi.in/";
+      var openPath = "https://petrofi.in/open";
+
+      var msg = document.getElementById("msg");
+      var store = document.getElementById("store");
+      var openApp = document.getElementById("openApp");
+
+      if (!isAndroid && !isIOS) {
+        msg.textContent = "Taking you to PetroFI…";
+        store.href = web;
+        openApp.href = web;
+        window.location.replace(web);
+        return;
+      }
+
+      if (isAndroid) {
+        store.href = play;
+        store.textContent = "Get on Google Play";
+        openApp.href = openPath;
+        var intent =
+          "intent://petrofi.in/open#Intent;scheme=https;package=com.petrofi.app;" +
+          "S.browser_fallback_url=" + encodeURIComponent(play) + ";end";
+        window.location.href = intent;
+        setTimeout(function () {
+          msg.textContent = "App not installed? Get it on Google Play.";
+        }, 1500);
+        return;
+      }
+
+      // iOS — Universal Link may open the app; in-app browsers (WhatsApp) often block it.
+      store.href = appStore;
+      store.textContent = "Get on the App Store";
+      openApp.href = openPath;
+      msg.textContent = "Opening PetroFI…";
+      setTimeout(function () {
+        if (!document.hidden) {
+          msg.textContent = "Tap Open app, or get it on the App Store.";
+          window.location.href = appStore;
+        }
+      }, 1600);
+    })();
+  </script>
+</body>
+</html>

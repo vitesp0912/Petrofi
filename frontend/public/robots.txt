@@ -3,10 +3,14 @@ User-agent: *
 Allow: /
 Disallow: /subscription
 Disallow: /subscription/
+Disallow: /open
+Disallow: /open/
 
 User-agent: Googlebot
 Allow: /
 Disallow: /subscription
 Disallow: /subscription/
+Disallow: /open
+Disallow: /open/
 
 Sitemap: https://petrofi.in/sitemap.xml

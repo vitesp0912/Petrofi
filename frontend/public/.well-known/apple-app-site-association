@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "3CZFYGRB93.com.petrofi.app",
+        "paths": ["/open", "/open/*"]
+      }
+    ]
+  }
+}

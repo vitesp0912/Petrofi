@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.petrofi.app",
+      "sha256_cert_fingerprints": [
+        "69:9A:97:C5:8A:2D:26:4E:45:CA:2B:FC:EA:FC:66:2B:D0:B5:86:4C:41:FE:00:FB:C4:AD:CE:62:A0:2A:AB:5D"
+      ]
+    }
+  }
+]
