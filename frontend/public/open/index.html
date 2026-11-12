@@ -80,6 +80,17 @@
       var msg = document.getElementById("msg");
       var store = document.getElementById("store");
       var openApp = document.getElementById("openApp");
+      var leftForApp = false;
+
+      function markLeft() {
+        leftForApp = true;
+      }
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) markLeft();
+      });
+      window.addEventListener("pagehide", markLeft);
+      window.addEventListener("blur", markLeft);
 
       if (!isAndroid && !isIOS) {
         msg.textContent = "Taking you to PetroFI…";
@@ -93,26 +104,34 @@
         store.href = play;
         store.textContent = "Get on Google Play";
         openApp.href = openPath;
+        // If App Links are verified, the OS may already have opened the app
+        // without loading this page. When this page does load (e.g. WhatsApp),
+        // intent:// is the best fallback — a pure silent open is not possible here.
         var intent =
           "intent://petrofi.in/open#Intent;scheme=https;package=com.petrofi.app;" +
           "S.browser_fallback_url=" + encodeURIComponent(play) + ";end";
         window.location.href = intent;
         setTimeout(function () {
-          msg.textContent = "App not installed? Get it on Google Play.";
+          if (!leftForApp && !document.hidden) {
+            msg.textContent = "App not installed? Get it on Google Play, or tap Open app.";
+          }
         }, 1500);
         return;
       }
 
-      // iOS — Universal Link may open the app; in-app browsers (WhatsApp) often block it.
+      // iOS — Universal Link may open the app. Never auto-jump to the App Store:
+      // the web page often keeps running after the app opens, so a timeout falsely
+      // thinks install failed and steals focus back to the store.
       store.href = appStore;
       store.textContent = "Get on the App Store";
       openApp.href = openPath;
       msg.textContent = "Opening PetroFI…";
       setTimeout(function () {
-        if (!document.hidden) {
-          msg.textContent = "Tap Open app, or get it on the App Store.";
-          window.location.href = appStore;
+        if (leftForApp || document.hidden) {
+          msg.textContent = "PetroFI should be open. You can close this tab.";
+          return;
         }
+        msg.textContent = "If the app did not open, tap Open app or get it on the App Store.";
       }, 1600);
     })();
   </script>
