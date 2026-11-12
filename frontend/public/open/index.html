@@ -76,14 +76,24 @@
         "https://apps.apple.com/in/app/petrofi/id6758732447";
       var web = "https://app.petrofi.in/";
       var openPath = "https://petrofi.in/open";
+      // No S.browser_fallback_url — that fallback often pulls Chrome/Play
+      // back to the front even after the app has already opened.
+      var androidIntent =
+        "intent://petrofi.in/open#Intent;scheme=https;package=com.petrofi.app;end";
 
       var msg = document.getElementById("msg");
       var store = document.getElementById("store");
       var openApp = document.getElementById("openApp");
       var leftForApp = false;
+      var storeTimer = null;
 
       function markLeft() {
         leftForApp = true;
+        if (storeTimer) {
+          clearTimeout(storeTimer);
+          storeTimer = null;
+        }
+        msg.textContent = "PetroFI should be open. You can close this tab.";
       }
 
       document.addEventListener("visibilitychange", function () {
@@ -103,36 +113,31 @@
       if (isAndroid) {
         store.href = play;
         store.textContent = "Get on Google Play";
-        openApp.href = openPath;
-        // If App Links are verified, the OS may already have opened the app
-        // without loading this page. When this page does load (e.g. WhatsApp),
-        // intent:// is the best fallback — a pure silent open is not possible here.
-        var intent =
-          "intent://petrofi.in/open#Intent;scheme=https;package=com.petrofi.app;" +
-          "S.browser_fallback_url=" + encodeURIComponent(play) + ";end";
-        window.location.href = intent;
-        setTimeout(function () {
-          if (!leftForApp && !document.hidden) {
-            msg.textContent = "App not installed? Get it on Google Play, or tap Open app.";
-          }
-        }, 1500);
+        openApp.href = androidIntent;
+        openApp.addEventListener("click", function (e) {
+          e.preventDefault();
+          window.location.href = androidIntent;
+        });
+
+        msg.textContent = "Opening PetroFI…";
+        window.location.href = androidIntent;
+
+        storeTimer = setTimeout(function () {
+          if (leftForApp || document.hidden) return;
+          msg.textContent =
+            "If PetroFI did not open, tap Open app or get it on Google Play.";
+        }, 1800);
         return;
       }
 
-      // iOS — Universal Link may open the app. Never auto-jump to the App Store:
-      // the web page often keeps running after the app opens, so a timeout falsely
-      // thinks install failed and steals focus back to the store.
+      // iOS — fully passive. Universal Links open the app at the OS level.
+      // Any automatic window.location (App Store, /open reload, timers that
+      // navigate) brings Safari/Chrome back on top after the app already opened.
       store.href = appStore;
       store.textContent = "Get on the App Store";
       openApp.href = openPath;
-      msg.textContent = "Opening PetroFI…";
-      setTimeout(function () {
-        if (leftForApp || document.hidden) {
-          msg.textContent = "PetroFI should be open. You can close this tab.";
-          return;
-        }
-        msg.textContent = "If the app did not open, tap Open app or get it on the App Store.";
-      }, 1600);
+      msg.textContent =
+        "If PetroFI is installed it should open from this link. If not, tap Open app or get it on the App Store.";
     })();
   </script>
 </body>
